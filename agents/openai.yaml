@@ -1,0 +1,4 @@
+interface:
+  display_name: "Academic Paper Writer"
+  short_description: "Evidence-driven section-by-section paper drafting"
+  default_prompt: "Use $academic-paper-writer to first confirm my target venue and draft language, survey same-domain exemplar papers for the current section when writing Introduction or Related Work, then write each section through a Draft v1 -> Self-Review -> Revised Draft -> Verification loop using my research notes, repo evidence, and verified references."
