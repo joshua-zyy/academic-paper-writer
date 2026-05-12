@@ -1,20 +1,29 @@
 ---
 name: "academic-reviser"
 description: "Use when self-reviewing, auditing, or verifying academic paper drafts — structured critique, verification gate, revision loop. Triggers on: 审修, self review, 自查, verification, revise, 修订, check draft."
+version: "1.0.0"
+status: "stable"
 ---
 
 # Academic Reviser
 
 将此 skill 视为"挑剔审稿人代理"——像 peer reviewer 一样审查自己的草稿，按证据→论证→风格三轮顺序执行检查，并输出可执行的修订与 Verification 判定。
 
+## Red Lines（绝对禁止）
+
+1. 禁止跳过检查顺序：必须证据→论证→风格，不得先修风格再查事实
+2. 禁止输出批评说明后沿用原稿：Revised Draft 必须真正吸收修改点
+3. 禁止在 citation debt / protocol debt / result debt / prose debt 未闭合时判为 passed
+4. 禁止删除占位符而不补真实内容
+5. 禁止因草稿篇幅长就假设它足够可信
+6. 禁止用更华丽的写法掩盖内容不足（如 related work 薄用漂亮 prose 包装）
+
 ## 非协商规则
 
-- 先检查事实与证据，再检查论证强度，最后检查结构与风格。不可跳过顺序。
-- 修订必须真正吸收 Self-Review 中发现的修改点，而不是只输出批评说明后沿用原稿。
-- 代码与方法一致性、实验与表格一致性必须检查。
-- 核心章节存在未闭合的 citation debt、protocol debt 或 result debt 时，Verification 不得判为 passed。
-- 存在 prose debt 或 thin_draft 时，Verification 不得判为 passed。
-- 只有满足终止条件时才能标记为 passed；否则输出"当前最佳版本 + 未闭合问题清单"。
+1. 代码与方法一致性、实验与表格一致性必须检查。
+2. 修订必须针对性修正，保持 evidence-first 原则：不确定的修正用占位符，不臆造。
+3. 只有满足终止条件时才能标记为 passed；否则输出"当前最佳版本 + 未闭合问题清单"。
+4. 遇到自欺信号（只修措辞不修证据、用长度代替可信度）必须主动标记为 failed。
 
 ## 任务模式
 
@@ -34,58 +43,27 @@ description: "Use when self-reviewing, auditing, or verifying academic paper dra
 
 ### Step 2: 第一轮 — 证据与事实检查
 
-详见 `references/revision-checklist.md`，逐项检查：
-
-1. 每个关键背景事实是否有 VERIFIED 引用
-2. 每个定量结果是否能追溯到本地证据
-3. 方法描述是否与代码或用户提供机制一致
-4. 表格、正文、摘要中的数字是否一致
-5. 是否把内部验证说成外部泛化
-6. 是否遗漏关键 baseline 或反例
-7. 若为 Method：是否写清整体架构、模块边界、输入输出和关键公式
-8. 若为 Method：是否给出图表放置位置或显式图占位
-9. 需要文献支撑的段落是否有 inline citation 或 [REF_NEEDED: ...]
-10. 参考文献列表中的条目是否都在正文中被实际引用
-11. 若为 Introduction / Related Work：是否先做过同领域 exemplar 调研
-12. 若为 Experimental Setup / Data：是否把领域常见默认协议误写成已确认事实
-13. 若为 Discussion / 解释性段落：是否清楚区分"观察结果"和"领域解释"
+详见 `references/revision-checklist.md`，逐项检查 13 项事实性问题。
 
 若任一项失败，先修事实，再谈语言。
 
 ### Step 3: 第二轮 — 论证强度与审稿风险检查
 
-从怀疑者视角提问（详见 `references/revision-checklist.md`）：
-
-- Reviewer 最可能攻击哪一条证据链？
-- 哪些地方的表述比证据更强？
-- 哪些局限性被藏起来了？
-- 哪些实验设计会被认为偏乐观？
-- 哪些 related work 被遗漏后会显得"选择性比较"？
-- 方法节是否只在复述直觉，而没有给出足够具体的结构、公式和实现细节？
-- 引言是否过早进入"我们提出了什么"而没有建立领域背景与缺口？
-- 相关工作是否只有论文名排队而无 work clusters 和综合比较？
-- 讨论中的领域解释是否有已核验文献支撑？
+详见 `references/revision-checklist.md`。从怀疑者视角提问 11 个审稿风险问题。
 
 对这些问题，要么补证据，要么弱化表述，要么把风险显式写出。
 
 ### Step 4: 第三轮 — 结构与风格检查
 
-只有在前两轮基本通过后，才重点检查（详见 `references/revision-checklist.md`）：
+详见 `references/revision-checklist.md`。只有在前两轮基本通过后，才检查 8 个结构/风格项。
 
-- 段落衔接是否清晰
-- 章节顺序是否合理
-- 术语是否前后一致
-- 图表引用是否完整
-- 是否符合目标 venue 的结构和语气
-- 正文引用样式是否统一
-- 正文中是否残留 AI 典型机械痕迹
-- 句子之间是否只靠连接词维持表面连贯
+注意：不得把语言润色放在事实检查之前。
 
 ### Step 5: 生成 Revised Draft
 
-- Revised Draft 必须真正吸收 Self-Review 中发现的修改点
-- 不是"重新生成一遍"，而是针对性修正后再输出
-- 保持 evidence-first 原则：不确定的修正用占位符，不臆造
+- 真正吸收 Self-Review 中发现的修改点
+- 不是"重新生成一遍"，而是针对性修正后输出
+- 保持 evidence-first 原则：不确定的修正用占位符
 
 ### Step 6: 输出 Section Critique 与 Verification Status
 
@@ -105,24 +83,114 @@ description: "Use when self-reviewing, auditing, or verifying academic paper dra
 - 仍未闭合的问题属于可继续自修，还是外部阻塞
 - 若 blocked：`safe_to_continue: yes|no` 和 `frozen_claims`
 
-## 常见自欺模式
+**完整输出示例**（passed 场景）：
 
-避免以下行为（详见 `references/common-pitfalls.md`）：
-- 只修措辞，不修证据
-- 把占位符删掉，却没有补真实内容
-- 因为草稿已经很长，就假设它足够可信
-- 看到一个高指标，就忽略协议缺陷
-- 用更华丽的写法掩盖 related work 不充分
+```md
+## Section Critique
+
+- Issues fixed:
+  - 补充了 3 处缺失的 inline citation（此前为 [REF_NEEDED: ...]）
+  - 降级了 2 处过度表述：将 "outperforms" 改为内部验证表述
+  - 在讨论节明确了当前评估受限于单数据集
+
+- Claims weakened or clarified:
+  - "Our method achieves SOTA" → "achieves competitive results on the evaluated benchmarks"
+  - "demonstrates strong generalization" → "shows promising results on internal validation"
+
+- Evidence still missing:
+  - 外部测试集评估结果（[RESULT_NEEDED: external test set evaluation]）
+  - 与 [StrongBaseline2024] 的比较（实验排队中）
+
+- Risks to carry into next section:
+  - 当前 split 为 file-level，subject-level 泄漏风险需在 Limitations 中讨论
+
+- Missing figure/table/formula placements: none
+
+- Missing or inconsistent inline citations: 已全部闭合
+
+## Verification Status
+
+- Verdict: passed
+- prose_debt: closed
+- thin_draft: no
+- Checks performed:
+  - [x] 事实与证据检查（13项）
+  - [x] 论证强度与审稿风险检查（11项）
+  - [x] 结构与风格检查（8项）
+  - [x] 代码与方法一致性检查
+  - [x] 引用闭合检查
+- Remaining issues:
+  - 外部测试集结果待补充（不阻塞继续，已标记 [RESULT_NEEDED]）
+- Can move to next section: yes
+```
+
+**完整输出示例**（blocked 场景）：
+
+```md
+## Section Critique
+
+- Issues fixed:
+  - 降级了 3 处强结论，改为中等强度表述
+
+- Claims weakened or clarified:
+  - "significantly improves" → "appears to improve"
+  - "robust to domain shift" → 改为 [RESULT_NEEDED: domain shift evaluation]
+
+- Evidence still missing:
+  - 核心模块 X 的设计动机无法从代码恢复
+  - 缺少 baseline Y 的比较结果
+
+- Risks to carry into next section:
+  - 当前 results section 依赖未闭合的 [RATIONALE_NEEDED]
+
+## Verification Status
+
+- Verdict: blocked
+- prose_debt: closed
+- thin_draft: no
+- Checks performed:
+  - [x] 事实与证据检查（13项）
+  - [x] 论证强度与审稿风险检查（11项）
+  - [x] 结构与风格检查（8项）
+- Remaining issues:
+  - [RATIONALE_NEEDED: 模块X设计动机] — 外部阻塞
+  - [RESULT_NEEDED: baseline Y comparison] — 外部阻塞
+- safe_to_continue: no
+- frozen_claims:
+  - Claim: "模块X通过机制M缓解了问题P"
+    Reason frozen: 设计动机无法从代码恢复，需要作者提供设计文档
+    Alternative text: "[RATIONALE_NEEDED: 模块X采用机制M的设计动机 | 预期缓解问题P | 需要作者提供]
+    Unfreeze condition: 作者提供模块X的设计文档或会议记录
+  - Claim: "方法在 baseline Y 上取得优势"
+    Reason frozen: 缺少 baseline Y 的完整比较数据
+    Alternative text: "[RESULT_NEEDED: baseline Y comparison | main results table]"
+    Unfreeze condition: 完成 baseline Y 实验并获得可复核指标
+```
+
+## 何时读取 references/
+
+| Reference 文件 | 打开条件 |
+|---------------|---------|
+| `references/revision-checklist.md` | 执行三轮审查时（Step 2-4） |
+| `references/verification-status.md` | 输出 Verification Status 时（Step 6） |
+| `references/common-pitfalls.md` | 自查是否存在自欺行为时 |
+
+## 不适用场景
+
+本 Skill 不适用于：
+- 非学术文体的通用文本审查
+- 需要领域专家知识才能判断的技术正确性（如特定医学诊断逻辑）
+- 仅需拼写/语法检查的场景（应使用 `academic-polishing` 的 de-ai-pass）
 
 ## 终止条件
 
-只有以下条件基本满足时，才把稿子当作当前版本定稿（passed）：
+只有以下条件基本满足时，才标记为 passed：
 - 关键主张有对应证据
 - 主要风险已被显式讨论
 - 未核验内容被清楚标记
 - 结果、表格、摘要相互一致
-- style brief 与正文不冲突
+- style brief 与正文不冲突（若适用）
 - 核心章节不再只是骨架式短稿
-- 无未闭合的 citation debt、protocol debt、result debt、prose debt
+- 无未闭合的 citation debt、protocol debt、result debt、prose debt、rationale debt
 
-否则，输出"当前最佳版本 + 未闭合问题清单"，不假装已经完成。
+否则，输出"当前最佳版本 + 未闭合问题清单"。

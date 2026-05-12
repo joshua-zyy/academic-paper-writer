@@ -1,22 +1,30 @@
 ---
 name: "academic-citation"
 description: "Use when searching, verifying, or mapping citations for academic papers — literature search, reference verification, citation-to-claim mapping, or exemplar set construction. Triggers on: 找引用, 文献检索, citation pass, find references, reference check, 补文献."
+version: "1.0.0"
+status: "stable"
 ---
 
 # Academic Citation
 
 将此 skill 视为"文献取证代理"，而不是搜索结果搬运器。
 
+## Red Lines（绝对禁止）
+
+1. 禁止编造文献、作者、年份、venue、DOI、arXiv 编号
+2. 禁止把 UNVERIFIED 条目当作 VERIFIED 写入正文
+3. 禁止在正文没有任何 inline citation 的情况下输出参考文献列表
+4. 禁止只引用与自己最相似的方法而故意忽略强基线或不利比较
+5. 禁止因为"搜索结果第一页看完了"就停止检索
+
 ## 非协商规则
 
-- 不编造文献、作者、年份、venue、DOI、arXiv 编号。
-- 只有经过核验的文献才能进入 `Verified References`；未核验条目必须标 `UNVERIFIED`。
-- 优先使用一级来源（官方 proceedings、期刊官网、OpenReview、PMLR、ACL Anthology、IEEE Xplore、ACM Digital Library、PubMed、arXiv、DBLP）核验元数据。
-- 不要因为"搜索结果第一页看完了"就停止检索；检索结束的标准是覆盖充分。
-- 对 `Introduction` 或 `Related Work`，除正文引用外，还必须建立同领域 `Exemplar Set`，用于学习章节组织与论证顺序，而非复制原文措辞。
-- 每条用于正文的引用必须有对应的 inline citation marker 和 Citation-to-Claim 映射记录。
-- 不输出"有参考文献列表但正文没有 inline citation"的状态。
-- 参考文献列表只能包含正文中已被引用或以 `[REF_NEEDED: ...]` 声明的条目；不生成与正文脱节的 bibliography。
+1. 只有经过核验的文献才能进入 `Verified References`；未核验条目必须标 `UNVERIFIED`。
+2. 优先使用一级来源（官方 proceedings、期刊官网、OpenReview、PMLR、ACL Anthology、IEEE Xplore、ACM Digital Library、PubMed、arXiv、DBLP）核验元数据。
+3. 检索结束的标准是覆盖充分，而非看了几页搜索结果。完整论文至少达到 8-15 篇 VERIFIED 文献，短论文至少 4-8 篇。
+4. 对 Introduction 或 Related Work，除正文引用外，还必须建立同领域 `Exemplar Set`（3-5 篇 Introduction exemplars + 4-8 篇 Related Work exemplars），用于学习章节组织与论证顺序，而非复制原文措辞。
+5. 每条用于正文的引用必须有对应的 inline citation marker 和 Citation-to-Claim 映射记录。
+6. 参考文献列表只能包含正文中已被引用或以 `[REF_NEEDED: ...]` 声明的条目。
 
 ## 任务模式
 
@@ -31,7 +39,7 @@ description: "Use when searching, verifying, or mapping citations for academic p
 
 - 明确当前是为哪个 section 做引用（Introduction / Related Work / Method / Experiments / Discussion）
 - 提取关键检索词：任务名、方法家族、数据集、模态
-- 若为 `Introduction` 或 `Related Work`，额外确认是否需要 Exemplar Set
+- 若为 Introduction 或 Related Work，额外确认是否需要 Exemplar Set
 
 ### Step 2: 执行多轮检索
 
@@ -42,11 +50,7 @@ description: "Use when searching, verifying, or mapping citations for academic p
 3. **基线导向查询** — `<task> baseline`、`<classical model> <task>`
 4. **时间导向查询** — `<task> 2024`、`<task> 2025`
 
-对 `Introduction` / `Related Work`，增加章节组织导向查询，用于构建 Exemplar Set。
-
-检索量级下限：
-- 完整论文：优先达到 8-15 篇 VERIFIED 文献
-- 短论文或 early draft：优先达到 4-8 篇 VERIFIED 文献
+对 Introduction / Related Work，增加章节组织导向查询，用于构建 Exemplar Set。
 
 ### Step 3: 核验每篇候选文献
 
@@ -54,12 +58,12 @@ description: "Use when searching, verifying, or mapping citations for academic p
 
 逐篇确认：标题准确、作者列表准确、venue 准确、年份准确、来源链接可定位到原始论文页面。
 
-只有以上全部确认的条目才能标为 `VERIFIED`。任一信息无法确认则标为 `UNVERIFIED`，不得写入正文确定性引用。
+全部确认 → `VERIFIED`。任一无法确认 → `UNVERIFIED`，不得写入正文确定性引用。
 
 ### Step 4: 构建 Exemplar Set（Introduction / Related Work 时）
 
-- Introduction：优先观察 3-5 篇同任务、同模态或相近方法论文的引言
-- Related Work：优先观察 4-8 篇同领域论文的相关工作组织方式
+- Introduction：至少观察 3-5 篇同任务、同模态或相近方法论文的引言
+- Related Work：至少观察 4-8 篇同领域论文的相关工作组织方式
 
 提炼内容（不是复制段落）：
 - 常见章节功能单元
@@ -71,10 +75,7 @@ description: "Use when searching, verifying, or mapping citations for academic p
 
 详见 `references/citation-mapping.md`。
 
-为每条正文使用的文献记录：
-- 支撑的段落或主张
-- 在正文中的 inline citation marker
-- 引用目的（背景事实 / 方法比较 / 基线来源 / 数据集来源 等）
+为每条正文使用的文献记录：支撑的段落或主张、inline citation marker、引用目的（背景事实/方法比较/基线来源/数据集来源）。
 
 ### Step 6: 输出
 
@@ -105,11 +106,26 @@ description: "Use when searching, verifying, or mapping citations for academic p
 - [REF_NEEDED: ...] — 哪些主张仍缺文献支撑
 ```
 
+## 何时读取 references/
+
+| Reference 文件 | 打开条件 |
+|---------------|---------|
+| `references/search-strategy.md` | 设计检索查询时（Step 2） |
+| `references/verification-protocol.md` | 核验候选文献时（Step 3） |
+| `references/citation-mapping.md` | 建立 Citation-to-Claim 映射时（Step 5） |
+
+## 不适用场景
+
+本 Skill 不适用于：
+- 生成 LaTeX/BibTeX 格式化引用书目（仅负责检索核验与映射）
+- 非 CS/AI/ML 领域的文献检索（如临床医学、法律）
+- 用户已有完整引用列表且明确不需要核验的场景
+
 ## 失败处理
 
-- 文献搜不到：如实报告"未找到足够可靠来源"，不补假引文。
-- 无法联网：明确哪些引用无法核验，相关结论降级为占位或待核验表述。
-- 遇本地 PDF 或旧草稿中的引文：作为 seed source，仍须回到一级来源核验。
+- **文献搜不到**：如实报告"未找到足够可靠来源"，不补假引文。
+- **无法联网**：明确哪些引用无法核验，相关结论降级为占位或待核验表述。
+- **遇本地 PDF 或旧草稿中的引文**：作为 seed source，仍须回到一级来源核验。
 
 ## 何时降低检索强度
 

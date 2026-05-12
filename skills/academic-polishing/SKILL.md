@@ -1,21 +1,39 @@
 ---
 name: "academic-polishing"
 description: "Use when polishing academic prose, de-AI-ifying text, controlling claim strength, or rewriting method sections into proper narrative form. Triggers on: 润色, polish, improve writing, 去AI, de-AI, claim strength, 改写, rewrite method, prose quality."
+version: "1.0.0"
+status: "stable"
 ---
 
 # Academic Polishing
 
 将此 skill 视为"学术文体打磨代理"——不是简单润色，而是执行 prose 质量闸门、去AI化改写、claim 强度控制和 Method 专项叙事强化。
 
+## Red Lines（绝对禁止）
+
+1. 禁止将编造内容包装成学术表述
+2. 禁止在无数据支撑时使用"显著的""重要的"等空洞强化词
+3. 禁止把未核验的 user_claim 改写成确定性的强结论
+4. 禁止在 Method 中保留元评论、代码讲解或审稿人对话口吻
+5. 禁止用更华丽的措辞掩盖 evidence gap（如用长篇 prose 包装缺失的实验结果）
+
+## AI 介入边界（Traffic Light）
+
+| 🟢 Green — 直接执行 | 🟡 Yellow — 谨慎执行 | 🔴 Red — 禁止 |
+|---------------------|---------------------|-------------|
+| 替换空洞形容词为具体描述 | 从代码/实现推断设计动机（必须降级语气） | 编造实验证据、虚构数值 |
+| 替换 AI 典型连接词 | 补全方法细节描述（必须标注推断来源） | 生成假引用或假数据 |
+| 调整句式衔接和逻辑连接 | 扩写 Discussion 中的领域解释（必须有文献） | 把 user_claim 改写成强结论 |
+| 改写语法错误和不自然表述 | 降级不匹配的 claim 强度 | 删除占位符但不补内容 |
+| 将提纲句改写为完整段落 | 将弱推断改写成确定性作者意图 | 在无证据时添加"显著提升"类表述 |
+
 ## 非协商规则
 
-- 正文应读起来像经验丰富的人类学者撰写，而非模板驱动的机器输出。
-- 空洞强化词必须有数据或 VERIFIED 引用支撑，否则删除或替换为具体描述。
-- AI 典型连接词（Moreover、Furthermore、However、Therefore、In summary）必须替换为上下文相关的自然表述。
-- 句子之间应建立因果、递进、转折或并列补足的深层逻辑，而非只靠连接词维持表面连贯。
-- 正文不得残留元评论口吻、审稿人对话口吻、代码讲解口吻或 checklist 痕迹。
-- Claim 强度必须与证据等级匹配：强结论需有本地可复核结果 + 无协议缺陷。
-- Method 相关 section 必须形成"问题 → 设计 → 机制 → 收益/边界"叙事，而非公式罗列。
+1. 正文必须读起来像经验丰富的人类学者撰写，不得有模板驱动的机器输出痕迹。
+2. 句子之间必须建立因果、递进、转折或并列补足的深层逻辑，不得只靠连接词维持表面连贯。
+3. 正文不得残留元评论口吻、审稿人对话口吻、代码讲解口吻或 checklist 痕迹。
+4. Claim 强度必须与证据等级严格匹配：强结论需有本地可复核结果 + 无协议缺陷。
+5. Method 相关 section 必须形成"问题 → 设计 → 机制 → 收益/边界"叙事，不得停留于公式罗列。
 
 ## 任务模式
 
@@ -28,12 +46,9 @@ description: "Use when polishing academic prose, de-AI-ifying text, controlling 
 
 ### Step 1: 确认当前 section 类型与改写目标
 
-- 明确是 Introduction / Related Work / Method / Experiments / Discussion / Conclusion
-- 不同 section 有不同的 prose 检查重点
+明确是 Introduction / Related Work / Method / Experiments / Discussion / Conclusion。不同 section 有不同的 prose 检查重点。
 
 ### Step 2: 执行通用 Prose Quality Gate
-
-检查以下项目并记录：
 
 **通用检查项：**
 - 正文是否仍以提纲句、说明句为主，而非完整 prose 段落
@@ -46,9 +61,7 @@ description: "Use when polishing academic prose, de-AI-ifying text, controlling 
 - Experimental Setup / Data：是否只有参数或流程罗列，缺少协议、约束与风险说明
 - Discussion / Limitations / Conclusion：是否只有泛泛结论，缺少边界分析、失败模式或限制讨论
 
-输出：
-- `prose_debt: open|closed`
-- `failed_items: [list]`
+输出：`prose_debt: open|closed`、`failed_items: [list]`
 
 ### Step 3: Prose Rewrite（若 prose_debt 为 open）
 
@@ -57,9 +70,11 @@ description: "Use when polishing academic prose, de-AI-ifying text, controlling 
 - 将罗列式段落改为具有论证链和段内逻辑衔接的连贯段落
 - 执行去AI化改写（参考 `references/de-ai-patterns.md`）
 
+Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 prose_debt: open，允许继续后续步骤但最终 Verification 不得判为 passed。
+
 ### Step 4: Method Prose Rewrite（若当前为 Method section）
 
-在通用 Prose Quality Gate 之后，额外执行 Method 专项强化（详见 `references/method-narrative.md`）：
+详见 `references/method-narrative.md`。
 
 重点检查：
 - 是否仍存在公式罗列而缺少"问题 → 设计 → 机制 → 收益/边界"叙事
@@ -82,9 +97,7 @@ description: "Use when polishing academic prose, de-AI-ifying text, controlling 
 | Medium | 内部验证 / baseline 不全 | suggest, indicate, appears to improve |
 | Weak | 仅 user_claim / 无法复核 | may, could, requires further validation |
 
-- 主动降级不匹配的 claims
-- 把内部验证包装成外部泛化 → 必须降级
-- 把缺失 baseline 的结果写成 SOTA → 必须降级
+必须主动降级不匹配的 claims。把内部验证包装成外部泛化 → 必须降级。把缺失 baseline 的结果写成 SOTA → 必须降级。
 
 ### Step 6: 输出
 
@@ -101,3 +114,18 @@ description: "Use when polishing academic prose, de-AI-ifying text, controlling 
 - Original: "X outperforms Y" → Revised: "X appears to improve over Y on internal validation"
 - ...
 ```
+
+## 何时读取 references/
+
+| Reference 文件 | 打开条件 |
+|---------------|---------|
+| `references/de-ai-patterns.md` | 执行去AI化改写、Prose Quality Gate 通用检查时 |
+| `references/claim-strength.md` | 执行 Claim Strength Audit 时 |
+| `references/method-narrative.md` | 当前为 Method section、执行 Method Prose Rewrite 时 |
+
+## 不适用场景
+
+本 Skill 不适用于：
+- 非学术文体的通用文本润色
+- 已有明确 LaTeX 格式且不需内容修改的场景
+- 内容补全（如补实验数据、补引用）——应使用 `academic-experiments` 或 `academic-citation`

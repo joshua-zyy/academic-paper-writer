@@ -1,21 +1,30 @@
 ---
 name: "academic-experiments"
 description: "Use when auditing, running, or verifying experimental evidence for academic papers — experiment inventory, result verification, protocol risk assessment. Triggers on: 复核实验, run experiments, 实验结果, experiment evidence, verify results, 实验验证."
+version: "1.0.0"
+status: "stable"
 ---
 
 # Academic Experiments
 
 将此 skill 视为"实验取证代理"，目标是建立最短且可信的证据链，而不是尽量多跑实验。
 
+## Red Lines（绝对禁止）
+
+1. 禁止编造实验结果、图表、命令或运行日志
+2. 禁止把 user_claim（用户口述）当作最终结果写入正文
+3. 禁止把"领域里常见的预处理/协议默认值"写成当前项目已确认事实
+4. 禁止把内部验证包装成外部泛化或 SOTA 结论
+5. 禁止因运行受阻就把旧草稿中的数字重新包装成已验证结果
+6. 禁止在不知道图表数据来源的情况下将图表结论写进论文
+
 ## 非协商规则
 
-- 不编造实验结果、图表、命令或运行日志。
-- 区分三类证据：`newly_run`（本轮执行）、`preexisting_artifact`（已有产物）、`user_claim`（用户口述）。只把前两类当作可直接引用的证据。
-- `user_claim` 只能写成待核验信息，不能当作最终结果。
-- 正文中的定量结果优先来自 `newly_run`。若无法重跑，可用 `preexisting_artifact` 但必须标注来源与限制。
-- 不要把"领域里常见的预处理/协议默认值"直接写进正文冒充当前项目事实。
-- 不能运行则明确报告阻塞点、已尝试命令和缺失条件，不得伪装成"已验证"。
-- 若结果仅为内部验证，明确写成 `internal validation`，不得包装成最终泛化结论或 SOTA 结论。
+1. 区分三类证据：`newly_run`（本轮执行）、`preexisting_artifact`（已有产物）、`user_claim`（用户口述）。只把前两类当作可直接引用的证据。
+2. 正文中的定量结果优先来自 `newly_run`。若无法重跑，可用 `preexisting_artifact` 但必须标注来源与限制。
+3. 不能运行则明确报告阻塞点、已尝试命令和缺失条件，不得伪装成"已验证"。
+4. 先验证环境 → 再跑最小可复核命令（如评估已有 checkpoint） → 只有在确有必要时才重训。不得一上来就 full training。
+5. 写结果时先交代 split 和 aggregation level，再给数字。不得跳过协议直接报指标。
 
 ## 任务模式
 
@@ -31,7 +40,6 @@ description: "Use when auditing, running, or verifying experimental evidence for
 
 - 配置文件（config.*）
 - 入口脚本（main.* / train.* / eval.*）
-- 运行脚本（run_*.sh / run_*.ps1）
 - 环境文件（requirements.txt / environment.yml）
 - Checkpoint 文件
 - 日志与输出（logs/ / outputs/ / results/）
@@ -45,48 +53,43 @@ description: "Use when auditing, running, or verifying experimental evidence for
 
 ### Step 2: 运行策略
 
-默认顺序（详见 `references/run-strategy.md`）：
+按优先级顺序执行（详见 `references/run-strategy.md`）：
 
-1. 先验证环境是否可用
-2. 再定位最小可复核命令
-3. 先跑评估或解释脚本
+1. 验证环境是否可用（Python/CUDA 版本、依赖）
+2. 定位最小可复核命令（评估已有 checkpoint）
+3. 运行评估或解释脚本
 4. 只有在确有必要时才重训
-
-优先动作示例：
-- 评估现有 `best_model.pth`
-- 运行解释脚本验证图表来源
-- 复核单个 split 的指标计算流程
-- 检查 subject-level 与 file-level 划分差异
 
 ### Step 3: 记录运行结果
 
-对每个进入论文正文的实验结果，至少记录：
+详见 `references/run-strategy.md`。对每个进入论文正文的实验结果，至少记录：
 
 ```md
 ## Experiment Evidence
-
 - Status: newly_run / preexisting_artifact / blocked
-- Command: ...
-- Workdir: ...
-- Environment: ...
-- Inputs: ...
-- Key Config: ...
-- Output Artifacts: ...
-- Metrics Used In Draft: ...
-- Protocol Risks: ...
+- Command: （实际执行的命令）
+- Workdir: （工作目录）
+- Environment: （Python/CUDA版本、关键依赖）
+- Inputs: （输入数据、checkpoint路径）
+- Key Config: （关键超参数）
+- Output Artifacts: （输出文件路径）
+- Metrics Used In Draft: （正文中引用的指标值）
+- Protocol Risks: （见 Step 4）
 ```
 
 ### Step 4: 协议风险评估
 
-主动记录（详见 `references/protocol-risks.md`）：
+主动记录以下风险（详见 `references/protocol-risks.md`）：
 
-- 数据泄漏风险
-- 验证集调参
-- baseline 缺失
-- 没有独立测试集
-- 只有单次运行、没有方差
-- 把 file-level split 写成 subject-level split
-- 把验证集调阈值后的结果写成最终测试性能
+| 风险类型 | 检查点 |
+|---------|--------|
+| 数据泄漏 | 训练/测试划分是否规范 |
+| 验证集调参 | 是否用验证集选阈值后报告测试性能 |
+| baseline 缺失 | 是否缺少关键对比方法 |
+| 无独立测试集 | 是否只有交叉验证或内部划分 |
+| 单次运行 | 是否有方差估计 |
+| 指标定义模糊 | 指标计算方式是否与标准定义一致 |
+| 图表溯源不明 | 图表是否可追溯到对应脚本和 checkpoint |
 
 ### Step 5: 输出
 
@@ -104,14 +107,20 @@ description: "Use when auditing, running, or verifying experimental evidence for
 （无法运行的实验、缺失的数据/环境/依赖）
 ```
 
-## 写结果时的约束
+## 何时读取 references/
 
-- 先写协议，再写指标
-- 先交代 split 和 aggregation level，再给数字
-- 如果结果来自旧 artifact，写清"来自现有 checkpoint / 现有输出文件"
-- 如果结果只支持内部验证，写成 internal validation，不升级成 generalization claim
-- 如果发现协议有缺陷，主动写入 `Discussion / Limitations`
-- 对实验协议与预处理细节，区分 `repo/artifact-verified protocol` 与 `domain-typical assumption`
+| Reference 文件 | 打开条件 |
+|---------------|---------|
+| `references/evidence-inventory.md` | 执行证据盘点时（Step 1） |
+| `references/run-strategy.md` | 规划运行策略和记录结果时（Step 2-3） |
+| `references/protocol-risks.md` | 评估协议风险时（Step 4） |
+
+## 不适用场景
+
+本 Skill 不适用于：
+- 非 CS/AI/ML 领域的实验（如湿实验、临床实验）
+- 纯理论论文（无实验产物需要复核）
+- 用户明确只需要文献综述的场景
 
 ## 失败处理
 
@@ -120,4 +129,4 @@ description: "Use when auditing, running, or verifying experimental evidence for
 - 记录已尝试命令
 - 标出缺失环境、缺失数据、缺失依赖或超长运行成本
 - 将结果节降级为"已知证据 + 待复核项"
-- 不要因为运行受阻，就把旧草稿中的数字重新包装成已验证结果
+- 不得因运行受阻而将旧草稿数字重新包装为已验证结果
