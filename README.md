@@ -1,6 +1,6 @@
 # Academic Paper Writer
 
-面向 CS / AI / ML 领域的**模块化、证据驱动**论文写作 Agent Skill 集合。将论文写作拆分为 5 个独立子 Skill：编排核心、文体润色、文献引用、审修验证、实验复核。每个子 Skill 可独立触发使用，也可由编排核心串联为完整写作流程。
+面向 CS / AI / ML 领域的**模块化、证据驱动**论文写作 Agent Skill 集合。将论文写作拆分为 6 个独立子 Skill：编排核心、文体润色、文献引用、审修验证、实验复核、论文绘图。每个子 Skill 可独立触发使用，也可由编排核心串联为完整写作流程。
 
 ---
 
@@ -13,6 +13,7 @@
 | `academic-citation` | 文献引用：检索、核验、Citation-to-Claim 映射、Exemplar Set 构建 | "找引用"、"文献检索"、"citation pass" |
 | `academic-reviser` | 审修验证：三轮自审（证据→论证→风格）、Verification 判定 | "审修"、"self review"、"verification" |
 | `academic-experiments` | 实验复核：证据盘点、最小可复核执行、协议风险审计 | "复核实验"、"verify results" |
+| `academic-figure` | 论文绘图：实验数据图（Python 自动出图） + 模型架构图（生图提示词） | "绘图"、"画图"、"架构图"、"训练曲线" |
 
 ---
 
@@ -20,12 +21,13 @@
 
 **证据优先，逐节闭环** — 每节经历 `Draft → Quality Gate → Expansion → Self-Review → Revision → Verification`。
 
-**模块独立，可编排** — 五个 Skill 各有独立触发词和完整 references/，由 core 在关键步骤委托调度：
+**模块独立，可编排** — 六个 Skill 各有独立触发词和完整 references/，由 core 在关键步骤委托调度：
 
 | Core Step | 委托 Skill |
 |-----------|-----------|
 | 文献检索与核验 | `academic-citation` |
 | 实验事实复核 | `academic-experiments` |
+| 实验图表生成（可选） | `academic-figure` |
 | Prose 质量闸门 | `academic-polishing` |
 | 自我审查与 Verification | `academic-reviser` |
 
@@ -72,13 +74,24 @@ academic-paper-writer/
     │       ├── revision-checklist.md
     │       ├── verification-status.md
     │       └── common-pitfalls.md
-    └── academic-experiments/         # 实验复核
+    ├── academic-experiments/         # 实验复核
+    │   ├── SKILL.md
+    │   ├── README.md
+    │   └── references/
+    │       ├── evidence-inventory.md
+    │       ├── run-strategy.md
+    │       └── protocol-risks.md
+    └── academic-figure/              # 论文绘图
         ├── SKILL.md
         ├── README.md
         └── references/
-            ├── evidence-inventory.md
-            ├── run-strategy.md
-            └── protocol-risks.md
+            ├── api.md
+            ├── chart-types.md
+            ├── design-theory.md
+            ├── architecture-prompting.md
+            ├── figure-contract.md
+            ├── qa-contract.md
+            └── tutorials.md
 ```
 
 ---
@@ -107,6 +120,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 > "帮我找几篇关于 ViT 医学图像的引用" → `academic-citation`
 > "帮我 self review 这节 Introduction" → `academic-reviser`
 > "帮我盘点这个仓库的实验产物" → `academic-experiments`
+> "根据这个 CSV 画训练曲线对比图" → `academic-figure`
 
 ---
 
@@ -118,6 +132,7 @@ Step 1  确认 venue / 语言（Blocking Gate：缺失则停等）
 Step 2  审计当前节证据
 Step 3  文献检索与核验 → 委托 academic-citation
 Step 4  实验事实复核 → 委托 academic-experiments
+Step 4.5 实验图表生成（可选） → 委托 academic-figure
 Step 5  生成 Section Blueprint / Method Blueprint
 Step 6  起草 Draft v1（含占位符系统）
 Step 7  Prose Quality Gate → 委托 academic-polishing

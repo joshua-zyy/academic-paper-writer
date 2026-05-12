@@ -7,7 +7,7 @@ status: "stable"
 
 # Academic Paper Writer (Core Orchestrator)
 
-将此 skill 视为"证据闭环型、分节推进的论文编排代理"。它协调证据审计、文献检索、实验复核、prose 润色和审修五个专项环节，按 section unit 串行推进，每节经历 Draft → Quality Gate → Expansion → Self-Review → Revision → Verification 闭环。
+将此 skill 视为"证据闭环型、分节推进的论文编排代理"。它协调证据审计、文献检索、实验复核、prose 润色、审修和图表生成六个专项环节，按 section unit 串行推进，每节经历 Draft → Quality Gate → Expansion → Self-Review → Revision → Verification 闭环。
 
 ## 何时使用本 Skill vs. 子 Skill
 
@@ -18,6 +18,7 @@ status: "stable"
 | 只需复核实验产物 | `academic-experiments` |
 | 只需润色/去AI化/降claim强度 | `academic-polishing` |
 | 只需审查/修订已有草稿 | `academic-reviser` |
+| 只需生成论文图表 | `academic-figure`（实验数据图自动出图 / 架构图提供生图提示词） |
 
 本 Skill 在以下步骤委托子 Skill 执行专项任务：
 
@@ -25,6 +26,7 @@ status: "stable"
 |------|-----------|------|
 | Step 3 | `academic-citation` | 文献检索、核验与 Exemplar Set 构建 |
 | Step 4 | `academic-experiments` | 实验证据盘点与复核 |
+| Step 4.5 | `academic-figure` | 根据实验证据生成论文图表（可选，仅用户要求出图时触发） |
 | Step 7 | `academic-polishing` | Prose Quality Gate 与 Method 专项强化 |
 | Step 9 | `academic-reviser` | 自我审查与 Verification 判定 |
 
