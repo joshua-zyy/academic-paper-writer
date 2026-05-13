@@ -64,7 +64,7 @@ description: "Use when user needs to create, revise, or audit academic figures f
   ├─ 实验数据图 → chart-from-data 模式
   └─ 模型架构图 → arch-prompt 模式
 
-自动触发：academic-paper-writer 的 Step 6.5 在 Draft v1 完成后，会自动扫描正文中的 [FIGURE_NEEDED] 占位符，
+自动触发：academic-paper-writer 的 Step 7 在 Draft v1 完成后，会自动扫描正文中的 [FIGURE_NEEDED] 占位符，
 对架构图类占位符以 arch-prompt 模式调用本 Skill 的生图提示词生成能力。
 ```
 
@@ -242,7 +242,7 @@ required = ["matplotlib", "seaborn", "numpy", "pandas", "scipy"]
 |------|------|
 | `agents/figure_agent.md` | 图表类型选择与生成规范 |
 
-**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 7 委托时加载参考，核心编排器根据此规范**自行执行**相关操作，不将任务 dispatch 给独立子代理。**此 agent 只生成图表，绝对不得修改项目源代码、配置文件或数据文件**。
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 7 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只生成图表，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
 
 ## 何时读取 references/
 

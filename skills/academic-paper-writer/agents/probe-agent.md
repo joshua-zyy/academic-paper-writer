@@ -42,6 +42,30 @@ baseline_results: string[] | null     # 基线结果描述
 ablation_results: string[] | null     # 消融结果描述
 ```
 
+### baseline_results — 基线结果探查
+**目标**：定位与主方法对比的基线结果、来源与可比性说明
+**产出**：
+```yaml
+baseline_results:
+  - baseline_name: string
+    metrics: string[]                 # 如 ["ACC 89.2", "AUC 0.931"]
+    source: string                    # 表格、日志、CSV 或论文引用路径
+    comparison_scope: string          # 同数据集/同划分/同指标等
+    evidence: "artifact-verified" | "inferred-from-gap" | "missing"
+```
+
+### ablation_results — 消融结果探查
+**目标**：定位模块删减、参数变体或设置变化带来的消融结果
+**产出**：
+```yaml
+ablation_results:
+  - ablation_name: string
+    variant: string
+    metrics: string[]                 # 如 ["ACC 87.4", "delta -1.8"]
+    source: string                    # 表格、日志、CSV 或图表路径
+    evidence: "artifact-verified" | "inferred-from-gap" | "missing"
+```
+
 ### experiment_config — 配置协议探查
 **目标**：定位训练配置、超参数、数据集划分细节  
 **产出**：

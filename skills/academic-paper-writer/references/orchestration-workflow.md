@@ -3,6 +3,8 @@
 This file contains the detailed step-by-step workflow for the core orchestrator.
 Load this when executing the section drafting loop.
 
+This file is the single detailed execution manual for the core orchestrator. When `SKILL.md` provides only summaries, follow the exact procedures, templates, and fallback paths defined here.
+
 ## 执行约束（硬性规则）
 
 - **主 Agent 只撰写论文文本，绝对不得修改项目源代码、配置文件或数据文件**。探查时只读，图表代码生成时创建新文件而非覆盖现有文件。
@@ -256,6 +258,8 @@ Output: Verified References, Exemplar Set (for Intro/RW), Citation-to-Claim Map 
 
 Constraint: only VERIFIED references enter the draft body. UNVERIFIED entries stay in candidate lists.
 
+For Introduction / Related Work: if retries still produce zero VERIFIED references and the user cannot provide usable seed papers, block before Step 6. Do **not** proceed with a `[REF_NEEDED]`-only draft for these sections.
+
 ## Step 4: Experiment Evidence Verification
 
 - Create a todo list for experiment evidence items.
@@ -482,6 +486,8 @@ This is Phase 1. Only proceed to Phase 2 (prose polishing) after `evidence_debt 
 Input: Draft v1 text, Evidence Map, Verified References, placeholder_debt from Step 7.
 Output: `evidence_debt` (open|closed), `evidence_issues` list.
 
+If protocol risks from Step 4 materially weaken a claim's support (for example: no independent test set, missing strong baselines, or single-run results used for strong conclusions), keep `evidence_debt = open` for that claim until the text is downgraded, the risk is made explicit, or the claim is frozen/blocked.
+
 If `evidence_debt = open`, record issues and return to Step 6. Do not proceed to Step 9 while open.
 
 ## Step 9: Prose Quality Gate (Phase 2 of Two-Phase Review)
@@ -660,32 +666,11 @@ When generating Abstract:
 
 ---
 
-## Cross-Skill Data Contracts
+## Shared Inputs and References
 
-| Contract | Producer → Consumer | Purpose |
-|----------|---------------------|---------|
-| `../shared/schemas/evidence-inventory.md` | `academic-experiments`, Step 2 → Step 6 | Experiment evidence |
-| `../shared/schemas/verified-references.md` | `academic-citation` → Step 6 | Verified references |
-| `../shared/schemas/verification-report.md` | `academic-reviser` → Step 11 | Verification status |
+Cross-skill data contracts, shared concept references, and reference-loading guidance are maintained in `skills/academic-paper-writer/SKILL.md` as the high-level orchestrator index.
 
-Shared references in `../shared/references/`:
-- `evidence-classification.md` — evidence type definitions
-- `placeholder-guide.md` — placeholder system spec
-- `paper-types.md` — paper type definitions
-- `mode-spectrum.md` — mode spectrum (fidelity vs originality)
-- `data-access-levels.md` — cross-skill data access boundaries
-
-## When to Read Which Reference
-
-| Reference file | Load condition |
-|----------------|---------------|
-| `references/paper-structure.md` | Determining section structure and goals |
-| `references/writing-guidelines.md` | Venue style adaptation |
-| `references/iteration-control.md` | Entering Draft → Revision → Verification loop |
-| `references/content-density.md` | Expansion Pass (Step 10) |
-| `references/exemplar-sections/` | Before writing Intro / RW / Method / Experiments / Abstract |
-| `references/test-scenarios.md` | Regression testing after skill changes |
-| `references/section-dependency-matrix.md` | Step 12 dependency checks |
-| `references/orchestration-workflow.md` | Executing detailed step workflow (this file) |
-| `../shared/schemas/...` | Receiving/consuming cross-skill data |
-| `../shared/references/...` | Understanding shared concepts |
+When executing a concrete step in this file:
+- read the referenced schema under `../shared/schemas/` if the step consumes or produces structured cross-skill data
+- read the referenced file under `references/` when that step explicitly calls for it
+- use `../shared/references/` for shared evidence, placeholder, paper-type, mode-spectrum, and data-boundary concepts

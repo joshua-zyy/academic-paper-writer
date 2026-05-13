@@ -133,7 +133,7 @@ Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 
 |------|------|
 | `agents/polishing_agent.md` | Prose 质量检查与 claim 强度审计规范 |
 
-**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 9 委托时加载参考，核心编排器根据此规范**自行执行**相关操作，不将任务 dispatch 给独立子代理。**此 agent 只修改论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件**。
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 9 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只修改论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写整节论文**。
 
 ## 何时读取 references/
 

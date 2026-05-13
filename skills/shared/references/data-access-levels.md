@@ -1,6 +1,6 @@
 # 数据访问级别
 
-每个 SKILL.md frontmatter 中的 `data_access_level` 字段定义该技能可接触的数据范围。
+本文件定义的是跨技能协作时的**运行时数据边界约定**，不是当前仓库中已实现的 frontmatter 字段。
 
 ## 级别定义
 
@@ -12,6 +12,14 @@
 
 ## 使用规则
 
-- 子 Skill 的 `data_access_level` 不得高于编排器的级别
+- 编排器在向子 Skill 传递上下文时，应保证子 Skill 的实际输入不超出其约定级别
 - `raw` → `redacted` → `verified_only` 为递减方向
 - 高级别技能委托低级别子 Skill 时，必须先经过 Gate B（引用合规门控）过滤后再传递数据
+
+## 当前项目中的解释方式
+
+- `academic-experiments` 和代码/数据探查类任务可视为 `raw`
+- `academic-polishing` 更接近 `redacted`
+- `academic-paper-writer`、`academic-citation`、`academic-reviser` 默认按 `verified_only` 处理最终可写入正文的结论
+
+若未来需要把该约束升级为可机器读取的元数据，应先确认所使用的 Skill 规范允许扩展 frontmatter 字段，再统一落地。

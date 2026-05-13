@@ -95,6 +95,8 @@ description: "Use when user needs to audit, run, or verify experimental evidence
 | 指标定义模糊 | 指标计算方式是否与标准定义一致 |
 | 图表溯源不明 | 图表是否可追溯到对应脚本和 checkpoint |
 
+若某项协议风险足以削弱正文主张的证据强度（如无独立测试集、缺少关键 baseline、仅单次运行却写成强结论），后续 Step 8 应保持对应 claim 的 `evidence_debt = open`，直到该主张被降级、风险被显式写出，或该 claim 被冻结/阻塞。
+
 ### Step 5: 输出
 
 输出按 `../shared/schemas/evidence-inventory.md` 中的 Evidence Inventory Schema 组织数据。以下是 Schema 数据的人可读呈现形式：
@@ -136,7 +138,7 @@ description: "Use when user needs to audit, run, or verify experimental evidence
 |------|------|
 | `agents/experiment_agent.md` | 实验盘点与运行规范 |
 
-**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 4 委托时加载参考，核心编排器根据此规范**自行执行**相关操作，不将任务 dispatch 给独立子代理。**此 agent 可运行实验但绝对不得修改项目源代码或数据文件**。
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 4 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 可运行实验但绝对不得修改项目源代码或数据文件，也不得独立撰写论文正文**。
 
 ## 何时读取 references/
 

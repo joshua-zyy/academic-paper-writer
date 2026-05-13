@@ -183,7 +183,7 @@ description: "Use when user needs to self-review, audit, or verify academic pape
 |------|------|
 | `agents/reviser_agent.md` | 三轮审查流程与 Verification 判定规范 |
 
-**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 8 和 Step 11 委托时加载参考，核心编排器根据此规范**自行执行**相关操作，不将任务 dispatch 给独立子代理。**此 agent 只审查论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件**。
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 8 和 Step 11 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只审查论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
 
 ## 何时读取 references/
 

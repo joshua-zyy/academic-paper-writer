@@ -131,7 +131,7 @@ description: "Use when user needs to search, verify, or map citations for academ
 |------|------|
 | `agents/citation_agent.md` | 文献检索策略（4 类查询模板、输出 schema） |
 
-**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 3 委托时加载参考，核心编排器根据此规范**自行执行**相关操作，不将任务 dispatch 给独立子代理。**此 agent 只执行检索与核验，绝对不得修改项目中的任何文件**。
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 3 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只执行检索与核验，绝对不得修改项目中的任何文件，也不得独立撰写论文正文**。
 
 ## 何时读取 references/
 

@@ -5,7 +5,7 @@
 当前 section 的最小闭环：
 
 ```
-Draft v1 → Prose Quality Gate → Expansion Pass → Self-Review → Revised Draft v2 → Verification
+Draft v1 → Placeholder Audit → Evidence Compliance Review → Prose Quality Gate → Expansion Pass → Self-Review → Revised Draft v2 → Verification
 ```
 
 ## 退出条件
@@ -34,13 +34,13 @@ Draft v1 → Prose Quality Gate → Expansion Pass → Self-Review → Revised D
 - 单节内部 Draft→Verification 闭环最多执行 **3 轮**
 - 3 轮后仍未通过 Verification → 冻结所有未闭合 claims，标记 `verdict: escalated`，报告用户决策
 - 用户可选择：继续修订 / 接受当前版本（含已知缺口） / 跳过本节
-- Prose Quality Gate 子循环上限为 **2 轮**，详见 Step 7 规则
+- Prose Quality Gate 子循环上限为 **2 轮**，详见 Step 9 规则
 
 ## 跨章节整合（依赖感知）
 
 参见 `references/section-dependency-matrix.md` 中的矩阵定义。
 
-每完成一个 section 后，按矩阵执行依赖检查（编排器 Step 10b）：
+每完成一个 section 后，按矩阵执行依赖检查（编排器 Step 12b）：
 - 当前 section 的 `depended_by` 列表中有哪些已完成 section
 - 这些 section 是否因 `shared_claims` 变更而需要回修
 - 若需回修，将对应 section 标记 `pending` 并询问使用者
