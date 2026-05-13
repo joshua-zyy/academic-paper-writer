@@ -71,6 +71,9 @@ metadata:
 用户请求 → 判断图类型
   ├─ 实验数据图 → chart-from-data 模式
   └─ 模型架构图 → arch-prompt 模式
+
+自动触发：academic-paper-writer 的 Step 6.5 在 Draft v1 完成后，会自动扫描正文中的 [FIGURE_NEEDED] 占位符，
+对架构图类占位符以 arch-prompt 模式调用本 Skill 的生图提示词生成能力。
 ```
 
 ### 路径 A — chart-from-data（实验数据图）

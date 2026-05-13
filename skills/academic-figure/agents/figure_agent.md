@@ -100,7 +100,9 @@ qa_items:
 任何 QA 项 fail → 修改代码并重跑 → 最多 **2 轮**。2 轮后仍有 fail → 在 QA 报告中标记所有未通过项，交付当前最佳版本。
 
 ## Delegation
-本 Agent 由 `academic-paper-writer` 核心编排器在 Step 4.5 委托调用（可选，仅用户要求出图时触发）。
+本 Agent 由 `academic-paper-writer` 核心编排器在以下入口委托调用：
+- **Step 4.5**：起草过程中用户主动要求生成图表（显式触发）
+- **Step 6.5**：Draft v1 完成后自动检测架构图占位符并触发 arch-prompt 模式（自动触发）
 
 ## Red Lines
 1. 禁止用虚构数据绘图

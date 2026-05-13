@@ -37,6 +37,12 @@ metadata:
 2. **cross-section-review** — 跨章节一致性检查（摘要 vs 正文 vs 表格 vs 结论）
 3. **verification-only** — 仅执行 Verification 判定（不重做自审）
 4. **targeted-review** — 针对特定问题做定向审查（如仅检查引用闭合）
+5. **targeted-evidence-mode** — 仅执行证据合规审查（由 orchestrator Step 7 委托调用）。检查内容：
+   - 每个 claim 是否有对应的 evidence 支撑（Evidence Map 中的 newly_run / preexisting_artifact）
+   - 每个 inline citation 是否对应 Verified References 中已核验条目
+   - 所有占位符使用是否符合规范（如 [REF_NEEDED] 含方向说明）
+   - 是否存在无证据支撑的"裸 claim"
+   输出 evidence_debt (open|closed) + evidence_issues 清单，不允许修改正文。
 
 ## 工作流
 

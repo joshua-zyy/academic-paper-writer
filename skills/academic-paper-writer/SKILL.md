@@ -38,8 +38,47 @@ metadata:
 | Step 4 | `academic-experiments` | 实验证据盘点与复核 |
 | Step 4.5 | `academic-figure` | 起草过程中应要求生成论文图表（由用户显式提出时触发） |
 | Step 6.5 | `academic-figure` | Draft v1 完成后自动检测架构图占位符并触发 arch-prompt 模式 |
-| Step 7 | `academic-polishing` | Prose Quality Gate 与 Method 专项强化 |
-| Step 9 | `academic-reviser` | 自我审查与 Verification 判定 |
+| Step 7 | `academic-reviser` | 证据合规审查（targeted-evidence-mode，两阶段第一阶段） |
+| Step 8 | `academic-polishing` | Prose Quality Gate 与 Method 专项强化（两阶段第二阶段） |
+| Step 10 | `academic-reviser` | 自我审查与 Verification 判定 |
+
+## 编排流程总览
+
+```dot
+digraph academic_paper_writer {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    "Step 0: 判定 mode" [fillcolor="#E8F0FE"];
+    "Step 1: 确认关键信息" [fillcolor="#E8F0FE"];
+    "Step 2: 证据审计" [fillcolor="#FFF3CD"];
+    "Step 3: 文献检索 → citation" [fillcolor="#FFF3CD"];
+    "Step 4: 实验复核 → experiments" [fillcolor="#FFF3CD"];
+    "Step 5: 生成 section plan" [fillcolor="#E8F0FE"];
+    "Step 6: 起草 Draft v1" [fillcolor="#D4EDDA"];
+    "Step 6.5: 占位符审计\n+ 架构图预生成 → figure" [fillcolor="#D4EDDA"];
+    "Step 7: 证据合规审查 → reviser" [fillcolor="#F8D7DA"];
+    "Step 8: Prose 质量门 → polishing" [fillcolor="#F8D7DA"];
+    "Step 9: 扩写检查" [fillcolor="#E8F0FE"];
+    "Step 10: 综合验证 → reviser" [fillcolor="#F8D7DA"];
+    "section loop" [shape=doublecircle, fillcolor="#CCE5FF"];
+
+    "Step 0" -> "Step 1";
+    "Step 1" -> "Step 2";
+    "Step 2" -> "Step 3";
+    "Step 3" -> "Step 4";
+    "Step 4" -> "Step 5";
+    "Step 5" -> "Step 6";
+    "Step 6" -> "Step 6.5";
+    "Step 6.5" -> "Step 7";
+    "Step 7" -> "Step 8";
+    "Step 8" -> "Step 9";
+    "Step 9" -> "Step 10";
+    "Step 10" -> "section loop" [label="通过"];
+    "section loop" -> "Step 5" [label="下一节"];
+    "Step 10" -> "Step 7" [label="未通过"];
+}
+```
 
 ## Red Lines（绝对禁止）
 
@@ -145,11 +184,13 @@ Gate B Failed（零引用）
     - 未核验条目不能作为确定引用，只能以 [REF_NEEDED: ...] 形式出现
 ```
 
-### Gate C: Verification 阶段通过门控（Step 9 → Step 10）
+### Gate C: Verification 阶段通过门控（Step 10 → Step 11）
 
-**触发位置**：Step 9（Self-Review & Verification）完成后、Step 10（section loop 推进）开始前。
+**触发位置**：Step 10（Self-Review & Verification）完成后、Step 11（section loop 推进）开始前。
 
-**条件**（基于 Step 9 输出判定）：
+**条件**：基于 `../shared/references/verification-checklists.md` 中对应 section 类型的清单逐项检查。全部 pass 方可判定通过。
+
+Step 10 的 `verdict` 输出决定推进规则：
 - `verdict = passed` → 可自由推进到下一节
 - `verdict = blocked` 且 `safe_to_continue = yes` → 可推进，阻塞点进入 Revision Queue
 - `verdict = failed` 或 `blocked` 且 `safe_to_continue = no` → **禁止推进**，必须继续当前 section 的修订
@@ -159,7 +200,7 @@ Gate B Failed（零引用）
 ```
 Gate C Failed
 ├─ verdict = failed
-│  ├─ 下一轮修订（进入下一轮 Step 9）
+│  ├─ 下一轮修订（进入下一轮 Step 10）
 │  ├─ 3 轮后仍 failed →
 │  │   ├─ 冻结所有未闭合 claims（记入 frozen_claims）
 │  │   ├─ 标记 verdict = escalated
@@ -227,7 +268,7 @@ Gate C Failed
 
 详见 `references/iteration-control.md`。
 
-节级最小闭环：`Draft v1 → Prose Quality Gate → Expansion → Self-Review → Revised Draft v2 → Verification`。
+节级最小闭环：`Draft v1 → 证据合规审查 → Prose Quality Gate → Expansion → Self-Review → Revised Draft v2 → Verification`。
 
 退出当前 section 的条件：
 - Verification passed
@@ -242,12 +283,17 @@ Gate C Failed
 
 ### Step 0: 判定 mode、scope 与当前节
 
+→ [ ] 创建 TodoWrite：列出 Step 0-11 的整体检查项
+→ [ ] 判断当前 task 属于哪种 mode
+
 - 判断当前是完整起草、单节写作、单节修订、补文献还是补实验。
 - 若用户明确点名章节，直接设为 current section unit。
 - 若用户未点名但要求"写论文"，先形成 Outline / Section Queue，进入串行 section loop。
 - 对 full-paper-planning 维护两个列表：Section Queue（待起草）和 Revision Queue（已起草但需修订）。
 
 ### Step 1: 确认关键信息（Blocking Gate）
+
+→ [ ] 创建 TodoWrite：列出本 section 需要确认的信息项
 
 以下为阻塞性确认——信息缺失时必须停止并提问，不得继续执行：
 
@@ -258,6 +304,33 @@ Gate C Failed
 若 venue 已知且对当前 section 有影响，读取 `references/writing-guidelines.md` 并形成简短 Venue / Language Brief。
 
 ### Step 2: 审计与当前节直接相关的证据
+
+→ [ ] 创建 TodoWrite：列出需审计的证据项清单
+→ [ ] 根据 section 类型确定探查任务并 dispatch 子代理
+
+根据当前 section 类型 dispatch 探查子代理（使用 `agents/probe-agent.md` 模板，并行执行）：
+
+| Section 类型 | 需 dispatch 的探查任务 |
+|-------------|----------------------|
+| Introduction | `existing_draft`（读取已有草稿结构） |
+| Related Work | `existing_draft`（读取已有草稿结构） |
+| Method | `code_structure`（代码模块、张量形状、forward 路径） + `preprocessing`（预处理流程） |
+| Experimental Setup | `data_statistics`（数据统计） + `experiment_config`（超参数、配置协议） |
+| Main Results | `experiment_data`（数值结果） + `baseline_results`（基线，如有） |
+| Ablation | `ablation_results`（消融结果，如有） |
+| Discussion | `interpretability`（可解释性结果） |
+
+每个探查子 agent dispatch 方式：
+```yaml
+description: "Probe {probe_type} for {section_type}"
+subagent_type: "general"
+prompt: |
+  加载 agents/probe-agent.md，以 {probe_type} 模式探查。
+  目标路径：<项目根目录>
+  产出对应 schema 的结构化证据后返回。
+```
+
+子 agent 返回后，汇总所有探查结果形成 Evidence Map，供 Step 5 和 Step 6 使用。
 
 轻量 inventory，按当前 section 定点读取。不做无差别全仓库扫描。
 
@@ -283,7 +356,9 @@ Gate C Failed
 
 ### Step 3: 文献检索与核验
 
-→ 委托 `academic-citation` 执行。
+→ [ ] 创建 TodoWrite：列出需检索的关键词与期望引用数
+→ [ ] 确定搜索关键词和检索范围
+→ [ ] 委托 `academic-citation` 执行后，标记 TodoWrite 对应项 completed
 
 输入：当前 section、研究关键词、目标 venue。
 输出：按 `../shared/schemas/verified-references.md` 组织：Verified References、Exemplar Set（Introduction/Related Work 时）、Citation-to-Claim Map。
@@ -292,7 +367,8 @@ Gate C Failed
 
 ### Step 4: 实验事实复核
 
-→ 委托 `academic-experiments` 执行（仅当 empirical paper 且当前 section 需要实验事实时）。
+→ [ ] 创建 TodoWrite：列出需复核的实验证据项
+→ [ ] 委托 `academic-experiments` 执行（仅当 empirical paper 且当前 section 需要实验事实时）。
 
 输入：代码仓库路径、当前 section。
 输出：按 `../shared/schemas/evidence-inventory.md` 组织：Experiment Evidence、Protocol Risks、Remaining Blockers。
@@ -300,6 +376,8 @@ Gate C Failed
 Introduction / Related Work 不因此步骤阻塞。
 
 ### Step 5: 生成 section plan
+
+→ [ ] 创建 TodoWrite：列出 plan 需覆盖的核心模块
 
 读取 `references/paper-structure.md`，按论文类型和目标 venue 选择结构。
 
@@ -319,6 +397,12 @@ Introduction / Related Work 不因此步骤阻塞。
 - 对每个核心模块形成 Module Card：位置、瓶颈、设计选择、合理性、预期收益、代价/限制/边界、证据来源（artifact-verified / inferred-from-gap / missing）
 
 ### Step 6: 生成 Draft v1
+
+→ [ ] 创建 TodoWrite：列出当前 section 需覆盖的所有子主题
+→ [ ] 检查 Evidence Map 中的可用证据
+→ [ ] 检查 Verified References 中的可用引用
+→ [ ] 生成 Draft v1 正文并完整填充各小节
+→ [ ] 将 TodoWrite 中对应项标记为 completed
 
 - 输出 Markdown。
 - Paper Body 只放论文正文；审查备注进 sidecar。
@@ -345,6 +429,13 @@ Introduction / Related Work 不因此步骤阻塞。
 
 ### Step 6.5: 占位符审计、架构图预生成与待补项列表
 
+→ [ ] 创建 TodoWrite：列出 Step 6.5 的四个子步
+→ [ ] 扫描占位符 → 标记 completed
+→ [ ] 填补遗漏架构图占位 → 标记 completed
+→ [ ] 触发架构图生成 → 标记 completed
+→ [ ] 生成待补项列表 → 标记 completed
+→ [ ] 报告审计结果 → 标记 completed
+
 Step 6 生成 Draft v1 后，自动执行以下流程：
 
 1. **扫描全文占位符** — 统计并分类以下占位符的数量、位置与内容：
@@ -356,9 +447,35 @@ Step 6 生成 Draft v1 后，自动执行以下流程：
    - `[DATASET_DETAIL_NEEDED]` — 记录缺失的数据集细节
    - `[RATIONALE_NEEDED]` — 记录缺失的设计理由
 
-2. **自动触发架构图生成** — 对每个 `[FIGURE_NEEDED]` 占位符，根据 figure purpose 判断类型：
-   - **架构图类**（purpose 含 architecture / structure / pipeline / diagram / network / overview / flow / 架构 / 网络结构 / 模块图 / 流程图 / 总体架构 等）→ 委托 `academic-figure` 以 `arch-prompt` 模式生成架构图生图提示词，并用生成的提示词替换占位符
-   - **数据图类**（purpose 含 curve / comparison / ablation / training / 曲线 / 对比 / 消融 / 实验 等）→ 保留占位符（需实验数据就绪后在用户指导下触发），记入待补项列表
+1a. **填补遗漏的架构图占位符** — 对 Method 节进行结构分析，主动补入缺失的图占位：
+    - 扫描方法节中每个独立模块标题（如 "1) ..."、"2) ..."、"#### ..." 或 "### ..."）
+    - 检查该模块附近是否已有 `[FIGURE_NEEDED]` 或已被替换的图注
+    - 若缺失，在该模块段落末尾插入：
+      ```
+      [FIGURE_NEEDED: 图X <模块名>模块图 | 对应小节 | 展示内部结构、输入输出与数据流]
+      ```
+
+2. **自动触发架构图生成** — 对每个 `[FIGURE_NEEDED]` 按用途分类处理：
+
+   **架构图类**（purpose 含 architecture / structure / pipeline / diagram / network / overview / flow / 架构 / 网络结构 / 模块图 / 流程图 / 总体架构 等）→
+   使用 Task tool dispatch 子 agent：
+   ```yaml
+   description: "Generate architecture diagram prompt for figure"
+   subagent_type: "general"
+   prompt: |
+     加载 academic-figure skill，以 arch-prompt 模式工作。
+     输入：
+       path: "B"
+       data_source: null
+       figure_purpose: <从 [FIGURE_NEEDED] 的 purpose 字段提取>
+       style_preferences:
+         color_palette: "academic"
+         width: "double_column"
+     输出架构图生图提示词后返回给我。
+   ```
+   子 agent 返回生图提示词后，用提示词替换原 `[FIGURE_NEEDED]` 占位符。
+
+   **数据图类**（purpose 含 curve / comparison / ablation / training / 曲线 / 对比 / 消融 / 实验 等）→ 保留占位符（需实验数据就绪后在用户指导下触发），记入待补项列表
 
 3. **生成待补项列表附录** — 在 Draft v1 末尾（参考文献之后）追加以下内容：
 
@@ -382,20 +499,36 @@ Step 6 生成 Draft v1 后，自动执行以下流程：
 
    若某类占位符不存在，对应项标记为「无」。
 
-4. **报告审计结果** — 将占位符统计信息（`placeholder_debt`）纳入 Section Critique，供 Step 9 Verification 引用。
+4. **报告审计结果** — 将占位符统计信息（`placeholder_debt`）纳入 Section Critique，供 Step 10 Verification 引用。
 
-### Step 7: Prose Quality Gate
+### Step 7: 证据合规审查（两阶段第一阶段）
 
-→ 委托 `academic-polishing` 执行。
+→ [ ] 创建 TodoWrite：列出证据合规审查项
+→ [ ] 委托 `academic-reviser` 以 `targeted-evidence-mode` 执行
+→ [ ] 检查 evidence_debt 状态
+
+这是两阶段审查的第一阶段。仅在证据合规通过（evidence_debt = closed）后才进入下一阶段 Prose 润色。确保所有 claim 都有证据支撑、引用都经过核验、占位符使用正确之后再优化措辞，避免将无证据支持的句子打磨得更有说服力。
+
+输入：Draft v1 文本、Evidence Map、Verified References、Step 6.5 的 placeholder_debt。
+输出：evidence_debt (open|closed)、evidence_issues 清单。
+
+若 evidence_debt = open，记录具体问题清单后返回 Step 6 修订。不得在 evidence_debt 未闭合时推进到 Step 8。
+
+### Step 8: Prose Quality Gate（两阶段第二阶段）
+
+→ [ ] 创建 TodoWrite：列出需润色的检查项
+→ [ ] 确认 Step 7 evidence_debt = closed 后方可执行
+→ [ ] 委托 `academic-polishing` 执行
 
 输入：Draft v1 文本、当前 section 类型。
 输出：prose_debt (open|closed)、failed_items、改写后文本。若当前为 Method，还包含 method_prose_debt。
 
 Prose Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 prose_debt: open，继续后续步骤但最终 Verification 不得判为 passed。
 
-### Step 8: Expansion Pass（内容密度检查）
+### Step 9: Expansion Pass（内容密度检查）
 
-检查当前 section 是否仍过薄。详细阈值见 `references/content-density.md`。
+→ [ ] 创建 TodoWrite：列出当前 section 的薄区域检查项
+→ [ ] 逐项检查 thin_draft 条件
 
 以下情况视为过薄（thin_draft: yes）：
 - Introduction ≤ 2 段，或只有背景+贡献列表
@@ -406,22 +539,29 @@ Prose Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 prose_debt: ope
 
 扩写原则：只用已有证据和合规占位符扩充，优先补足"读者理解链条"。
 
-### Step 9: Self-Review & Verification
+### Step 10: Self-Review & Verification
 
-→ 委托 `academic-reviser` 执行。
+→ [ ] 创建 TodoWrite：列出 Step 10 的审查项
+→ [ ] 委托 `academic-reviser` 执行。
+→ [ ] 检查 verdict 判定结果，决定是否推进或回修
 
 输入：Expanded Draft、Evidence Map、前序步骤状态（prose_debt、thin_draft、frozen_claims 等）。
 输出：按 `../shared/schemas/verification-report.md` 组织：Self-Review、Revised Draft vN（必须吸收修改点）、Section Critique、Verification Status（passed/failed/blocked）。
 
 若 Verification 判定为 blocked，必须含 safe_to_continue 和 frozen_claims。只有 safe_to_continue = yes 时才允许推进到下一节。
 
-### Step 10: 整合 & section loop（依赖感知）
+### Step 11: 整合 & section loop（依赖感知）
+
+→ [ ] 创建 TodoWrite：列出整合与推进步骤
+→ [ ] 更新 Cumulative Draft
+→ [ ] 检查依赖矩阵
+→ [ ] 选择下一节或结束
 
 对 full-paper-planning 任务，不得在一个 section 修订完就结束。本节增加依赖感知逻辑——基于 `references/section-dependency-matrix.md` 中的矩阵管理跨节一致性。
 
 #### 10a. 状态更新
 
-- 若 failed 且非外部阻塞 → 保持当前 section 为活跃项，继续下一轮 Step 9
+- 若 failed 且非外部阻塞 → 保持当前 section 为活跃项，继续下一轮 Step 10
 - 若 blocked 且 safe_to_continue = yes → 将阻塞点写入 Revision Queue，冻结 claims 后前进
 - 若 blocked 且 safe_to_continue = no → 保持活跃，等待外部证据闭合
 - 将其并入 Cumulative Draft，更新 Section Queue 和 Revision Queue
@@ -485,7 +625,7 @@ Prose Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 prose_debt: ope
 | `references/test-scenarios.md` | 修改 Skill 后做回归验证时 |
 | `../shared/schemas/evidence-inventory.md` | Step 4 接收实验证据时 |
 | `../shared/schemas/verified-references.md` | Step 3 接收文献引用时 |
-| `../shared/schemas/verification-report.md` | Step 9 接收审修结果时 |
+| `../shared/schemas/verification-report.md` | Step 10 接收审修结果时 |
 | `../shared/references/evidence-classification.md` | Step 2 审计证据时 |
 | `../shared/references/placeholder-guide.md` | Step 6 生成 Draft 使用占位符时 |
 | `../shared/references/mode-spectrum.md` | 选择或理解任务模式时（Step 0） |

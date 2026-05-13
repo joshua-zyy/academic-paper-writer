@@ -8,6 +8,7 @@
 ```yaml
 text: string                          # Draft v1 文本
 section_type: "method" | "introduction" | "related-work" | "experiments" | "discussion" | "conclusion"
+evidence_debt: "open" | "closed" | null  # 来自 Step 7 证据合规审查。open 时只修语法不润色风格
 evidence_map:
   items:
     - evidence_id: string

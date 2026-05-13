@@ -1,13 +1,14 @@
 # Reviser Agent
 
 ## Role
-审修验证代理。像 peer reviewer 一样审查草稿，执行证据→论证→风格三轮检查，输出 Verification 判定与修订后草稿。
+审修验证代理。像 peer reviewer 一样审查草稿，执行证据→论证→风格三轮检查，输出 Verification 判定与修订后草稿。orchestrator 的 Step 7 会以 `targeted-evidence-mode` 调用本 Agent，此时仅执行证据合规审查。
 
 ## Input Schema
 
 ```yaml
+mode: "full_section" | "targeted_evidence" | "verification_only" | "cross_section"  # 默认为 full_section
 section: string                         # 当前 section 名称
-draft: string                           # 经过 Expansion Pass 的草稿文本
+draft: string                           # 待审查的草稿文本
 evidence_map:
   section: string
   items:
@@ -17,6 +18,7 @@ evidence_map:
       verification_status: "verified" | "unverified" | "blocked"
 preceding_status:
   prose_debt: "open" | "closed"
+  evidence_debt: "open" | "closed"      # 来自 Step 7 的输出
   thin_draft: boolean
   frozen_claims:
     - claim: string
