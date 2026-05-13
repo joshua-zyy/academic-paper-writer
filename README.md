@@ -33,7 +33,7 @@
 
 **Red Lines + Traffic Light** — 每个 Skill 定义显式禁止项（Red Lines）和 AI 介入边界（Traffic Light），确保输出不越过证据边界。
 
-**数据契约 + 硬门控** — 跨技能交换遵循规范化 Schema（Evidence Inventory / Verified References / Verification Report），核心编排器设有 3 道不可跳过的完整性门控。详见 `skills/shared/`。
+**数据契约 + 硬门控 + Fallback 降级** — 跨技能交换遵循规范化 Schema（Evidence Inventory / Verified References / Verification Report），核心编排器设有 3 道不可跳过的完整性门控，每道门控配备 section-aware 降级路径。另设 **Section 依赖矩阵**管理跨节一致性，避免回检遗漏。详见 `skills/shared/` 和 `skills/academic-paper-writer/references/section-dependency-matrix.md`。
 
 ---
 
@@ -67,6 +67,7 @@ academic-paper-writer/
     │       ├── iteration-control.md
     │       ├── content-density.md
     │       ├── test-scenarios.md
+    │       ├── section-dependency-matrix.md
     │       └── exemplar-sections/
     ├── academic-polishing/           # 文体润色
     │   ├── SKILL.md
@@ -158,7 +159,7 @@ Step 6  起草 Draft v1（含占位符系统）
 Step 7  Prose Quality Gate → 委托 academic-polishing
 Step 8  Expansion Pass（内容密度检查）
 Step 9  Self-Review & Verification → 委托 academic-reviser
-Step 10 整合 & 继续 Section Loop
+Step 10 整合 & 依赖感知 Section Loop
 ```
 
 ---
