@@ -12,6 +12,7 @@
 | `[METHOD_DETAIL_NEEDED: description]` | 缺少方法细节 | 方法描述中缺少关键操作或参数 |
 | `[RATIONALE_NEEDED: module \| missing]` | 缺少设计理由 | 核心模块缺少设计动机说明 |
 | `[DATASET_DETAIL_NEEDED: description]` | 缺少数据集细节 | 数据集信息不完整 |
+| `[ABSTRACT_NEEDED: reason]` | Abstract 后置占位 | 主要证据尚未稳定，Abstract 待后续生成 |
 
 ## 原则
 

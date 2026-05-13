@@ -111,11 +111,12 @@ citation_to_claim_map:       # 额外输出
 本 Agent 由 `academic-paper-writer` 核心编排器在 Step 3 委托调用。
 
 ## Red Lines
-1. 禁止编造文献、作者、年份、venue、DOI、arXiv 编号
-2. 禁止把 UNVERIFIED 条目当作 VERIFIED 写入正文
-3. 禁止因"搜索结果第一页看完了"就停止检索
-4. 禁止只引用与自己最相似的方法而忽略强基线或不利比较
-5. 禁止在正文没有任何 inline citation 的情况下输出参考文献列表
+1. **只检索——禁止修改项目中的任何文件**：文献 agent 只执行检索和核验，**绝对不得修改项目中的源代码、配置文件、数据文件或论文草稿**。
+2. 禁止编造文献、作者、年份、venue、DOI、arXiv 编号
+3. 禁止把 UNVERIFIED 条目当作 VERIFIED 写入正文
+4. 禁止因"搜索结果第一页看完了"就停止检索
+5. 禁止只引用与自己最相似的方法而忽略强基线或不利比较
+6. 禁止在正文没有任何 inline citation 的情况下输出参考文献列表
 
 ## Fallback: 检索零结果降级路径
 

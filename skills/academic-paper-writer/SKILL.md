@@ -72,14 +72,15 @@ digraph academic_paper_writer {
 
 以下行为绝对禁止，违反即为 Skill 执行失败：
 
-1. 编造文献、作者、年份、venue、DOI、arXiv 编号
-2. 编造实验结果、图表、命令或运行日志
-3. 把 UNVERIFIED 文献当作 VERIFIED 写入正文
-4. 把 user_claim（用户口述）当作可直接引用的证据
-5. 把内部验证包装成外部泛化或 SOTA 结论
-6. 把领域常见默认值写成当前项目已确认事实
-7. 在正文没有任何 inline citation 的情况下输出参考文献列表
-8. 把审查备注、元评论、代码讲解口吻混入 Paper Body
+1. **主 Agent 只撰写论文文本，绝对不得修改项目源代码、配置文件或数据文件**。探查时只读，图表代码生成时创建新文件而非覆盖现有文件。
+2. 编造文献、作者、年份、venue、DOI、arXiv 编号
+3. 编造实验结果、图表、命令或运行日志
+4. 把 UNVERIFIED 文献当作 VERIFIED 写入正文
+5. 把 user_claim（用户口述）当作可直接引用的证据
+6. 把内部验证包装成外部泛化或 SOTA 结论
+7. 把领域常见默认值写成当前项目已确认事实
+8. 在正文没有任何 inline citation 的情况下输出参考文献列表
+9. 把审查备注、元评论、代码讲解口吻混入 Paper Body
 
 ## 非协商规则
 
@@ -178,6 +179,13 @@ Gate B Failed（零引用）
 
 **条件**：基于 `../shared/references/verification-checklists.md` 中对应 section 类型的清单逐项检查。全部 pass 方可判定通过。
 
+** strict 模式判定规则（用户选择 A）**：
+- `verdict = passed` **仅当** `prose_debt = closed` 且 `citation_debt = closed` 且 `evidence_debt = closed` 且 `figure_debt = closed` 且 `thin_draft = no`
+- 任何 debt 未闭合或 `thin_draft = yes` → `verdict = blocked`（禁止伪装为 passed）
+- `verdict = blocked` 且 `safe_to_continue = yes` → 可推进，但输出标题必须标注"Draft v1（含已知缺口）"
+- `verdict = blocked` 且 `safe_to_continue = no` → **禁止推进**
+- `verdict = failed` → **禁止推进**，必须继续修订
+
 Step 11 的 `verdict` 输出决定推进规则：
 - `verdict = passed` → 可自由推进到下一节
 - `verdict = blocked` 且 `safe_to_continue = yes` → 可推进，阻塞点进入 Revision Queue
@@ -222,6 +230,7 @@ Gate C Failed
 8. Verification Status（verdict、prose_debt、thin_draft、checks_run、remaining_issues；blocked 时含 safe_to_continue 与 frozen_claims）
 9. Revision Queue
 10. Next Recommended Section
+11. **Citation-to-Claim Map**（整篇论文完成后统一生成，放置于论文末尾参考文献列表之后）
 
 ### section-drafting / section-revision
 
@@ -246,7 +255,8 @@ Gate C Failed
 6. Ablation / Analysis
 7. Discussion / Limitations
 8. Conclusion
-9. Abstract
+
+**Abstract 为后置章节**，不在初始 Section Queue 中。仅在 Section Queue 全部完成且所有核心章节 Verification = passed 后才允许生成。在此之前，在占位符系统中使用 `[ABSTRACT_NEEDED: 待主要证据稳定后撰写]`。
 
 ### 其他类型
 
@@ -306,6 +316,34 @@ Gate C Failed
 | `../shared/references/evidence-classification.md` | 三类证据的定义与使用规范 |
 | `../shared/references/placeholder-guide.md` | 占位符系统规范 |
 | `../shared/references/paper-types.md` | 论文类型定义与选择方法 |
+
+## Agent 资源与执行架构
+
+本 Skill 采用**主 Agent 一体化写作 + 子 Agent 工具型辅助**的架构：
+
+### 写作原则
+
+- **论文正文（Introduction / Related Work / Method / Experiments / Discussion / Conclusion / Abstract）由主 Agent 直接撰写**，不 dispatch 独立写作子代理
+- 这一设计确保全文叙事风格一致、术语统一、引用编号连续
+- 子 Skill 的 `agents/` 文件是**工具规范参考**，主 Agent 加载后**自行执行**相关操作
+
+### 可 dispatch 的子 Agent（工具型任务）
+
+| 步骤 | 子 Skill | Agent 文件 | 任务类型 | 约束 |
+|------|---------|-----------|---------|------|
+| Step 2 | `academic-paper-writer` | `agents/probe-agent.md` | 只读探查（代码结构/实验数据/配置协议） | **只读，禁止修改任何项目文件** |
+| Step 3 | `academic-citation` | `agents/citation_agent.md` | 文献检索与核验 | **只检索，禁止修改项目文件** |
+| Step 4 | `academic-experiments` | `agents/experiment_agent.md` | 实验证据盘点与运行 | **可运行实验，禁止修改源代码/数据** |
+| Step 7 | `academic-figure` | `agents/figure_agent.md` | 架构图提示词生成 | **只生成图表，禁止修改项目代码** |
+| Step 8 | `academic-reviser` | `agents/reviser_agent.md` | 证据合规审查 | **只审查文本，禁止修改项目文件** |
+| Step 9 | `academic-polishing` | `agents/polishing_agent.md` | Prose 润色与 claim 强度审计 | **只修改论文草稿，禁止修改项目文件** |
+| Step 11 | `academic-reviser` | `agents/reviser_agent.md` | 综合验证判定 | **只审查文本，禁止修改项目文件** |
+
+### 核心编排器的职责边界
+
+- **主 Agent 负责**：制定 Section Blueprint、撰写 Draft v1、执行 Expansion Pass、整合 Cumulative Draft、生成 Abstract、维护跨节一致性
+- **子 Agent 负责**：提供专项工具输出（探查结果 / 文献列表 / 实验数据 / 审修报告 / 润色建议 / 图表），供主 Agent 吸收进论文正文
+- 子 Agent **不得**直接修改 Cumulative Draft 或生成独立章节文本
 
 ## 何时读取 references/
 

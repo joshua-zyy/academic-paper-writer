@@ -58,13 +58,14 @@ description: "Use when user needs to audit, run, or verify experimental evidence
 3. 运行评估或解释脚本
 4. 只有在确有必要时才重训
 
-### Step 3: 记录运行结果
+### Step 3: 记录运行结果（强制标注证据类型）
 
-详见 `references/run-strategy.md`。对每个进入论文正文的实验结果，至少记录：
+详见 `references/run-strategy.md`。对每个进入论文正文的实验结果，**必须标注证据类型**（`newly_run` / `preexisting_artifact` / `user_claim`），并至少记录：
 
 ```md
 ## Experiment Evidence
 - Status: newly_run / preexisting_artifact / blocked
+- Evidence Type: newly_run / preexisting_artifact
 - Command: （实际执行的命令）
 - Workdir: （工作目录）
 - Environment: （Python/CUDA版本、关键依赖）
@@ -74,6 +75,11 @@ description: "Use when user needs to audit, run, or verify experimental evidence
 - Metrics Used In Draft: （正文中引用的指标值）
 - Protocol Risks: （见 Step 4）
 ```
+
+**证据类型标注规则**：
+- `newly_run`：本轮 session 中实际运行产生的证据。优先使用，标注运行时间戳。
+- `preexisting_artifact`：仓库中已有但非本轮运行的证据。必须标注来源路径、产生时间（或版本）、已知限制。
+- 正文中的每个数值结果必须在括号内或脚注中标注证据类型，例如："准确率 86.58%（newly_run，2026-05-10）"或"AUC 0.9314（preexisting_artifact，见 experiments/run_logs/exp001.log）"。
 
 ### Step 4: 协议风险评估
 
@@ -121,6 +127,16 @@ description: "Use when user needs to audit, run, or verify experimental evidence
 ## Remaining Blockers
 （无法运行的实验、缺失的数据/环境/依赖）
 ```
+
+## Agent 资源
+
+本 Skill 目录下的 `agents/` 文件夹包含以下辅助文件：
+
+| 文件 | 用途 |
+|------|------|
+| `agents/experiment_agent.md` | 实验盘点与运行规范 |
+
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 4 委托时加载参考，核心编排器根据此规范**自行执行**相关操作，不将任务 dispatch 给独立子代理。**此 agent 可运行实验但绝对不得修改项目源代码或数据文件**。
 
 ## 何时读取 references/
 

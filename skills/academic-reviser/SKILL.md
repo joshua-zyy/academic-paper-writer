@@ -175,6 +175,16 @@ description: "Use when user needs to self-review, audit, or verify academic pape
 
 输出应按 `../shared/schemas/verification-report.md` 中定义的 Verification Report Schema 组织。Section Critique 的格式规范见 `../shared/templates/section-critique.md`。
 
+## Agent 资源
+
+本 Skill 目录下的 `agents/` 文件夹包含以下辅助文件：
+
+| 文件 | 用途 |
+|------|------|
+| `agents/reviser_agent.md` | 三轮审查流程与 Verification 判定规范 |
+
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 8 和 Step 11 委托时加载参考，核心编排器根据此规范**自行执行**相关操作，不将任务 dispatch 给独立子代理。**此 agent 只审查论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件**。
+
 ## 何时读取 references/
 
 | Reference 文件 | 打开条件 |

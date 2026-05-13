@@ -3,6 +3,12 @@
 This file contains the detailed step-by-step workflow for the core orchestrator.
 Load this when executing the section drafting loop.
 
+## 执行约束（硬性规则）
+
+- **主 Agent 只撰写论文文本，绝对不得修改项目源代码、配置文件或数据文件**。探查时只读，图表代码生成时创建新文件而非覆盖现有文件。
+- 子 Agent 的约束见各自 `agents/xxx_agent.md` 中的 Red Lines。
+- 论文正文（Introduction / Related Work / Method / Experiments / Discussion / Conclusion / Abstract）由主 Agent **直接撰写**，不 dispatch 独立写作子代理，以确保叙事风格一致。
+
 ---
 
 ## Step 0: Mode, Scope, and Current Section
@@ -16,11 +22,17 @@ Load this when executing the section drafting loop.
 
 Blocking confirmations — must stop and ask if missing:
 
-1. **Target venue**: Required for `full-paper-planning`, formal drafting, or substantial revision. Only fall back to generic CS/AI structure if user explicitly says "undecided."
+1. **Target venue**: **Blocking requirement** for `full-paper-planning`, formal drafting, or substantial revision.
+   - **Do not proceed to Step 2 until venue is confirmed.** This is a hard block.
+   - If user says "undecided": provide 2-3 venue suggestions and ask user to confirm or specify.
+   - If user explicitly declines to specify: record `venue = user_declined`, warn that "generic structure may not meet specific venue requirements," and require explicit user acknowledgment before proceeding.
+   - Only if user explicitly says "you decide" may the agent autonomously select a venue and inform the user.
 2. **Draft language**: Required for formal drafting. Default to English if not specified.
 3. **Current section**: Determined by Step 0 if user did not specify.
 
 If venue is known and relevant, read `references/writing-guidelines.md` and form a brief Venue / Language Brief.
+
+**Failure to confirm venue**: Stop and wait. Do not proceed to Step 2. Do not generate Outline or Section Queue until venue is resolved.
 
 ## Step 2: Evidence Audit
 
@@ -103,6 +115,10 @@ Introduction / Related Work do not block on this step.
 Body constraints:
 - Paper Body = draft text only; critique/audit notes go to sidecar.
 - Only use verified references and confirmed experiment facts for definitive claims.
+- **Evidence type annotation**: Every numerical result in body must be annotated with its evidence type:
+  - `newly_run` results: append "(newly_run, YYYY-MM-DD)" or similar timestamp
+  - `preexisting_artifact` results: append "(preexisting_artifact, source: path/to/file)"
+  - Example: "accuracy 86.58% (newly_run, 2026-05-10)" or "AUC 0.9314 (preexisting_artifact, experiments/run_logs/exp001.log)"
 - Placeholders:
   - `[REF_NEEDED: claim/topic]`
   - `[FIGURE_NEEDED: purpose | placement | why]`
@@ -112,6 +128,7 @@ Body constraints:
   - `[METHOD_DETAIL_NEEDED: description]`
   - `[RATIONALE_NEEDED: module | missing]`
   - `[DATASET_DETAIL_NEEDED: description]`
+  - `[ABSTRACT_NEEDED: 待主要证据稳定后撰写]`
 
 **Method section minimum requirements**:
 - Overall framework first, with architecture figure placeholder at proper position.
@@ -236,6 +253,22 @@ Continue until:
 - Core sections have substantial drafts
 - Blocking evidence gaps would significantly increase hallucination risk
 - User explicitly requests pause
+
+### 12d. Abstract Generation (Hard Gate D)
+
+Abstract is **not** in the initial Section Queue. It can only be generated after **all** of the following conditions are met:
+
+1. All core sections (Introduction / Related Work / Method / Experiments / Discussion / Conclusion) are completed in Cumulative Draft
+2. Each core section's Verification Status = `passed` (`blocked` is insufficient)
+3. Main experimental results are stable (`evidence_debt = closed`)
+
+If conditions are not met, retain `[ABSTRACT_NEEDED: 待主要证据稳定后撰写]` in the placeholder system. Do **not** output a complete Abstract.
+
+When generating Abstract:
+- It must reflect the actual content of the Cumulative Draft
+- Any numerical results must be verified (`newly_run` or `preexisting_artifact`)
+- Do not introduce new claims, methods, or terminology not present in the body
+- Place Abstract at the beginning of the final Cumulative Draft output
 
 ---
 

@@ -69,11 +69,28 @@ description: "Use when user needs to search, verify, or map citations for academ
 - 文献分组方式（work clusters）
 - 贡献点如何与已有工作拉开距离
 
-### Step 5: 建立 Citation-to-Claim 映射
+### Step 5: 建立 Citation-to-Claim 映射（强制输出）
 
 详见 `references/citation-mapping.md`。
 
-为每条正文使用的文献记录：支撑的段落或主张、inline citation marker、引用目的（背景事实/方法比较/基线来源/数据集来源）。
+**此步骤为强制步骤，不可跳过。** 为每条正文使用的文献记录：支撑的段落或主张、inline citation marker、引用目的（背景事实/方法比较/基线来源/数据集来源）。
+
+输出格式要求：
+
+```md
+## Citation-to-Claim Map
+
+| 正文主张/句子 | Inline Citation | 文献 | 引用目的 | 所在章节 |
+|--------------|----------------|------|---------|---------|
+| "AD 占痴呆病例 60%–70%" | [1] | Alzheimer's Association, 2025 | 背景事实 | Introduction |
+| "早期方法依赖静态 FC 矩阵" | [2] | Badhwar et al., 2017 | 方法历史 | Introduction |
+```
+
+**检查清单**：
+- [ ] 每条 Verified Reference 都有对应的 inline citation 位置
+- [ ] 每个 inline citation 都对应一条 Verified Reference
+- [ ] 无"裸 claim"（需要文献支撑但无 citation 或 [REF_NEEDED]）
+- [ ] 无孤立引用（Reference 列表中有但正文未引用）
 
 ### Step 6: 输出
 
@@ -105,6 +122,16 @@ description: "Use when user needs to search, verify, or map citations for academ
 ## Missing References
 - [REF_NEEDED: ...] — 哪些主张仍缺文献支撑
 ```
+
+## Agent 资源
+
+本 Skill 目录下的 `agents/` 文件夹包含以下辅助文件：
+
+| 文件 | 用途 |
+|------|------|
+| `agents/citation_agent.md` | 文献检索策略（4 类查询模板、输出 schema） |
+
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 3 委托时加载参考，核心编排器根据此规范**自行执行**相关操作，不将任务 dispatch 给独立子代理。**此 agent 只执行检索与核验，绝对不得修改项目中的任何文件**。
 
 ## 何时读取 references/
 

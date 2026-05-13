@@ -234,6 +234,16 @@ required = ["matplotlib", "seaborn", "numpy", "pandas", "scipy"]
 1. QA 判定清单（pass / fail per item）
 2. 具体问题列表与修改建议
 
+## Agent 资源
+
+本 Skill 目录下的 `agents/` 文件夹包含以下辅助文件：
+
+| 文件 | 用途 |
+|------|------|
+| `agents/figure_agent.md` | 图表类型选择与生成规范 |
+
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 7 委托时加载参考，核心编排器根据此规范**自行执行**相关操作，不将任务 dispatch 给独立子代理。**此 agent 只生成图表，绝对不得修改项目源代码、配置文件或数据文件**。
+
 ## 何时读取 references/
 
 | Reference 文件 | 打开条件 |

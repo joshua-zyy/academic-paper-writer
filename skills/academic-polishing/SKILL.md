@@ -86,9 +86,20 @@ Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 
 - "与……相比，该设计……"
 - "为使……能够……，我们进一步……"
 
-### Step 5: Claim Strength Audit（按需）
+### Step 5: Claim Strength Audit（强制，非可选）
 
 详见 `references/claim-strength.md`。
+
+**零容忍触发词规则**：以下词汇在正文中出现时，必须立即检查是否满足 Strong 条件。若不满足，**强制降级**，不得保留原表述：
+
+| 触发词 | 必须附带的证据 | 不满足时的降级 |
+|--------|--------------|--------------|
+| "显著(地)" / "significantly" | p 值 < 0.05 或效应量 / 置信区间 | 删除或改为具体数值差异 |
+| "稳定(的)" / "robust" / "stable" | 多随机种子 / 交叉验证 / 外部测试集 | 改为"在观察到的...中一致" |
+| "作为" / "acts as" / "serves as" | 因果干预实验或领域共识文献 | 改为"可能作为...候选" |
+| "表明" / "demonstrates" | Strong 条件全部满足 | 改为"提示" / "与...一致" |
+| "泛化" / "generalization" | 独立测试集或多数据集验证 | 改为"在...数据集上" |
+| "SOTA" / "state-of-the-art" | 完整基线对比 + 独立测试集 | 改为"与当前比较范围相比..." |
 
 | 强度 | 条件 | 典型表达 |
 |------|------|---------|
@@ -113,6 +124,16 @@ Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 
 - Original: "X outperforms Y" → Revised: "X appears to improve over Y on internal validation"
 - ...
 ```
+
+## Agent 资源
+
+本 Skill 目录下的 `agents/` 文件夹包含以下辅助文件：
+
+| 文件 | 用途 |
+|------|------|
+| `agents/polishing_agent.md` | Prose 质量检查与 claim 强度审计规范 |
+
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 9 委托时加载参考，核心编排器根据此规范**自行执行**相关操作，不将任务 dispatch 给独立子代理。**此 agent 只修改论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件**。
 
 ## 何时读取 references/
 
