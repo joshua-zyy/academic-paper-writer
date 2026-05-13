@@ -1,8 +1,14 @@
 ---
 name: "academic-figure"
 description: "Use when creating, revising, or auditing academic figures for CS/AI/ML papers — experimental charts (Python-rendered) and model architecture diagrams (prompt-based). Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, model architecture, plot."
-version: "1.0.0"
-status: "stable"
+metadata:
+  version: "1.0.0"
+  last_updated: "2026-05-13"
+  status: stable
+  data_access_level: raw
+  task_type: open-ended
+  related_skills:
+    - academic-paper-writer (core orchestrator)
 ---
 
 # Academic Figure
@@ -274,3 +280,12 @@ required = ["matplotlib", "seaborn", "numpy", "pandas", "scipy"]
 - 需要交互式绘图（Plotly、Bokeh、D3.js）
 - 已有 Adobe Illustrator / TikZ 完成图且无需修改
 - 仅需数据统计汇报（EDA 图），无发表目标
+
+## Anti-Patterns
+
+| 模式 | 问题 | 正确做法 |
+|------|------|---------|
+| 美观优先 | 用彩虹/jet 色板使图表"好看" | 灰度安全色调 + 简洁明晰的学术风格 |
+| 无 QA 出图 | 代码跑通就直接交付用户 | 必须经过 QA Contract：可读性、数据一致性、格式合规 |
+| 硬编码路径 | 图中路径写死开发者本地路径 | 使用相对路径或参数化配置 |
+| 虚构架构 | 生图提示词中包含不存在的模块连接 | 架构描述必须与代码/论文中的模块定义一致 |

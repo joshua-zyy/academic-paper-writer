@@ -1,8 +1,18 @@
 ---
 name: "academic-paper-writer"
 description: "Use when drafting, revising, or evidence-checking a CS/AI/ML paper from project materials, experimental artifacts, or partial drafts. Triggers on: 写论文, paper draft, 初稿, write introduction, draft method, 论文起草."
-version: "1.0.0"
-status: "stable"
+metadata:
+  version: "1.0.0"
+  last_updated: "2026-05-13"
+  status: stable
+  data_access_level: verified_only
+  task_type: open-ended
+  related_skills:
+    - academic-citation
+    - academic-experiments
+    - academic-figure
+    - academic-polishing
+    - academic-reviser
 ---
 
 # Academic Paper Writer (Core Orchestrator)
@@ -60,13 +70,65 @@ status: "stable"
 
 ## 任务模式
 
-1. `full-paper-planning` — 从概要或仓库启动完整论文
-2. `section-drafting` — 聚焦单节，只收集该节所需证据
-3. `section-revision` — 局部证据核验与局部重写
-4. `related-work-or-citation-pass` — 文献检索与引用映射（委托 `academic-citation`）
-5. `experiment-evidence-pass` — 实验证据链整理（委托 `academic-experiments`）
+1. `full-paper-planning` — 从概要或仓库启动完整论文（平衡光谱）
+2. `section-drafting` — 聚焦单节，只收集该节所需证据（平衡光谱）
+3. `section-revision` — 局部证据核验与局部重写（忠实度光谱）
+4. `related-work-or-citation-pass` — 文献检索与引用映射（委托 `academic-citation`，忠实度光谱）
+5. `experiment-evidence-pass` — 实验证据链整理（委托 `academic-experiments`，忠实度光谱）
 
 若用户请求含糊，优先选择最小满足需求的 mode。
+
+模式光谱详情见 `../shared/references/mode-spectrum.md`。
+
+## 完整性门控（Hard Gates）
+
+以下三种门控是不可跳过的完整性检查关卡。任一关卡未通过不得进入下一阶段。
+
+### Gate A: 证据完备门控（Step 2 → Step 6）
+
+**触发位置**：Step 2（证据审计）完成后、Step 6（Draft v1 生成）开始前。
+
+**条件**：
+- Evidence Inventory 必须包含至少一条与当前 section 直接相关的可引用证据（`newly_run` 或 `preexisting_artifact`）
+- 若本节完全不涉及实验事实（如纯理论推导），必须有明确的 "no experiment required" 记录
+
+**门控失败处理**：
+- 领域论文类型不是需要实验证据的类型 → 降级为理论/position 结构并记录 paper_type，继续
+- 实质性缺失且无替代方案 → 阻塞，向用户报告：当前 section 无可用证据，需要用户提供材料或改变 section 范围
+- 不得在证据为零时生成 Draft v1
+
+### Gate B: 引用资源就绪门控（Step 3 → Step 6）
+
+**触发位置**：Step 3（文献检索与核验）完成后、Step 6（Draft v1 生成）开始前。
+
+**检查内容**：引用资源是否可用，而非检查正文（正文尚未生成）。
+
+**条件**：
+- 至少有一条与当前 section 相关的 `VERIFIED` 引用已到位，或
+- 明确记录"当前 section 不需要文献支撑"（如纯方法推导部分在无外部引用时）
+- 所有候选条目已标注 `VERIFIED` 或 `UNVERIFIED`
+
+**门控失败处理**：
+- 全部为空（零引用）→ 对于 Introduction / Related Work 必须阻塞并提示至少找到 1-2 篇 seed reference 后再开始；对于其他 section 可以先起草但必须标注引用缺口
+
+**正文引用约束**（Step 6 起草时执行，非门控检查项）：
+- Draft v1 中每个需要文献支撑的 claim 必须有 `VERIFIED` 引用或 `[REF_NEEDED: ...]` 占位符
+- 不能在正文中出现既无引用又无占位符的 "裸 claim"
+- 未核验条目不能作为确定引用，只能以 `[REF_NEEDED: ...]` 形式出现
+
+### Gate C: Verification 阶段通过门控（Step 9 → Step 10）
+
+**触发位置**：Step 9（Self-Review & Verification）完成后、Step 10（section loop 推进）开始前。
+
+**条件**（基于 Step 9 输出判定）：
+- `verdict = passed` → 可自由推进到下一节
+- `verdict = blocked` 且 `safe_to_continue = yes` → 可推进，阻塞点进入 Revision Queue
+- `verdict = failed` 或 `blocked` 且 `safe_to_continue = no` → **禁止推进**，必须继续当前 section 的修订
+
+**门控失败处理**：
+- failed → 自动回到 Step 9 进入下一轮修订（最多 3 轮仍未通过 → 冻结所有未闭合 claims，标记为 `verdict: escalated`，报告给用户决策是否继续）
+- blocked + safe_to_continue = no → 终止当前 section 活动，等待用户提供外部证据
+- 不得在 failed 状态下伪推进到下一节
 
 ## 默认交付物
 
@@ -175,7 +237,7 @@ status: "stable"
 → 委托 `academic-citation` 执行。
 
 输入：当前 section、研究关键词、目标 venue。
-输出：Verified References、Exemplar Set（Introduction/Related Work 时）、Citation-to-Claim Map。
+输出：按 `../shared/schemas/verified-references.md` 组织：Verified References、Exemplar Set（Introduction/Related Work 时）、Citation-to-Claim Map。
 
 约束：只有 VERIFIED 文献才能写入正文。未核验条目只能在候选列表。
 
@@ -184,7 +246,7 @@ status: "stable"
 → 委托 `academic-experiments` 执行（仅当 empirical paper 且当前 section 需要实验事实时）。
 
 输入：代码仓库路径、当前 section。
-输出：Experiment Evidence、Protocol Risks、Remaining Blockers。
+输出：按 `../shared/schemas/evidence-inventory.md` 组织：Experiment Evidence、Protocol Risks、Remaining Blockers。
 
 Introduction / Related Work 不因此步骤阻塞。
 
@@ -259,7 +321,7 @@ Prose Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 prose_debt: ope
 → 委托 `academic-reviser` 执行。
 
 输入：Expanded Draft、Evidence Map、前序步骤状态（prose_debt、thin_draft、frozen_claims 等）。
-输出：Self-Review、Revised Draft vN（必须吸收修改点）、Section Critique、Verification Status（passed/failed/blocked）。
+输出：按 `../shared/schemas/verification-report.md` 组织：Self-Review、Revised Draft vN（必须吸收修改点）、Section Critique、Verification Status（passed/failed/blocked）。
 
 若 Verification 判定为 blocked，必须含 safe_to_continue 和 frozen_claims。只有 safe_to_continue = yes 时才允许推进到下一节。
 
@@ -277,6 +339,24 @@ Prose Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 prose_debt: ope
 - 遇到阻塞性证据缺口且继续会显著增加幻觉风险
 - 用户明确要求暂停
 
+## 跨技能数据契约
+
+本 Skill 与其委托的子 Skill 之间通过规范化数据契约交换信息。数据契约定义在 `../shared/schemas/` 中：
+
+| 契约 | 生产者 → 消费者 | 用途 |
+|------|----------------|------|
+| `../shared/schemas/evidence-inventory.md` | `academic-experiments`, Step 2 → Step 6 | 实验证据盘点数据 |
+| `../shared/schemas/verified-references.md` | `academic-citation` → Step 6 | 核验后的文献引用数据 |
+| `../shared/schemas/verification-report.md` | `academic-reviser` → Step 10 | 审修验证状态数据 |
+
+共享参考文件在 `../shared/references/` 中：
+
+| 文件 | 用途 |
+|------|------|
+| `../shared/references/evidence-classification.md` | 三类证据的定义与使用规范 |
+| `../shared/references/placeholder-guide.md` | 占位符系统规范 |
+| `../shared/references/paper-types.md` | 论文类型定义与选择方法 |
+
 ## 何时读取 references/
 
 | Reference 文件 | 打开条件 |
@@ -287,6 +367,13 @@ Prose Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 prose_debt: ope
 | `references/content-density.md` | 执行 Expansion Pass（Step 8）时 |
 | `references/exemplar-sections/` | 写 Introduction / Related Work / Method / Experiments / Abstract 前 |
 | `references/test-scenarios.md` | 修改 Skill 后做回归验证时 |
+| `../shared/schemas/evidence-inventory.md` | Step 4 接收实验证据时 |
+| `../shared/schemas/verified-references.md` | Step 3 接收文献引用时 |
+| `../shared/schemas/verification-report.md` | Step 9 接收审修结果时 |
+| `../shared/references/evidence-classification.md` | Step 2 审计证据时 |
+| `../shared/references/placeholder-guide.md` | Step 6 生成 Draft 使用占位符时 |
+| `../shared/references/mode-spectrum.md` | 选择或理解任务模式时（Step 0） |
+| `../shared/references/data-access-levels.md` | 理解跨技能数据访问边界时 |
 
 ## 不适用场景
 
@@ -302,3 +389,13 @@ Prose Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 prose_debt: ope
 - **运行成本过高**：优先退回 preexisting_artifact 盘点或最小复核。
 - **证据不足**：降级为带占位符的 section 草稿，说明当前不能下哪些结论。
 - **用户要求一次成稿**：仍优先先给 Outline / Section Queue，随后分节推进。
+
+## Anti-Patterns
+
+| 模式 | 问题 | 正确做法 |
+|------|------|---------|
+| 跳过证据审计 | 不盘点证据直接开写 | 必须 Step 2 完成证据审计后再 Step 6 起草 |
+| 批量输出整篇 | 同时多节起草导致证据一致性差 | 分节推进，逐节完成 Draft→Quality→Verification 闭环 |
+| Abstract 前置 | 证据未稳时就先写 Abstract | Abstract 必须后置，等主体章节证据稳定后再写 |
+| 无证据式 SOTA | 未与强基线比较就声称 SOTA | 任何 SOTA / state-of-the-art 表述必须附 baseline 比较表 |
+| 自我审查赦免 | 因接近截止期就缩短审查流程 | Hard Gates 不可跳过，每种核实步骤都至少执行一遍 |

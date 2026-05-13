@@ -1,8 +1,14 @@
 ---
 name: "academic-citation"
 description: "Use when searching, verifying, or mapping citations for academic papers — literature search, reference verification, citation-to-claim mapping, or exemplar set construction. Triggers on: 找引用, 文献检索, citation pass, find references, reference check, 补文献."
-version: "1.0.0"
-status: "stable"
+metadata:
+  version: "1.0.0"
+  last_updated: "2026-05-13"
+  status: stable
+  data_access_level: verified_only
+  task_type: open-ended
+  related_skills:
+    - academic-paper-writer (core orchestrator)
 ---
 
 # Academic Citation
@@ -79,6 +85,8 @@ status: "stable"
 
 ### Step 6: 输出
 
+按 `../shared/schemas/verified-references.md` 中定义的数据结构输出。
+
 输出至少包含：
 
 ```md
@@ -113,6 +121,7 @@ status: "stable"
 | `references/search-strategy.md` | 设计检索查询时（Step 2） |
 | `references/verification-protocol.md` | 核验候选文献时（Step 3） |
 | `references/citation-mapping.md` | 建立 Citation-to-Claim 映射时（Step 5） |
+| `../shared/schemas/verified-references.md` | 理解输出数据格式（Step 6） |
 
 ## 不适用场景
 
@@ -135,3 +144,12 @@ status: "stable"
 - 当前任务是修一句话或局部改写
 
 即便如此，也不能编造引用；缺失处保留 `[REF_NEEDED: ...]`。
+
+## Anti-Patterns
+
+| 模式 | 问题 | 正确做法 |
+|------|------|---------|
+| 快速扫描型检索 | 只翻了搜索结果第一页就确认引用 | 至少覆盖 4 类查询，完整论文 8-15 篇合格文献 |
+| 单信源核验 | 仅靠 Google Scholar 标题核验 | 优先使用一级来源（官方 proceedings、DOI 解析） |
+| 引用孤立 | 参考文献列表有正文未引用的条目 | 列表只能包含正文中已引用或 [REF_NEEDED] 声明的条目 |
+| 偏误引用 | 只引与自己最相似的方法，忽略强基线 | 对等引用，不利比较也要反映在文中 |

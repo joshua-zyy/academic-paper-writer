@@ -29,6 +29,13 @@ Draft v1 → Prose Quality Gate → Expansion Pass → Self-Review → Revised D
 - 完整论文草稿：优先做 2 轮以上，其中至少含 1 轮扩写和 1 轮批判性修订
 - 证据链复杂、实验风险高或目标 venue 较严：直到主要问题被显式处理后再停
 
+## 轮次上限
+
+- 单节内部 Draft→Verification 闭环最多执行 **3 轮**
+- 3 轮后仍未通过 Verification → 冻结所有未闭合 claims，标记 `verdict: escalated`，报告用户决策
+- 用户可选择：继续修订 / 接受当前版本（含已知缺口） / 跳过本节
+- Prose Quality Gate 子循环上限为 **2 轮**，详见 Step 7 规则
+
 ## 跨章节整合
 
 每完成 2-3 个 section，做一次轻量 integration pass：

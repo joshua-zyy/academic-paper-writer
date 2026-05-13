@@ -1,8 +1,14 @@
 ---
 name: "academic-polishing"
 description: "Use when polishing academic prose, de-AI-ifying text, controlling claim strength, or rewriting method sections into proper narrative form. Triggers on: 润色, polish, improve writing, 去AI, de-AI, claim strength, 改写, rewrite method, prose quality."
-version: "1.0.0"
-status: "stable"
+metadata:
+  version: "1.0.0"
+  last_updated: "2026-05-13"
+  status: stable
+  data_access_level: redacted
+  task_type: open-ended
+  related_skills:
+    - academic-paper-writer (core orchestrator)
 ---
 
 # Academic Polishing
@@ -129,3 +135,12 @@ Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 
 - 非学术文体的通用文本润色
 - 已有明确 LaTeX 格式且不需内容修改的场景
 - 内容补全（如补实验数据、补引用）——应使用 `academic-experiments` 或 `academic-citation`
+
+## Anti-Patterns
+
+| 模式 | 问题 | 正确做法 |
+|------|------|---------|
+| 表面润色 | 只改措辞不改 evidence gap | claim 强度必须与证据匹配，无证据时保留占位符 |
+| AI 典型用词 | "delve into"、"crucial"、"notably" 过度使用 | 使用领域特定词汇，替换空洞修饰词 |
+| 方法缩写 | Method 只写概述不写核心细节 | 核心模块需展开：瓶颈→设计选择→机制→公式→收益→代价 |
+| 强词夺理 | 无数据时仍用"显著提升"等强表述 | 降级语气，用保守表述或占位符 |

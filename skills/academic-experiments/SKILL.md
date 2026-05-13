@@ -1,8 +1,14 @@
 ---
 name: "academic-experiments"
 description: "Use when auditing, running, or verifying experimental evidence for academic papers — experiment inventory, result verification, protocol risk assessment. Triggers on: 复核实验, run experiments, 实验结果, experiment evidence, verify results, 实验验证."
-version: "1.0.0"
-status: "stable"
+metadata:
+  version: "1.0.0"
+  last_updated: "2026-05-13"
+  status: stable
+  data_access_level: verified_only
+  task_type: open-ended
+  related_skills:
+    - academic-paper-writer (core orchestrator)
 ---
 
 # Academic Experiments
@@ -93,6 +99,23 @@ status: "stable"
 
 ### Step 5: 输出
 
+输出按 `../shared/schemas/evidence-inventory.md` 中的 Evidence Inventory Schema 组织数据。以下是 Schema 数据的人可读呈现形式：
+
+```md
+## Experiment Evidence
+- Status: newly_run / preexisting_artifact / blocked
+- Command: （实际执行的命令）
+- Workdir: （工作目录）
+- Environment: （Python/CUDA版本、关键依赖）
+- Inputs: （输入数据、checkpoint路径）
+- Key Config: （关键超参数）
+- Output Artifacts: （输出文件路径）
+- Metrics Used In Draft: （正文中引用的指标值）
+- Protocol Risks: （见 Step 4）
+```
+
+完整输出包含：
+
 ```md
 ## Experiment Evidence
 （按 Step 3 格式逐条记录）
@@ -115,6 +138,10 @@ status: "stable"
 | `references/run-strategy.md` | 规划运行策略和记录结果时（Step 2-3） |
 | `references/protocol-risks.md` | 评估协议风险时（Step 4） |
 
+## 输出数据格式
+
+实验结果应按 `../shared/schemas/evidence-inventory.md` 中定义的 Evidence Inventory Schema 组织输出。
+
 ## 不适用场景
 
 本 Skill 不适用于：
@@ -130,3 +157,12 @@ status: "stable"
 - 标出缺失环境、缺失数据、缺失依赖或超长运行成本
 - 将结果节降级为"已知证据 + 待复核项"
 - 不得因运行受阻而将旧草稿数字重新包装为已验证结果
+
+## Anti-Patterns
+
+| 模式 | 问题 | 正确做法 |
+|------|------|---------|
+| 先跑再想 | 一上来就 full training，不先盘点已有产物 | 先验证环境 → 跑最小可复核命令 → 确有必要才重训 |
+| 协议后置 | 跑完才想用什么评估协议 | 写结果前先交代 split 和 aggregation level |
+| 证据混淆 | 把 user_claim 和 newly_run 混在一起 | 严格区分三类证据，只有前两类可引用 |
+| 伪装运行 | 运行受阻就把旧数字重包为已验证 | 如实报告阻塞点，不得伪造运行结果 |

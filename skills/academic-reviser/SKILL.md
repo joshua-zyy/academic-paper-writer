@@ -1,8 +1,14 @@
 ---
 name: "academic-reviser"
 description: "Use when self-reviewing, auditing, or verifying academic paper drafts — structured critique, verification gate, revision loop. Triggers on: 审修, self review, 自查, verification, revise, 修订, check draft."
-version: "1.0.0"
-status: "stable"
+metadata:
+  version: "1.0.0"
+  last_updated: "2026-05-13"
+  status: stable
+  data_access_level: verified_only
+  task_type: open-ended
+  related_skills:
+    - academic-paper-writer (core orchestrator)
 ---
 
 # Academic Reviser
@@ -67,7 +73,7 @@ status: "stable"
 
 ### Step 6: 输出 Section Critique 与 Verification Status
 
-详见 `references/verification-status.md`。
+详见 `references/verification-status.md`。输出格式遵循 `../shared/templates/section-critique.md` 中定义的结构。
 
 **Section Critique** 明确：
 - 本节已解决的问题
@@ -167,6 +173,10 @@ status: "stable"
     Unfreeze condition: 完成 baseline Y 实验并获得可复核指标
 ```
 
+## 输出数据格式
+
+输出应按 `../shared/schemas/verification-report.md` 中定义的 Verification Report Schema 组织。Section Critique 的格式规范见 `../shared/templates/section-critique.md`。
+
 ## 何时读取 references/
 
 | Reference 文件 | 打开条件 |
@@ -174,6 +184,8 @@ status: "stable"
 | `references/revision-checklist.md` | 执行三轮审查时（Step 2-4） |
 | `references/verification-status.md` | 输出 Verification Status 时（Step 6） |
 | `references/common-pitfalls.md` | 自查是否存在自欺行为时 |
+| `../shared/schemas/verification-report.md` | 理解输出数据格式 |
+| `../shared/templates/section-critique.md` | 组织 Section Critique 输出格式 |
 
 ## 不适用场景
 
@@ -194,3 +206,12 @@ status: "stable"
 - 无未闭合的 citation debt、protocol debt、result debt、prose debt、rationale debt
 
 否则，输出"当前最佳版本 + 未闭合问题清单"。
+
+## Anti-Patterns
+
+| 模式 | 问题 | 正确做法 |
+|------|------|---------|
+| 顺序颠倒 | 先改语言再查事实 | 必须证据→论证→风格三轮依次执行 |
+| 姑息判决 | 草稿篇幅长就假设足够可信 | 检查核心内容是否充分，不因页数放行 |
+| 伪修订 | 输出批注但不改原稿 | Revised Draft 必须真正吸收全部修改点 |
+| 放水收尾 | 剩余 issues 多仍判 passed | 只有终止条件基本满足时才能判为 passed |
