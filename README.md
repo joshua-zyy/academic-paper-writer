@@ -166,8 +166,9 @@ Step 10 整合 & 依赖感知 Section Loop
 
 ## 参考
 
-1. [nature-skills](https://github.com/Yuan1z0825/nature-skills)（袁一哲，上海交通大学）
-2. [academic-research-skills](https://github.com/Imbad0202/academic-research-skills) 
+1. [superpowers](https://github.com/obra/superpowers)
+2. [nature-skills](https://github.com/Yuan1z0825/nature-skills)
+3. [academic-research-skills](https://github.com/Imbad0202/academic-research-skills) 
 
 ## 许可
 

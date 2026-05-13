@@ -48,8 +48,79 @@ Create a todo list for evidence items. Dispatch probe agents per section type (p
 | Ablation | `ablation_results` |
 | Discussion | `interpretability` |
 
-Single probe: dispatch one general subagent with `agents/probe-agent.md`.
-Multiple probes: dispatch multiple subagents simultaneously, each with a different probe type.
+Single probe: dispatch one general subagent with the template below.
+Multiple probes: dispatch multiple subagents simultaneously (inter‑independent), each with its own template.
+
+**Dispatch template — 单探查任务：**
+```yaml
+Task:
+  description: "Probe {probe_type} for {section_type}"
+  subagent_type: "general"
+  prompt: |
+    你已加载 probe-agent 模板。按照以下要求执行。
+
+    Role: 项目探查代理（只读）
+
+    probe_type: {probe_type}
+    target_path: <项目根目录>
+    section_type: {section_type}
+
+    加载并执行 skills/academic-paper-writer/agents/probe-agent.md 中对应 probe_type 的 schema。
+    输出对应 probe_type 的结构化结果。若目标路径不存在，在 blocked_items 中列出。
+
+    Red Lines（硬性约束）:
+    1. 只读——禁止修改任何项目文件。绝对不得创建、修改、删除、重命名任何文件。
+    2. 找不到就标记 null，不编造
+    3. 只探查指定路径及其直接子目录，不递归全仓库
+
+    返回: 按对应 probe schema 的结构化结果
+```
+
+**Dispatch template — 并行多探查任务（如 Method → code_structure + preprocessing）：**
+```yaml
+# 同时 dispatch，互不等待，不共享上下文
+Task ①:
+  description: "Probe code_structure for Method"
+  subagent_type: "general"
+  prompt: |
+    你已加载 probe-agent 模板。按照以下要求执行。
+
+    Role: 项目探查代理（只读）
+    probe_type: code_structure
+    target_path: <项目根目录>
+    section_type: method
+
+    加载 skills/academic-paper-writer/agents/probe-agent.md 的 code_structure 探查 schema。
+    产出 Module Cards 表 + 张量形状。区分 artifact-verified / inferred-from-gap / missing。
+
+    Red Lines（硬性约束）:
+    1. 只读——禁止修改任何项目文件
+    2. 找不到就标记 null，不编造
+    3. 不递归遍历整个仓库
+
+    返回: 结构化 Module Cards
+
+Task ②:
+  description: "Probe preprocessing for Method"
+  subagent_type: "general"
+  prompt: |
+    你已加载 probe-agent 模板。按照以下要求执行。
+
+    Role: 项目探查代理（只读）
+    probe_type: preprocessing
+    target_path: <项目根目录>
+    section_type: method
+
+    加载 skills/academic-paper-writer/agents/probe-agent.md 的 preprocessing 探查 schema。
+    输出预处理步骤列表。
+
+    Red Lines（硬性约束）:
+    1. 只读——禁止修改任何项目文件
+    2. 找不到就标记 null，不编造
+    3. 不递归遍历整个仓库
+
+    返回: 结构化预处理步骤列表
+```
 
 After probes return, aggregate into an Evidence Map. Light-weight, section-targeted inventory only.
 
@@ -61,15 +132,124 @@ List four categories:
 - Missing but placeholder-acceptable facts
 - Claims needing external validation
 
+### 探查策略：轻量全量探查 + 按需深度探查（混合策略）
+
+首次执行 full-paper-planning 时，Step 2 采用**混合探查策略**：
+
+**Phase 1 — 轻量全量探查（Step 2 执行，并行 dispatch）：**
+同时 dispatch 以下 3 个轻量探查任务（每个只需读取目录级信息和配置文件）：
+
+```yaml
+Task ①:
+  description: "Project overview: code structure"
+  subagent_type: "general"
+  prompt: |
+    只读探查——列出项目的模块清单、文件组织方式、核心类/函数签名。
+    目标路径: <项目根目录>
+
+    输出:
+    - 文件结构摘要（模块名、文件路径）
+    - 核心代码模块列表（model.py、dataset.py、train.py 等）
+    - 各模块的职责（1-2 句）
+
+    Red Lines:
+    1. 只读——禁止修改任何文件
+    2. 只探查顶层目录和直接子目录，不递归进 __pycache__/ .git/ 等
+
+Task ②:
+  description: "Project overview: data & artifacts"
+  subagent_type: "general"
+  prompt: |
+    只读探查——定位数据集 CSV、checkpoint 文件、日志文件、配置文件的路径。
+    目标路径: <项目根目录>
+
+    输出:
+    - 实验产出目录列表（如 AD_NC/、EMIC_LMCI/）
+    - 每个目录下的文件类型（best_model.pth、checkpoints、explain_outputs 等）
+    - 是否存在训练日志、指标 CSV、可解释性结果
+
+    Red Lines:
+    1. 只读——禁止修改任何文件
+
+Task ③:
+  description: "Project overview: config"
+  subagent_type: "general"
+  prompt: |
+    只读探查——读取 config.py 等关键配置文件，提取超参数摘要。
+    目标路径: <项目根目录>
+
+    输出:
+    - 关键超参数列表（学习率、batch size、epochs、hidden_dim 等）
+    - 路径配置（数据目录、输出目录）
+
+    Red Lines:
+    1. 只读——禁止修改任何文件
+```
+
+3 个探查返回后，汇总为 **Project Overview**，作为 Evidence Map 的索引层。
+
+**Phase 2 — 按需深度探查（各 section 起草前 dispatch）：**
+以下深层探查**不在此阶段执行**，而是推迟到对应 section 起草前 dispatch：
+
+| Section 起草前 | dispatch 的深层探查 |
+|---------------|-------------------|
+| Method | `code_structure`（逐模块的 Module Cards、张量形状、forward 路径） |
+| Method | `preprocessing`（数据预处理详细步骤） |
+| Experimental Setup | `data_statistics`（受试者级人口统计） |
+| Experimental Setup | `experiment_config`（评估协议、划分方式、超参数） |
+| Main Results | `experiment_data`（具体数值：ACC/AUC/F1） |
+| Main Results | `baseline_results`（基线对比数据） |
+| Ablation | `ablation_results`（消融实验数值） |
+| Discussion | `interpretability`（可解释性结果、网络重要性） |
+
+每个深层探查使用 Step 2 中定义的 dispatch 模板，传入对应 probe_type。
+
 For Introduction / Related Work, also audit exemplar paper candidates.
 For Method, also audit model data flow, module boundaries, tensor shapes, recoverable formulas.
 
 ## Step 3: Literature Search and Verification
 
 - Create a todo list for keywords and expected reference counts.
-- Determine search keywords and scope.
-- Delegate to `academic-citation`.
+- Determine search keywords and scope (e.g., task_name, method_family, dataset).
+- Delegate to `academic-citation` via the dispatch template below.
 - Mark todo completed after return.
+
+**Dispatch template：**
+```yaml
+Task:
+  description: "文献检索 - {section}"
+  subagent_type: "general"
+  prompt: |
+    你已加载 academic-citation 子 Skill（skills/academic-citation/SKILL.md）。
+
+    任务: 为 {section} 执行文献检索与核验
+    关键词: {keywords}
+    目标 venue: {venue}
+
+    执行步骤:
+    1. 读取 skills/academic-citation/SKILL.md，按 Step 1-6 执行
+    2. 至少覆盖 4 类查询：问题导向 / 方法导向 / 基线导向 / 时间导向
+    3. 逐篇核验元数据，优先一级来源（official proceedings、DOI）
+    4. 完整论文至少 8-15 篇 VERIFIED 文献，短论文至少 4-8 篇
+    5. Introduction/Related Work 时额外构建 Exemplar Set（3-5 篇）
+    6. 输出时同时输出 Citation-to-Claim Map
+
+    输出:
+    - Verified References（含 VERIFIED/UNVERIFIED 状态、来源链接）
+    - Exemplar Set（Introduction/Related Work 时必选）
+    - Citation-to-Claim Map（每篇引用→对应主张的映射）
+    - Missing References（[REF_NEEDED: ...] 方向列表）
+
+    Red Lines:
+    1. 只检索——禁止修改项目中的任何文件
+    2. 禁止编造文献、作者、年份、venue、DOI、arXiv 编号
+    3. 禁止把 UNVERIFIED 当作 VERIFIED 写入正文
+    4. 禁止因"搜索结果第一页看完了"就停止检索
+    5. 禁止只引与自己最相似的方法而忽略强基线
+    6. 搜索引擎不可用时如实报告，不得伪造
+
+    返回: 结构化输出
+```
 
 Input: current section, research keywords, target venue.
 Output: Verified References, Exemplar Set (for Intro/RW), Citation-to-Claim Map per `../shared/schemas/verified-references.md`.
@@ -79,7 +259,43 @@ Constraint: only VERIFIED references enter the draft body. UNVERIFIED entries st
 ## Step 4: Experiment Evidence Verification
 
 - Create a todo list for experiment evidence items.
-- Delegate to `academic-experiments` (only when empirical paper and current section needs experiment facts).
+- Delegate to `academic-experiments` via the dispatch template below (only when empirical paper and current section needs experiment facts).
+
+**Dispatch template：**
+```yaml
+Task:
+  description: "实验复核 - {section}"
+  subagent_type: "general"
+  prompt: |
+    你已加载 academic-experiments 子 Skill（skills/academic-experiments/SKILL.md）。
+
+    任务: 对项目路径 {repo_path} 执行实验证据盘点与复核
+    当前 section: {section}
+    目标 venue: {venue}
+
+    执行步骤:
+    1. 读取 skills/academic-experiments/SKILL.md，按 Step 1-5 执行
+    2. 先盘点已有产物（preexisting_artifact）：checkpoint、日志、CSV、配置文件
+    3. 优先评估已有 checkpoint（最小可复核命令），不重训
+    4. 确有必要才尝试运行，运行前置验证环境
+    5. 每条结果必须标注 evidence_type（newly_run / preexisting_artifact / user_claim）
+    6. 评估协议风险（数据泄漏、验证集调参、基线缺失、单次运行等）
+
+    输出:
+    - Evidence Inventory（含 evidence_type 标注）
+    - Protocol Risks（逐项列出风险类型与严重程度）
+    - Remaining Blockers（可执行/数据/环境缺失）
+
+    Red Lines:
+    1. 可运行实验/评估脚本，但禁止修改源代码/数据文件/配置文件
+    2. 禁止编造实验结果
+    3. 禁止把 user_claim 当作可直接引用的证据
+    4. 禁止把领域默认值写成当前项目已确认事实
+    5. 禁止因运行受阻就把旧数字重新包装为已验证结果
+    6. 若需安装依赖，必须经用户明确同意
+
+    返回: 结构化输出
+```
 
 Input: repo path, current section.
 Output: Experiment Evidence, Protocol Risks, Remaining Blockers per `../shared/schemas/evidence-inventory.md`.
@@ -140,40 +356,126 @@ Body constraints:
 
 Reference list must only contain entries cited in body or declared via `[REF_NEEDED: ...]`.
 
-## Step 7: Placeholder Audit, Architecture Figure Pre-generation, and Debt List
+## Step 7: Placeholder Audit, Architecture Figure Pre-generation, and Debt List（**强制执行，不可跳过**）
 
-After Draft v1, automatically execute:
+After Draft v1, **必须**自动执行以下 5 个子步骤：
 
-1. **Scan placeholders** — count and classify all placeholders by type and location.
-2. **Fill missing architecture figure placeholders** — for Method section, scan module headings; if missing `[FIGURE_NEEDED]`, insert:
-   ```
-   [FIGURE_NEEDED: Figure X <module> module diagram | corresponding subsection | show internal structure, input/output, data flow]
-   ```
-3. **Auto-trigger architecture figure generation** — per `[FIGURE_NEEDED]`, classify:
-   - Architecture/pipeline/structure diagrams → dispatch `academic-figure` in `arch-prompt` mode, replace placeholder with prompt.
-   - Data/curve/comparison charts → keep placeholder, add to debt list (trigger later when data is ready).
-4. **Append debt list** — after Draft v1 (after references), append:
-   ```markdown
-   ---
-   ## Appendix: Pending Items
-   *Not part of the formal body; internal draft status record only.*
+### 7a. 扫描全文占位符
+统计并分类所有占位符的数量、位置与内容：
+- `[FIGURE_NEEDED]`、`[TABLE_NEEDED]`、`[RESULT_NEEDED]`、`[REF_NEEDED]`、`[METHOD_DETAIL_NEEDED]`、`[DATASET_DETAIL_NEEDED]`、`[RATIONALE_NEEDED]`
 
-   ### Pending
-   1. [FIGURE_NEEDED] <data chart placeholders>
-   2. [TABLE_NEEDED] <table placeholders>
-   3. [RESULT_NEEDED] <result placeholders>
-   4. [REF_NEEDED] <reference placeholders>
-   5. [METHOD_DETAIL_NEEDED] / [DATASET_DETAIL_NEEDED] / [RATIONALE_NEEDED] <if any>
-   6. (Other known gaps)
-   ```
-   Mark items as "none" if the category has no placeholders.
-5. **Report audit result** — include placeholder statistics (`placeholder_debt`) in Section Critique for Step 11 Verification.
+### 7b. 填补遗漏的架构图占位符（**必须**）
+对 Method 节进行结构分析，主动补入缺失的图占位：
+- 扫描 Method 节中每个独立模块标题（如 "###"、"####" 或 "1) ..." 等）
+- 检查该模块附近是否已有 `[FIGURE_NEEDED]` 占位符
+- 若缺失，**必须**在该模块段落末尾插入：
+  ```
+  [FIGURE_NEEDED: 图X <模块名>模块图 | 对应小节 | 展示内部结构、输入输出与数据流]
+  ```
+- **不得因"模块描述较清晰"而跳过架构图占位符**
+
+### 7c. 自动触发架构图生成
+对每个 `[FIGURE_NEEDED]` 按用途分类处理：
+- **架构图类**（purpose 含 architecture / structure / pipeline / diagram / network / flow / 架构 / 模块图 等）：
+  按下文 Step 7 的 dispatch 模板委托 `academic-figure` 的 arch-prompt 模式，用生图提示词替换原占位符
+- **数据图类**（purpose 含 curve / comparison / ablation / 曲线 / 对比 等）：
+  保留占位符，记入待补项列表
+
+### 7d. 追加待补项清单（**必须，不可省略**）
+在 Draft v1 末尾（参考文献之后）**必须**追加以下内容。即使某类占位符不存在也要列出（标记为「无」）：
+
+```markdown
+---
+
+## 附：待补项清单
+
+*以下内容不作为正式正文，仅作为草稿状态内部记录。*
+
+### 仍待补项
+
+1. [FIGURE_NEEDED] <汇总所有数据图类占位符，逐项列出用途>
+2. [TABLE_NEEDED] <汇总所有表格类占位符，逐项列出用途>
+3. [RESULT_NEEDED] <汇总所有结果类占位符，逐项列出>
+4. [REF_NEEDED] <汇总所有文献类占位符，逐项列出方向>
+5. [METHOD_DETAIL_NEEDED] / [DATASET_DETAIL_NEEDED] / [RATIONALE_NEEDED] <如有>
+6. （预处理细节补充、多随机种子/交叉验证、英文翻译等其他已知待补项）
+```
+
+### 7e. 报告审计结果
+将占位符统计信息（`placeholder_debt`）纳入 Section Critique，供 Step 11 Verification 引用。
+
+### 7f. 架构图 dispatch 模板
+对架构图类的 `[FIGURE_NEEDED]`，按此模板 dispatch：
+
+```yaml
+Task:
+  description: "生成架构图提示词 - {module_name}"
+  subagent_type: "general"
+  prompt: |
+    你已加载 academic-figure 子 Skill（skills/academic-figure/SKILL.md）。
+
+    任务: 以 arch-prompt 模式生成架构图生图提示词
+    图用途: {从 [FIGURE_NEEDED] 的 purpose 字段提取}
+    path: B
+
+    执行步骤:
+    1. 读取 skills/academic-figure/SKILL.md，按 B 路径（arch-prompt）执行
+    2. 确认模型结构：核心组件列表、数据流方向、关键连接方式（残差/跨层注意力等）
+    3. 输出结构化描述式提示词
+
+    输出:
+    - 架构分析说明（组件、数据流、连接方式）
+    - 生图提示词（通用描述式语言，不含 --ar、--style 等工具参数）
+    - 配色建议（学术色板 + 灰度安全）
+    - 使用说明
+
+    Red Lines:
+    1. 禁止编造不存在的网络结构或模块连接
+    2. 禁止在提示词中包含特定生图工具的硬编码参数
+    3. 输出必须与代码/论文中的模块定义一致
+    4. 禁止虚构数据来生成图表
+
+    返回: 架构分析说明 + 生图提示词
+```
 
 ## Step 8: Evidence Compliance Review (Phase 1 of Two-Phase Review)
 
 - Create a todo list for evidence compliance checks.
-- Delegate to `academic-reviser` in `targeted-evidence-mode`.
+- Delegate to `academic-reviser` in `targeted-evidence-mode` via the dispatch template below.
 - Check `evidence_debt` status.
+
+**Dispatch template：**
+```yaml
+Task:
+  description: "证据合规审查 - {section}"
+  subagent_type: "general"
+  prompt: |
+    你已加载 academic-reviser 子 Skill（skills/academic-reviser/SKILL.md）。
+
+    任务: 对 {section} 执行证据合规审查（targeted-evidence-mode）
+    Draft: <传入 Draft v1 文本>
+    Evidence Map: <传入证据清單>
+    Verified References: <传入已核验引用>
+    placeholder_debt: <传入占位符统计>
+
+    执行步骤:
+    1. 读取 skills/academic-reviser/SKILL.md，按 targeted-evidence-mode 执行
+    2. 检查每个 claim 是否在 Evidence Map 中有对应的 newly_run 或 preexisting_artifact 支撑
+    3. 检查每个 inline citation 是否对应 Verified References 中已核验条目
+    4. 检查所有占位符使用是否符合规范（如 [REF_NEEDED] 含方向说明）
+    5. 检查是否存在无证据支撑的"裸 claim"
+
+    输出: evidence_debt (open/closed) + evidence_issues 清单
+    **不允许修改正文。**
+
+    Red Lines:
+    1. 只审查文本——禁止修改项目中的任何文件
+    2. 禁止在 evidence_debt 未闭合时伪装为 closed
+    3. 禁止删除占位符
+    4. 禁止跳过检查顺序
+
+    返回: 审查结果（evidence_debt + issues）
+```
 
 This is Phase 1. Only proceed to Phase 2 (prose polishing) after `evidence_debt = closed`.
 
@@ -186,7 +488,48 @@ If `evidence_debt = open`, record issues and return to Step 6. Do not proceed to
 
 - Create a todo list for prose checks.
 - Confirm Step 8 `evidence_debt = closed` before executing.
-- Delegate to `academic-polishing`.
+- Delegate to `academic-polishing` via the dispatch template below.
+
+**Dispatch template：**
+```yaml
+Task:
+  description: "Prose 质量门 - {section}"
+  subagent_type: "general"
+  prompt: |
+    你已加载 academic-polishing 子 Skill（skills/academic-polishing/SKILL.md）。
+
+    任务: 对 {section} 执行 Prose Quality Gate（含 Claim Strength Audit）
+    Draft: <传入 Draft 文本>
+    evidence_debt: {evidence_debt}
+    section_type: {section_type}
+
+    执行步骤:
+    1. 读取 skills/academic-polishing/SKILL.md，按 Step 1-6 执行
+    2. 若 evidence_debt = open，只修语法错误，不进行风格强化或措辞润色
+    3. 执行通用检查 + 章节专项检查
+    4. 执行 Claim Strength Audit
+    5. 若为 Method 节，执行 Method Prose Rewrite
+    6. Prose Rewrite 最多 2 轮，2 轮后仍 open 则保留状态继续
+
+    Zero-Tolerance（零容忍触发词）——出现时必须检查 Strong 条件，不满足则强制降级:
+    - "显著" / "significantly" → 无 p 值/效应量时必须降级
+    - "稳定" / "robust" → 无多随机种子/交叉验证时必须降级
+    - "作为" / "acts as" → 无因果干预实验时必须降级
+    - "表明" / "demonstrates" → 不满足 Strong 条件时必须降级
+    - "泛化" / "generalization" → 无独立测试集时必须降级
+    - "SOTA" / "state-of-the-art" → 无完整基线对比时必须降级
+
+    输出: prose_debt (open/closed) + failed_items + 改写后文本
+    （Method 时额外输出 method_prose_debt）
+
+    Red Lines:
+    1. 只修改论文草稿文本——禁止修改项目中的任何文件
+    2. 禁止把未核验的 user_claim 改写成确定性结论
+    3. 禁止用华丽措辞掩盖 evidence gap
+    4. Prose Rewrite 2 轮后不得假装 prose_debt = closed
+
+    返回: 润色后文本 + prose_debt 状态
+```
 
 Input: Draft v1 text, current section type.
 Output: `prose_debt` (open|closed), `failed_items`, rewritten text. For Method, also `method_prose_debt`.
@@ -209,8 +552,53 @@ Expansion principle: use only existing evidence and compliant placeholders. Prio
 ## Step 11: Self-Review & Verification
 
 - Create a todo list for review items.
-- Delegate to `academic-reviser`.
+- Delegate to `academic-reviser` via the dispatch template below（full-section-review mode）.
 - Check verdict and decide whether to advance or revise.
+
+**Dispatch template：**
+```yaml
+Task:
+  description: "综合验证 - {section}"
+  subagent_type: "general"
+  prompt: |
+    你已加载 academic-reviser 子 Skill（skills/academic-reviser/SKILL.md）。
+
+    任务: 对 {section} 执行完整三轮审查 + Verification（full-section-review）
+    Draft: <传入 Expanded Draft>
+    Evidence Map: <传入证据清單>
+    prose_debt: {prose_debt}
+    thin_draft: {thin_draft}
+    frozen_claims: {frozen_claims}
+    iteration_count: {iteration_count}
+
+    执行步骤:
+    1. 读取 skills/academic-reviser/SKILL.md，按 Step 1-6 执行
+    2. 第一轮——证据与事实检查（13 项）
+    3. 第二轮——论证强度与审稿风险检查（11 项）
+    4. 第三轮——结构与风格检查（8 项）
+    5. 生成 Revised Draft（必须真正吸收修改点）
+    6. 输出 Section Critique + Verification Status
+
+    Verification 判定规则（Gate C strict 模式）:
+    - verdict = passed 仅当 prose_debt=closed 且 citation_debt=closed 且 evidence_debt=closed 且 figure_debt=closed 且 thin_draft=no
+    - 任何 debt 未闭合 → verdict = blocked（禁止伪装为 passed）
+    - blocked 时输出 safe_to_continue + frozen_claims
+
+    输出的 Section Critique 必须明确:
+    - 本节已解决的问题
+    - 本节仍缺的证据
+    - 剩余占位符统计
+    - 下一节最合理的候选
+
+    Red Lines:
+    1. 只审查论文草稿——禁止修改项目中的任何文件
+    2. 必须证据→论证→风格三轮顺序，不得先修风格再查事实
+    3. 禁止在 debts 未闭合时判为 passed
+    4. 禁止删除占位符而不补真实内容
+    5. 禁止因草稿篇幅长就假设它足够可信
+
+    返回: Section Critique + Revised Draft + Verification Status
+```
 
 Input: Expanded Draft, Evidence Map, prior step states (`prose_debt`, `thin_draft`, `frozen_claims`, etc.).
 Output: Self-Review, Revised Draft vN (must absorb fixes), Section Critique, Verification Status (`passed`/`failed`/`blocked`) per `../shared/schemas/verification-report.md`.

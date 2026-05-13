@@ -299,6 +299,8 @@ Gate C Failed
 
 **核心约束**：Draft v1 → Evidence Review → Prose Review → Expansion → Verification → Advance（或 Revise）。
 
+**Dispatch 模板指引**：每个委托步骤的完整 Task() dispatch 模板见 `references/orchestration-workflow.md`。执行委托任务时，按对应步骤的模板创建 Task 调用并传入参数。
+
 ## 跨技能数据契约
 
 本 Skill 与其委托的子 Skill 之间通过规范化数据契约交换信息。数据契约定义在 `../shared/schemas/` 中：
