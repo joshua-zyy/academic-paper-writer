@@ -36,7 +36,8 @@ metadata:
 |------|-----------|------|
 | Step 3 | `academic-citation` | 文献检索、核验与 Exemplar Set 构建 |
 | Step 4 | `academic-experiments` | 实验证据盘点与复核 |
-| Step 4.5 | `academic-figure` | 根据实验证据生成论文图表（可选，仅用户要求出图时触发） |
+| Step 4.5 | `academic-figure` | 起草过程中应要求生成论文图表（由用户显式提出时触发） |
+| Step 6.5 | `academic-figure` | Draft v1 完成后自动检测架构图占位符并触发 arch-prompt 模式 |
 | Step 7 | `academic-polishing` | Prose Quality Gate 与 Method 专项强化 |
 | Step 9 | `academic-reviser` | 自我审查与 Verification 判定 |
 
@@ -341,6 +342,47 @@ Introduction / Related Work 不因此步骤阻塞。
 - 若设计动机只能有限推断，正文必须显式降级语气，使用"该设计意在……""从实现结构看……"等保守表述
 
 参考文献列表只能包含正文中被引用或以 `[REF_NEEDED: ...]` 声明的条目。
+
+### Step 6.5: 占位符审计、架构图预生成与待补项列表
+
+Step 6 生成 Draft v1 后，自动执行以下流程：
+
+1. **扫描全文占位符** — 统计并分类以下占位符的数量、位置与内容：
+   - `[FIGURE_NEEDED]` — 记录图表用途与缺失原因
+   - `[TABLE_NEEDED]` — 记录表格用途与所需列
+   - `[RESULT_NEEDED]` — 记录实验/指标/来源
+   - `[REF_NEEDED]` — 记录需要补充的文献方向
+   - `[METHOD_DETAIL_NEEDED]` — 记录缺失的方法细节
+   - `[DATASET_DETAIL_NEEDED]` — 记录缺失的数据集细节
+   - `[RATIONALE_NEEDED]` — 记录缺失的设计理由
+
+2. **自动触发架构图生成** — 对每个 `[FIGURE_NEEDED]` 占位符，根据 figure purpose 判断类型：
+   - **架构图类**（purpose 含 architecture / structure / pipeline / diagram / network / overview / flow / 架构 / 网络结构 / 模块图 / 流程图 / 总体架构 等）→ 委托 `academic-figure` 以 `arch-prompt` 模式生成架构图生图提示词，并用生成的提示词替换占位符
+   - **数据图类**（purpose 含 curve / comparison / ablation / training / 曲线 / 对比 / 消融 / 实验 等）→ 保留占位符（需实验数据就绪后在用户指导下触发），记入待补项列表
+
+3. **生成待补项列表附录** — 在 Draft v1 末尾（参考文献之后）追加以下内容：
+
+   ```markdown
+   ---
+
+   ## 附：待补项清单
+
+   *以下内容不作为正式正文，仅作为草稿状态内部记录。*
+
+   ### 仍待补项
+
+   1. [FIGURE_NEEDED] <汇总所有数据图类占位符，逐项列出用途>
+   2. [TABLE_NEEDED] <汇总所有表格类占位符，逐项列出用途>
+   3. [RESULT_NEEDED] <汇总所有结果类占位符，逐项列出>
+   4. [REF_NEEDED] <汇总所有文献类占位符，逐项列出方向>
+   5. [METHOD_DETAIL_NEEDED] <汇总所有方法细节占位符>
+   6. [DATASET_DETAIL_NEEDED] / [RATIONALE_NEEDED] <如有>
+   7. （预处理细节补充、多随机种子/交叉验证、英文翻译等其他已知待补项）
+   ```
+
+   若某类占位符不存在，对应项标记为「无」。
+
+4. **报告审计结果** — 将占位符统计信息（`placeholder_debt`）纳入 Section Critique，供 Step 9 Verification 引用。
 
 ### Step 7: Prose Quality Gate
 
