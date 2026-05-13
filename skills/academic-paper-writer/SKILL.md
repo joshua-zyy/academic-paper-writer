@@ -96,6 +96,7 @@ digraph academic_paper_writer {
 10. **引用闭合**：需要文献支撑的段落必须有 inline citation 或 `[REF_NEEDED: ...]`。参考文献列表只能包含正文中被引用或已声明的条目。
 11. **一轮闭环**：当前 section 至少经历 Draft v1 → Prose Quality Gate → Expansion → Self-Review → Revised Draft v2 → Verification。不得把 v1 当作完成稿交付。
 12. **失败不伪装**：Verification 未通过且非外部阻塞时，必须继续下一轮修订，不得直接结束或假装通过。
+13. **完整流程执行**：执行 full-paper-planning 时，必须按 Step 0→1→2→...→12 的顺序逐一执行，不得跳步。用户催促时也不得跳过证据审计（Step 2）、文献检索（Step 3）、实验复核（Step 4）、Hard Gates（A/B/C）中的任何一个。
 
 ## 任务模式
 
@@ -281,25 +282,48 @@ Gate C Failed
 
 详见 `references/orchestration-workflow.md` 获取每个步骤的完整执行细节。
 
-| Step | 动作 | 委托 Skill |
-|------|------|-----------|
-| 0 | 判定 mode、scope、当前 section | — |
-| 1 | 确认 venue / 语言（Blocking Gate） | — |
-| 2 | 证据审计（dispatch probe agents） | — |
-| 3 | 文献检索与核验 | `academic-citation` |
-| 4 | 实验事实复核 | `academic-experiments` |
-| 5 | 生成 Section / Method Blueprint | — |
-| 6 | 起草 Draft v1（含占位符系统） | — |
-| 7 | 占位符审计 + 架构图预生成 | `academic-figure`（arch-prompt） |
-| 8 | 证据合规审查（Phase 1） | `academic-reviser` |
-| 9 | Prose Quality Gate（Phase 2） | `academic-polishing` |
-| 10 | Expansion Pass（内容密度检查） | — |
-| 11 | Self-Review & Verification | `academic-reviser` |
-| 12 | 整合 & 依赖感知 section loop | — |
+| Step | 动作 | 委托 Skill | 触发方式 |
+|------|------|-----------|---------|
+| 0 | 判定 mode、scope、当前 section | — | 自动 |
+| 1 | 确认 venue / 语言（Blocking Gate） | — | 自动 |
+| 2 | 证据审计（dispatch probe agents） | — | 自动 |
+| 3 | 文献检索与核验 | `academic-citation` | 自动 |
+| 4 | 实验事实复核 | `academic-experiments` | 自动 |
+| 5 | 生成 Section / Method Blueprint | — | 自动 |
+| 6 | 起草 Draft v1（含占位符系统 + **待补项清单**） | — | 自动 |
+| 7 | 占位符审计 + 架构图预生成 | `academic-figure`（arch-prompt） | 自动 |
+| 8 | 证据合规审查（Phase 1） | `academic-reviser` | 自动 |
+| 9 | Prose Quality Gate（Phase 2） | `academic-polishing` | 自动 |
+| 10 | Expansion Pass（内容密度检查） | — | 自动 |
+| 11 | Self-Review & Verification | `academic-reviser` | 自动 |
+| 12 | 整合 & 依赖感知 section loop | — | 自动 |
 
 **核心约束**：Draft v1 → Evidence Review → Prose Review → Expansion → Verification → Advance（或 Revise）。
 
 **Dispatch 模板指引**：每个委托步骤的完整 Task() dispatch 模板见 `references/orchestration-workflow.md`。执行委托任务时，按对应步骤的模板创建 Task 调用并传入参数。
+
+### Step 6 必附：待补项清单
+
+Draft v1 生成后，**必须**在正文末尾（参考文献之后）追加待补项清单。这是 Draft v1 交付物的组成部分，不可省略：
+
+```markdown
+---
+
+## 附：待补项清单
+
+*以下内容不作为正式正文，仅作为草稿状态内部记录。*
+
+### 仍待补项
+
+1. [FIGURE_NEEDED] <汇总所有数据图类占位符，逐项列出用途>
+2. [TABLE_NEEDED] <汇总所有表格类占位符，逐项列出用途>
+3. [RESULT_NEEDED] <汇总所有结果类占位符，逐项列出>
+4. [REF_NEEDED] <汇总所有文献类占位符，逐项列出方向>
+5. [METHOD_DETAIL_NEEDED] / [DATASET_DETAIL_NEEDED] / [RATIONALE_NEEDED] <如有>
+6. （预处理细节补充、多随机种子/交叉验证、英文翻译等其他已知待补项）
+```
+
+若某类占位符不存在，对应项标记为「无」。
 
 ## 跨技能数据契约
 
