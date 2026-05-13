@@ -1,14 +1,6 @@
 ---
-name: "academic-experiments"
-description: "Use when auditing, running, or verifying experimental evidence for academic papers — experiment inventory, result verification, protocol risk assessment. Triggers on: 复核实验, run experiments, 实验结果, experiment evidence, verify results, 实验验证."
-metadata:
-  version: "1.0.0"
-  last_updated: "2026-05-13"
-  status: stable
-  data_access_level: verified_only
-  task_type: open-ended
-  related_skills:
-    - academic-paper-writer (core orchestrator)
+name: academic-experiments
+description: "Use when user needs to audit, run, or verify experimental evidence for academic papers. Triggers on: 复核实验, run experiments, 实验结果, experiment evidence, verify results, 实验验证."
 ---
 
 # Academic Experiments

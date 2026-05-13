@@ -1,14 +1,6 @@
 ---
-name: "academic-citation"
-description: "Use when searching, verifying, or mapping citations for academic papers — literature search, reference verification, citation-to-claim mapping, or exemplar set construction. Triggers on: 找引用, 文献检索, citation pass, find references, reference check, 补文献."
-metadata:
-  version: "1.0.0"
-  last_updated: "2026-05-13"
-  status: stable
-  data_access_level: verified_only
-  task_type: open-ended
-  related_skills:
-    - academic-paper-writer (core orchestrator)
+name: academic-citation
+description: "Use when user needs to search, verify, or map citations for academic papers. Triggers on: 找引用, 文献检索, citation pass, find references, reference check, 补文献."
 ---
 
 # Academic Citation

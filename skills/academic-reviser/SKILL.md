@@ -1,14 +1,6 @@
 ---
-name: "academic-reviser"
-description: "Use when self-reviewing, auditing, or verifying academic paper drafts — structured critique, verification gate, revision loop. Triggers on: 审修, self review, 自查, verification, revise, 修订, check draft."
-metadata:
-  version: "1.0.0"
-  last_updated: "2026-05-13"
-  status: stable
-  data_access_level: verified_only
-  task_type: open-ended
-  related_skills:
-    - academic-paper-writer (core orchestrator)
+name: academic-reviser
+description: "Use when user needs to self-review, audit, or verify academic paper drafts. Triggers on: 审修, self review, 自查, verification, revise, 修订, check draft."
 ---
 
 # Academic Reviser

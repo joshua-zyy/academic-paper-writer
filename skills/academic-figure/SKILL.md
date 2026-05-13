@@ -1,14 +1,6 @@
 ---
-name: "academic-figure"
-description: "Use when creating, revising, or auditing academic figures for CS/AI/ML papers — experimental charts (Python-rendered) and model architecture diagrams (prompt-based). Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, model architecture, plot."
-metadata:
-  version: "1.0.0"
-  last_updated: "2026-05-13"
-  status: stable
-  data_access_level: raw
-  task_type: open-ended
-  related_skills:
-    - academic-paper-writer (core orchestrator)
+name: academic-figure
+description: "Use when user needs to create, revise, or audit academic figures for CS/AI/ML papers. Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, model architecture, plot."
 ---
 
 # Academic Figure

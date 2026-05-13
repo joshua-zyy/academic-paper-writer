@@ -10,6 +10,10 @@
 | 大量的、许多 | 给出具体数量或范围 |
 | 各种各样的 | 列出具体类别或用 "diverse" / "heterogeneous" 等更精确的词 |
 | 显而易见的、不言而喻的 | 删除或改为具体论证 |
+| 至关重要的 (crucial) | 删除或改为具体机制说明 |
+| 深刻的 (profound) | 删除或改为具体效应量 |
+| 前所未有的 (unprecedented) | 必须有严格比较支撑，否则删除 |
+| 全面的 (comprehensive) | 删除或改为具体覆盖范围 |
 
 ## AI 典型连接词替换表
 
@@ -20,8 +24,33 @@
 | 因此 (Therefore) | 这一结果表明、由此可以推断、这一现象提示了 |
 | 总而言之 (In summary) | 综合以上观察、上述证据表明 |
 | 值得注意的是 (It is worth noting that) | 直接陈述事实，删除套话前缀 |
+| 有趣的是 (Interestingly) | 删除，直接陈述观察 |
+| 重要的是 (Importantly) | 删除，用因果连接替代 |
+|  delve into | 分析、探讨、检验 |
+|  notably | 删除或改为具体数据支撑 |
+|  significantly | 仅在附 p 值或效应量时使用 |
+|  effectively | 删除或改为具体性能指标 |
+|  robustly | 删除或改为具体方差/稳定性指标 |
 
 替换原则：不要机械地把一个模板词换成另一个模板词；应根据上下文逻辑选择最自然的表述。
+
+## Before / After 改写示例
+
+### 示例 1：Introduction 开头
+- ❌ "In recent years, deep learning has garnered significant attention across various domains."
+- ✅ "Deep learning methods have achieved measurable improvements in image classification accuracy, reducing top-5 error from 15.3% to 3.6% on ImageNet between 2012 and 2015."
+
+### 示例 2：Method 描述
+- ❌ "We delve into the architecture design to effectively capture robust features."
+- ✅ "To reduce sensitivity to input scale variations, we replace global pooling with adaptive spatial attention, which reweights feature maps by estimated saliency scores."
+
+### 示例 3：Results 陈述
+- ❌ "Our method significantly outperforms the baseline, demonstrating strong generalization."
+- ✅ "On the held-out test set, our method achieved 87.3% accuracy (±1.2%) compared to the ResNet-50 baseline of 82.1% (±1.5%)."
+
+### 示例 4：Discussion 段落
+- ❌ "However, it is worth noting that our approach has several limitations."
+- ✅ "The current evaluation relies on a single-site dataset with 312 subjects; whether the observed performance transfers to multi-site protocols remains unverified."
 
 ## 强化句子级逻辑衔接
 

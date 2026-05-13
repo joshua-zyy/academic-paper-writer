@@ -1,14 +1,6 @@
 ---
-name: "academic-polishing"
-description: "Use when polishing academic prose, de-AI-ifying text, controlling claim strength, or rewriting method sections into proper narrative form. Triggers on: 润色, polish, improve writing, 去AI, de-AI, claim strength, 改写, rewrite method, prose quality."
-metadata:
-  version: "1.0.0"
-  last_updated: "2026-05-13"
-  status: stable
-  data_access_level: redacted
-  task_type: open-ended
-  related_skills:
-    - academic-paper-writer (core orchestrator)
+name: academic-polishing
+description: "Use when user asks to polish academic prose, de-AI-ify text, control claim strength, or rewrite method sections. Triggers on: 润色, polish, improve writing, 去AI, de-AI, claim strength, 改写, rewrite method, prose quality."
 ---
 
 # Academic Polishing
