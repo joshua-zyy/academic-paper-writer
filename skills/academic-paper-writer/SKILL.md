@@ -92,10 +92,22 @@ metadata:
 - Evidence Inventory 必须包含至少一条与当前 section 直接相关的可引用证据（`newly_run` 或 `preexisting_artifact`）
 - 若本节完全不涉及实验事实（如纯理论推导），必须有明确的 "no experiment required" 记录
 
-**门控失败处理**：
-- 领域论文类型不是需要实验证据的类型 → 降级为理论/position 结构并记录 paper_type，继续
-- 实质性缺失且无替代方案 → 阻塞，向用户报告：当前 section 无可用证据，需要用户提供材料或改变 section 范围
-- 不得在证据为零时生成 Draft v1
+**门控失败处理**（按优先级尝试降级路径）：
+
+```
+Gate A Failed（证据为零或不足）
+├─ 检查 paper_type
+│  ├─ empirical → 尝试缩小 section scope 或合并到相邻节，重新盘点
+│  ├─ theory/position → 降级为理论结构，记录 paper_type，继续
+│  └─ 用户未指定 → 询问是否切换论文类型
+├─ 若 scope 调整后仍无证据
+│  ├─ 询问用户是否有未提供的材料或 artifact
+│  ├─ 用户提供了新材料 → 重新执行 Step 2 证据审计
+│  └─ 仍未找到 →
+│      ├─ 推荐"从当前 section 切换到 evidence-ready 的 section 起草"
+│      └─ 用户拒绝切换 → 阻塞，报告：当前 section 无可用证据，需用户提供材料
+└─ 不得在证据为零时生成 Draft v1
+```
 
 ### Gate B: 引用资源就绪门控（Step 3 → Step 6）
 
@@ -108,13 +120,29 @@ metadata:
 - 明确记录"当前 section 不需要文献支撑"（如纯方法推导部分在无外部引用时）
 - 所有候选条目已标注 `VERIFIED` 或 `UNVERIFIED`
 
-**门控失败处理**：
-- 全部为空（零引用）→ 对于 Introduction / Related Work 必须阻塞并提示至少找到 1-2 篇 seed reference 后再开始；对于其他 section 可以先起草但必须标注引用缺口
+**门控失败处理**（section-aware fallback）：
 
-**正文引用约束**（Step 6 起草时执行，非门控检查项）：
-- Draft v1 中每个需要文献支撑的 claim 必须有 `VERIFIED` 引用或 `[REF_NEEDED: ...]` 占位符
-- 不能在正文中出现既无引用又无占位符的 "裸 claim"
-- 未核验条目不能作为确定引用，只能以 `[REF_NEEDED: ...]` 形式出现
+```
+Gate B Failed（零引用）
+├─ section 类型判定
+│  ├─ Introduction / Related Work
+│  │  ├─ 尝试 alternative keywords / 放宽检索范围（委托 academic-citation 重试）
+│  │  ├─ 重试后仍有结果但不足 → 用已有结果 + [REF_NEEDED: ...] 占位
+│  │  └─ 全部为零 → 询问用户是否提供 seed papers
+│  │      ├─ 用户提供 → 以 seed papers 重新执行 Step 3
+│  │      └─ 无 seed papers → 阻塞，提示"至少需要 1-2 篇 seed reference 才能起草"
+│  ├─ Method / Experiments / Discussion
+│  │  ├─ 先用 [REF_NEEDED: ...] 占位所有引用缺口
+│  │  ├─ 标记 citation_debt = open，传递给后续步骤
+│  │  └─ 不阻塞，继续起草（正文用占位符覆盖）
+│  └─ Conclusion
+│      ├─ 引用已由前序 section 收集，不要求新引用
+│      └─ 直接继续
+└─ 正文引用约束（Step 6 强制执行，非门控项）：
+    - Draft v1 中每个需要文献支撑的 claim 必须有 VERIFIED 引用或 [REF_NEEDED: ...] 占位符
+    - 不能在正文中出现既无引用又无占位符的"裸 claim"
+    - 未核验条目不能作为确定引用，只能以 [REF_NEEDED: ...] 形式出现
+```
 
 ### Gate C: Verification 阶段通过门控（Step 9 → Step 10）
 
@@ -126,9 +154,29 @@ metadata:
 - `verdict = failed` 或 `blocked` 且 `safe_to_continue = no` → **禁止推进**，必须继续当前 section 的修订
 
 **门控失败处理**：
-- failed → 自动回到 Step 9 进入下一轮修订（最多 3 轮仍未通过 → 冻结所有未闭合 claims，标记为 `verdict: escalated`，报告给用户决策是否继续）
-- blocked + safe_to_continue = no → 终止当前 section 活动，等待用户提供外部证据
-- 不得在 failed 状态下伪推进到下一节
+
+```
+Gate C Failed
+├─ verdict = failed
+│  ├─ 下一轮修订（进入下一轮 Step 9）
+│  ├─ 3 轮后仍 failed →
+│  │   ├─ 冻结所有未闭合 claims（记入 frozen_claims）
+│  │   ├─ 标记 verdict = escalated
+│  │   └─ 自动生成 3 个选项给用户：
+│  │       ├─ 1. continue_revision — 继续修订当前 section
+│  │       ├─ 2. accept_with_gaps — 接受含已知缺口的当前版本（safe_to_continue = yes）
+│  │       └─ 3. skip_section — 跳过本节，推进到下一节
+│  │   用户未选择时默认取 2（accept_with_gaps），附加 escalated 标记
+│  └─ 不得在 failed 状态下伪推进到下一节
+├─ verdict = blocked + safe_to_continue = no
+│  ├─ 终止当前 section 活动
+│  ├─ 以 blocked_claims 清单和已冻结内容等待用户提供外部证据
+│  └─ 不推进到下一节
+└─ verdict = blocked + safe_to_continue = yes
+   ├─ 冻结相关 claims
+   ├─ 阻塞点写入 Revision Queue
+   └─ 可推进到下一节（携带 frozen_claims）
+```
 
 ## 默认交付物
 
@@ -325,14 +373,40 @@ Prose Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 prose_debt: ope
 
 若 Verification 判定为 blocked，必须含 safe_to_continue 和 frozen_claims。只有 safe_to_continue = yes 时才允许推进到下一节。
 
-### Step 10: 整合 & section loop
+### Step 10: 整合 & section loop（依赖感知）
 
-对 full-paper-planning 任务，不得在一个 section 修订完就结束：
+对 full-paper-planning 任务，不得在一个 section 修订完就结束。本节增加依赖感知逻辑——基于 `references/section-dependency-matrix.md` 中的矩阵管理跨节一致性。
+
+#### 10a. 状态更新
 
 - 若 failed 且非外部阻塞 → 保持当前 section 为活跃项，继续下一轮 Step 9
 - 若 blocked 且 safe_to_continue = yes → 将阻塞点写入 Revision Queue，冻结 claims 后前进
 - 若 blocked 且 safe_to_continue = no → 保持活跃，等待外部证据闭合
 - 将其并入 Cumulative Draft，更新 Section Queue 和 Revision Queue
+
+#### 10b. 依赖检查
+
+当前 section 通过 Verification 后，检查 `references/section-dependency-matrix.md`：
+
+1. 读取当前 section 的 `depended_by` 列表
+2. 检查列表中哪些 section 已被完成（存在于 Cumulative Draft 中）
+3. 检查 shared_claims 是否发生了变更（对比原始 Evidence Map 与当前 draft）
+4. 若有变更 → 标记对应 section 的 revision_queue 状态为 `pending`
+5. 推进到下一节前询问使用者：
+   > "本节改变了 X（claim），Y 节依赖该 claim。是否先回修 Y 节？"
+   - 用户确认 → 将 Y 节移到 Section Queue 头部
+   - 用户跳过 → Y 节保留 `pending` 标记，后续完成 Y 节时自动触发回检
+
+#### 10c. 选择下一节
+
+从 `depends_on` 全部满足且 revision_queue 中无 `pending` 标记的 section 中选择：
+
+```
+优先顺序:
+  1. depends_on 全部已完成的 section
+  2. 其中无 pending 回检标记的 section
+  3. 用户明确指明的 section
+```
 
 继续推进直到：
 - 核心章节已形成 substantial draft

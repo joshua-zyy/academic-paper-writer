@@ -36,9 +36,16 @@ Draft v1 → Prose Quality Gate → Expansion Pass → Self-Review → Revised D
 - 用户可选择：继续修订 / 接受当前版本（含已知缺口） / 跳过本节
 - Prose Quality Gate 子循环上限为 **2 轮**，详见 Step 7 规则
 
-## 跨章节整合
+## 跨章节整合（依赖感知）
 
-每完成 2-3 个 section，做一次轻量 integration pass：
+参见 `references/section-dependency-matrix.md` 中的矩阵定义。
+
+每完成一个 section 后，按矩阵执行依赖检查（编排器 Step 10b）：
+- 当前 section 的 `depended_by` 列表中有哪些已完成 section
+- 这些 section 是否因 `shared_claims` 变更而需要回修
+- 若需回修，将对应 section 标记 `pending` 并询问使用者
+
+此外，每完成 2-3 个 section，做一次轻量 integration pass：
 - 术语是否一致
 - 符号是否统一
 - 贡献点口径是否前后一致
