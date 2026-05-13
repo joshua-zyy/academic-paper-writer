@@ -33,6 +33,8 @@
 
 **Red Lines + Traffic Light** — 每个 Skill 定义显式禁止项（Red Lines）和 AI 介入边界（Traffic Light），确保输出不越过证据边界。
 
+**数据契约 + 硬门控** — 跨技能交换遵循规范化 Schema（Evidence Inventory / Verified References / Verification Report），核心编排器设有 3 道不可跳过的完整性门控。详见 `skills/shared/`。
+
 ---
 
 ## 项目结构
@@ -41,12 +43,25 @@
 academic-paper-writer/
 ├── README.md
 ├── LICENSE
-└── skills/
-    ├── academic-paper-writer/         # 核心编排器
-    │   ├── SKILL.md
-    │   ├── README.md
-    │   ├── agents/openai.yaml
-    │   └── references/
+├── skills/
+│   ├── shared/                       # 跨技能共享层
+│   │   ├── schemas/
+│   │   │   ├── evidence-inventory.md
+│   │   │   ├── verified-references.md
+│   │   │   └── verification-report.md
+│   │   ├── references/
+│   │   │   ├── evidence-classification.md
+│   │   │   ├── placeholder-guide.md
+│   │   │   ├── paper-types.md
+│   │   │   ├── mode-spectrum.md
+│   │   │   └── data-access-levels.md
+│   │   └── templates/
+│   │       └── section-critique.md
+│   ├── academic-paper-writer/         # 核心编排器
+│   │   ├── SKILL.md
+│   │   ├── README.md
+│   │   ├── agents/openai.yaml
+│   │   └── references/
     │       ├── paper-structure.md
     │       ├── writing-guidelines.md
     │       ├── iteration-control.md
@@ -56,6 +71,7 @@ academic-paper-writer/
     ├── academic-polishing/           # 文体润色
     │   ├── SKILL.md
     │   ├── README.md
+    │   ├── agents/polishing_agent.md
     │   └── references/
     │       ├── de-ai-patterns.md
     │       ├── claim-strength.md
@@ -63,6 +79,7 @@ academic-paper-writer/
     ├── academic-citation/            # 文献引用
     │   ├── SKILL.md
     │   ├── README.md
+    │   ├── agents/citation_agent.md
     │   └── references/
     │       ├── search-strategy.md
     │       ├── verification-protocol.md
@@ -70,6 +87,7 @@ academic-paper-writer/
     ├── academic-reviser/             # 审修验证
     │   ├── SKILL.md
     │   ├── README.md
+    │   ├── agents/reviser_agent.md
     │   └── references/
     │       ├── revision-checklist.md
     │       ├── verification-status.md
@@ -77,6 +95,7 @@ academic-paper-writer/
     ├── academic-experiments/         # 实验复核
     │   ├── SKILL.md
     │   ├── README.md
+    │   ├── agents/experiment_agent.md
     │   └── references/
     │       ├── evidence-inventory.md
     │       ├── run-strategy.md
@@ -84,6 +103,7 @@ academic-paper-writer/
     └── academic-figure/              # 论文绘图
         ├── SKILL.md
         ├── README.md
+        ├── agents/figure_agent.md
         └── references/
             ├── api.md
             ├── chart-types.md
@@ -146,8 +166,7 @@ Step 10 整合 & 继续 Section Loop
 ## 参考
 
 1. [nature-skills](https://github.com/Yuan1z0825/nature-skills)（袁一哲，上海交通大学）
-
----
+2. [academic-research-skills](https://github.com/Imbad0202/academic-research-skills) 
 
 ## 许可
 
