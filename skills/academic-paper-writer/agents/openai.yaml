@@ -1,4 +1,0 @@
-interface:
-  display_name: "Academic Paper Writer"
-  short_description: "Evidence-driven section-by-section paper drafting"
-  default_prompt: "Use $academic-paper-writer to first confirm my target venue and draft language, run an evidence audit before drafting, dispatch tool-oriented subagents for citation search, experiment verification, figure generation, prose review, and verification when needed, then move each section through Draft v1 -> Placeholder Audit -> Evidence Compliance Review -> Prose Quality Gate -> Expansion -> Self-Review -> Revised Draft -> Verification using my research notes, repo evidence, and verified references."

@@ -1,11 +1,15 @@
 ---
 name: academic-polishing
-description: "Use when user asks to polish academic prose, de-AI-ify text, control claim strength, or rewrite method sections. Triggers on: 润色, polish, improve writing, 去AI, de-AI, claim strength, 改写, rewrite method, prose quality."
+description: "Polish academic prose, de-AI-ify text, control claim strength, or rewrite method sections for CS/AI/ML papers. Executes Prose Quality Gate, Claim Strength Audit, and de-AI pass."
 ---
 
 # Academic Polishing
 
 将此 skill 视为"学术文体打磨代理"——不是简单润色，而是执行 prose 质量闸门、去AI化改写、claim 强度控制和 Method 专项叙事强化。
+
+## 触发条件
+
+润色, polish, improve writing, 去AI, de-AI, claim strength, 改写, rewrite method, prose quality, 降级表述
 
 ## Red Lines（绝对禁止）
 
@@ -125,23 +129,29 @@ Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 
 - ...
 ```
 
-## Agent 资源
+## Agent 资源与调用方式
 
-本 Skill 目录下的 `agents/` 文件夹包含以下辅助文件：
+### 调用方式
 
-| 文件 | 用途 |
-|------|------|
-| `agents/polishing_agent.md` | Prose 质量检查与 claim 强度审计规范 |
+本 Skill 支持两种调用方式：
 
-**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 9 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只修改论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写整节论文**。
+1. **内化调用**（由 `academic-paper-writer` 在 Step 9 使用）：主 Agent 读取本 SKILL.md 及 references/ 下的规则文件后自行执行润色与 claim 强度审计，不 dispatch 独立子 Agent。这确保叙事风格与全文一致，避免上下文传递损失。
+2. **独立使用**：用户直接要求润色、去AI化、claim 强度审计时，本 Skill 独立执行。
+
+### 独立使用时的约束
+
+- **此 Skill 只修改论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件**
+- **不得独立撰写整节论文**
 
 ## 何时读取 references/
 
 | Reference 文件 | 打开条件 |
 |---------------|---------|
 | `references/de-ai-patterns.md` | 执行去AI化改写、Prose Quality Gate 通用检查时 |
-| `references/claim-strength.md` | 执行 Claim Strength Audit 时 |
+| `references/claim-strength.md` | 执行 Claim Strength Audit、overclaim 检查或学术风格检查时 |
 | `references/method-narrative.md` | 当前为 Method section、执行 Method Prose Rewrite 时 |
+| `references/section-moves.md` | 需要按节类型获取 move order、phrase families 或过渡表达参考时 |
+| `references/phrasebank-playbook.md` | 需要证据强度用词替换、过渡词族、gap/limitation/implication 短语参考时 |
 
 ## 不适用场景
 

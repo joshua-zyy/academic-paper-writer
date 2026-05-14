@@ -23,16 +23,17 @@ import numpy as np
 # ---------------------------------------------------------------------------
 # Academic style constants
 # ---------------------------------------------------------------------------
-PALETTE = [
-    "#1f77b4",  # blue
-    "#ff7f0e",  # orange
-    "#2ca02c",  # green
-    "#d62728",  # red
-    "#9467bd",  # purple
-    "#8c564b",  # brown
-    "#e377c2",  # pink
-    "#7f7f7f",  # gray
-]
+PALETTE = {
+    "blue_main": "#0F4D92",
+    "green_3": "#8BCF8B",
+    "red_strong": "#B64342",
+    "teal": "#42949E",
+    "violet": "#9A4D8E",
+    "orange": "#E08B2D",
+    "gray_neutral": "#A0A0A0",
+}
+
+PALETTE_LIST = list(PALETTE.values())
 
 # Approximate NeurIPS/ICML double-column width in inches
 DOUBLE_COL_WIDTH = 5.5  # inches
@@ -108,7 +109,7 @@ def plot_line(data, labels=None, title="", xlabel="", ylabel="", width=DOUBLE_CO
         mean = data[:, 2 * i]
         std = data[:, 2 * i + 1] if 2 * i + 1 < data.shape[1] else np.zeros_like(mean)
         label = labels[i] if labels and i < len(labels) else f"Series {i+1}"
-        color = PALETTE[i % len(PALETTE)]
+        color = PALETTE_LIST[i % len(PALETTE_LIST)]
         ax.plot(x, mean, label=label, color=color)
         ax.fill_between(x, mean - std, mean + std, color=color, alpha=0.15)
 
@@ -136,7 +137,7 @@ def plot_bar(data, labels=None, groups=None, title="", xlabel="", ylabel="", wid
         mean = data[:, i] if not has_err else data[:, 2 * i]
         err = data[:, 2 * i + 1] if has_err else None
         label = labels[i] if labels and i < len(labels) else f"Series {i+1}"
-        color = PALETTE[i % len(PALETTE)]
+        color = PALETTE_LIST[i % len(PALETTE_LIST)]
         offset = (i - num_series / 2 + 0.5) * bar_width
         ax.bar(x + offset, mean, bar_width, yerr=err, label=label, color=color, capsize=2)
 

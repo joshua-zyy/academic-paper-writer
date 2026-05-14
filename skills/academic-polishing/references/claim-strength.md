@@ -90,3 +90,64 @@
 | "This demonstrates strong generalization" | 仅内部验证 | "On our internal validation set, ..." | 无外部测试集 |
 | "The proposed module significantly improves accuracy" | 无统计检验 | "The proposed module improves accuracy by 2.3 percentage points" | 未报告 p 值或置信区间 |
 ```
+
+---
+
+## Overclaim 检查清单
+
+以下词汇出现时必须标记并弱化，除非证据异常强且范围严格限定：
+
+| 过度表述 | 安全替换 |
+|---------|---------|
+| `prove` | `show` / `suggest` |
+| `conclusively` | `to our knowledge` |
+| `unprecedented` | `to our knowledge, no prior work has ...` |
+| `best` / `superior` | `among the strongest` / `competitive` |
+| `first`（未验证） | `to our knowledge, this is the first ...` |
+| `clinically relevant`（无临床验证） | `may have clinical implications` |
+
+---
+
+## 学术风格检查
+
+### 冠词用法
+
+- 首次提及单数可数名词：`a` 或 `an`
+- 再次提及同一事物：`the`
+- 泛指复数：通常不用冠词
+- 唯一实体：通常用 `the`
+- 抽象名词泛指：通常不用冠词
+
+典型修复：
+
+- 错：`The hypoxia induces ...`
+- 对：`Hypoxia induces ...`
+
+### 数字与单位
+
+- 测量值使用数字
+- 数值与单位之间留空格：`25 cm`、`3.2 s`
+- 统计符号和数学记号保持一致
+- 范围使用 en dash
+
+### 学术语体
+
+- 避免口语化填充词和弱评价语言
+- 仅在学科和文体适合时使用 `we`
+- 保持名词化有用但不过度
+- 保持适当的客观语体，但不强求生硬
+
+### 句段检查
+
+- 每句应表达一个主要命题
+- 从句必须依附于主句
+- 不用单个逗号连接两个独立分句
+- 每段需要一个主控观点和支撑材料
+- 避免由 `although` 或 `whereas` 引起的常见句法错误
+
+### 完整性规则
+
+- 不得编造参考文献
+- 不得篡改量化值（除非修正用户指出的明显笔误）
+- 不得将关联升级为因果
+- 不得暗示比研究支持范围更广的泛化能力

@@ -64,7 +64,7 @@ query_types:
 
 ## Output Schema
 
-遵循 `../../shared/schemas/verified-references.md` 中定义的 Verified References Schema：
+遵循 `references/schemas/verified-references.md` 中定义的 Verified References Schema：
 
 ```yaml
 verified_references:

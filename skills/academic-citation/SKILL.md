@@ -1,11 +1,15 @@
 ---
 name: academic-citation
-description: "Use when user needs to search, verify, or map citations for academic papers. Triggers on: 找引用, 文献检索, citation pass, find references, reference check, 补文献."
+description: "Search, verify, and map citations for CS/AI/ML papers. Produces VERIFIED/UNVERIFIED reference lists with Citation-to-Claim maps and Exemplar Sets."
 ---
 
 # Academic Citation
 
 将此 skill 视为"文献取证代理"，而不是搜索结果搬运器。
+
+## 触发条件
+
+找引用, 文献检索, citation pass, find references, reference check, 补文献, citation verification, Exemplar Set
 
 ## Red Lines（绝对禁止）
 
@@ -94,7 +98,7 @@ description: "Use when user needs to search, verify, or map citations for academ
 
 ### Step 6: 输出
 
-按 `../shared/schemas/verified-references.md` 中定义的数据结构输出。
+按 `references/schemas/verified-references.md` 中定义的数据结构输出。
 
 输出至少包含：
 
@@ -140,7 +144,7 @@ description: "Use when user needs to search, verify, or map citations for academ
 | `references/search-strategy.md` | 设计检索查询时（Step 2） |
 | `references/verification-protocol.md` | 核验候选文献时（Step 3） |
 | `references/citation-mapping.md` | 建立 Citation-to-Claim 映射时（Step 5） |
-| `../shared/schemas/verified-references.md` | 理解输出数据格式（Step 6） |
+| `references/schemas/verified-references.md` | 理解输出数据格式（Step 6） |
 
 ## 不适用场景
 

@@ -2,13 +2,13 @@
 
 **用途**: 论文编排器、实验复核、审修技能之间的证据盘点数据交换格式。
 **生产者**: `academic-experiments`, `academic-paper-writer` (Step 2)
-**消费者**: `academic-paper-writer` (Step 6), `academic-reviser` (Step 9)
+**消费者**: `academic-paper-writer` (Step 6), `academic-reviser` (Step 8/11)
 
 ## 结构
 
 ```yaml
 evidence_inventory:
-  section: string              # 所属章节
+  section: string
   paper_type: string           # empirical / theory / survey / reproducibility / position
   items:
     - evidence_id: string      # 如 E001
@@ -19,30 +19,8 @@ evidence_inventory:
       verified_at: string|null # 验证时间或版本号
       used_in_draft: boolean   # 是否已写入当前草稿
       risks: string[]          # 潜在风险列表
-  known_facts: string[]        # 已知事实
-  missing_blocking: string[]   # 缺失但阻塞当前 section 的事实
-  missing_placeholder: string[] # 缺失但可占位的事实
-  needs_external_validation: string[] # 需要外部核验的主张
-```
-
-## 示例
-
-```yaml
-evidence_inventory:
-  section: method
-  paper_type: empirical
-  items:
-    - evidence_id: E001
-      type: newly_run
-      source_path: "experiments/run_logs/exp001.log"
-      claim_summary: "Proposed module achieves 92.3% accuracy on CIFAR-10"
-      verification_status: verified
-      verified_at: "2026-05-10"
-      used_in_draft: true
-      risks: []
-  known_facts:
-    - "Model uses ResNet-50 backbone"
-    - "Trained for 200 epochs with cosine annealing"
-  missing_placeholder:
-    - "Ablation study results on module size"
+  known_facts: string[]
+  missing_blocking: string[]
+  missing_placeholder: string[]
+  needs_external_validation: string[]
 ```

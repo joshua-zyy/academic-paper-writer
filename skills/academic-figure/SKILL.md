@@ -1,11 +1,15 @@
 ---
 name: academic-figure
-description: "Use when user needs to create, revise, or audit academic figures for CS/AI/ML papers. Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, model architecture, plot."
+description: "Create, revise, or audit academic figures for CS/AI/ML papers. Two paths: architecture figure prompting and data figure code generation with publication-ready Python scripts."
 ---
 
 # Academic Figure
 
 将此 skill 视为"学术论文图表代理"——负责 CS/AI/ML 论文中两类图表的生产：
+
+## 触发条件
+
+绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, model architecture, plot, publication figure
 
 | 路径 | 类型 | 产出方式 |
 |------|------|---------|
@@ -242,7 +246,7 @@ required = ["matplotlib", "seaborn", "numpy", "pandas", "scipy"]
 |------|------|
 | `agents/figure_agent.md` | 图表类型选择与生成规范 |
 
-**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 7 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只生成图表，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 7 委托时，按 `academic-paper-writer/references/workflow-step-5-8.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只生成图表，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
 
 ## 何时读取 references/
 

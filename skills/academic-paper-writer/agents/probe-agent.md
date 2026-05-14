@@ -14,7 +14,8 @@ task_description: string              # 需要探查的具体内容
 ## Probe Types
 
 ### code_structure — 代码结构探查
-**目标**：理解模型实现的核心组件、数据流、张量形状  
+**目标**：理解模型实现的核心组件、数据流、张量形状
+**适用 section**：Method
 **产出一张 Module Card 表**：
 ```yaml
 modules:
@@ -27,47 +28,21 @@ modules:
     evidence: "artifact-verified" | "inferred-from-gap" | "missing"
 ```
 
-### experiment_data — 实验数据探查
-**目标**：从 checkpoint 日志、CSV 文件中定位数值结果  
+### preprocessing — 预处理流程探查
+**目标**：定位预处理步骤、参数、模板信息
+**适用 section**：Method / Experimental Setup
 **产出**：
 ```yaml
-tasks:
-  - name: string
-    metrics:
-      accuracy: float | null
-      auc: float | null
-      sensitivity: float | null
-      specificity: float | null
-baseline_results: string[] | null     # 基线结果描述
-ablation_results: string[] | null     # 消融结果描述
+steps:
+  - tool: string
+    operation: string
+    parameters: string
+additional_details_needed: string[]
 ```
 
-### baseline_results — 基线结果探查
-**目标**：定位与主方法对比的基线结果、来源与可比性说明
-**产出**：
-```yaml
-baseline_results:
-  - baseline_name: string
-    metrics: string[]                 # 如 ["ACC 89.2", "AUC 0.931"]
-    source: string                    # 表格、日志、CSV 或论文引用路径
-    comparison_scope: string          # 同数据集/同划分/同指标等
-    evidence: "artifact-verified" | "inferred-from-gap" | "missing"
-```
-
-### ablation_results — 消融结果探查
-**目标**：定位模块删减、参数变体或设置变化带来的消融结果
-**产出**：
-```yaml
-ablation_results:
-  - ablation_name: string
-    variant: string
-    metrics: string[]                 # 如 ["ACC 87.4", "delta -1.8"]
-    source: string                    # 表格、日志、CSV 或图表路径
-    evidence: "artifact-verified" | "inferred-from-gap" | "missing"
-```
-
-### experiment_config — 配置协议探查
-**目标**：定位训练配置、超参数、数据集划分细节  
+### experiment_setup — 实验配置与数据探查
+**目标**：定位训练配置、超参数、数据集划分细节与人口统计信息。合并原 `experiment_config` 和 `data_statistics`。
+**适用 section**：Experimental Setup
 **产出**：
 ```yaml
 hyperparameters:
@@ -85,24 +60,44 @@ dataset:
   groups:
     - name: string
       count: integer
-      demographics: string
+      male: integer | null
+      female: integer | null
+      mean_age: float | null
+      age_range: string | null
+      demographics: string | null
 ```
 
-### data_statistics — 数据集统计探查
-**目标**：汇总数据集的受试者级人口统计信息  
+### experiment_results — 实验结果探查
+**目标**：从 checkpoint、日志、CSV 中定位主结果、基线对比和消融实验数值。合并原 `experiment_data`、`baseline_results` 和 `ablation_results`。
+**适用 section**：Main Results / Ablation
 **产出**：
 ```yaml
-groups:
+main_results:
   - name: string
-    count: integer
-    male: integer
-    female: integer
-    mean_age: float
-    age_range: string
+    metrics:
+      accuracy: float | null
+      auc: float | null
+      sensitivity: float | null
+      specificity: float | null
+    source: string | null
+    evidence: "artifact-verified" | "inferred-from-gap" | "missing"
+baseline_results:
+  - baseline_name: string
+    metrics: string[]                 # 如 ["ACC 89.2", "AUC 0.931"]
+    source: string                    # 表格、日志、CSV 或论文引用路径
+    comparison_scope: string          # 同数据集/同划分/同指标等
+    evidence: "artifact-verified" | "inferred-from-gap" | "missing"
+ablation_results:
+  - ablation_name: string
+    variant: string
+    metrics: string[]                 # 如 ["ACC 87.4", "delta -1.8"]
+    source: string                    # 表格、日志、CSV 或图表路径
+    evidence: "artifact-verified" | "inferred-from-gap" | "missing"
 ```
 
 ### interpretability — 可解释性探查
-**目标**：定位掩蔽分析、网络重要性等可解释性结果  
+**目标**：定位掩蔽分析、网络重要性等可解释性结果
+**适用 section**：Discussion
 **产出**：
 ```yaml
 network_importance:
@@ -116,26 +111,31 @@ network_pairs:
     importance: string
 ```
 
-### preprocessing — 预处理流程探查
-**目标**：定位预处理步骤、参数、模板信息  
-**产出**：
-```yaml
-steps:
-  - tool: string
-    operation: string
-    parameters: string
-additional_details_needed: string[]
-```
-
-### existing_draft — 已有草稿探查
-**目标**：读取已有草稿或类似论文的结构作为参考  
+### existing_material — 已有材料探查
+**目标**：读取已有草稿、类似论文结构或研究笔记作为参考。合并原 `existing_draft`。
+**适用 section**：Introduction / Related Work
 **产出**：
 ```yaml
 existing_structure:
   sections: string[]
   key_formulas: string[]
   writing_style_notes: string[]
+  research_notes: string[] | null
 ```
+
+## 旧探查类型映射
+
+| 旧类型 | 新类型 | 说明 |
+|--------|--------|------|
+| `code_structure` | `code_structure` | 不变 |
+| `preprocessing` | `preprocessing` | 不变 |
+| `experiment_config` | `experiment_setup` | 合并至 experiment_setup |
+| `data_statistics` | `experiment_setup` | 合并至 experiment_setup |
+| `experiment_data` | `experiment_results` | 合并至 experiment_results |
+| `baseline_results` | `experiment_results` | 合并至 experiment_results |
+| `ablation_results` | `experiment_results` | 合并至 experiment_results |
+| `interpretability` | `interpretability` | 不变 |
+| `existing_draft` | `existing_material` | 重命名，扩展字段 |
 
 ## Output
 按上述对应 probe_type 的 schema 输出结构化证据。若探查目标路径不存在或无法读取，在对应字段标记为 null 并在输出末尾列出 `blocked_items`。

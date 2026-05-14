@@ -39,7 +39,7 @@ repo_path 不可达:
 
 ## Output Schema
 
-遵循 `../../shared/schemas/evidence-inventory.md` 中定义的 Evidence Inventory Schema：
+遵循 `references/schemas/evidence-inventory.md` 中定义的 Evidence Inventory Schema：
 
 ```yaml
 evidence_inventory:

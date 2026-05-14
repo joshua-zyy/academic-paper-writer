@@ -1,7 +1,7 @@
 # Reviser Agent
 
 ## Role
-审修验证代理。像 peer reviewer 一样审查草稿，执行证据→论证→风格三轮检查，输出 Verification 判定与修订后草稿。orchestrator 的 Step 7 会以 `targeted-evidence-mode` 调用本 Agent，此时仅执行证据合规审查。
+审修验证代理。像 peer reviewer 一样审查草稿，执行证据→论证→风格三轮检查，输出 Verification 判定与修订后草稿。orchestrator 的 Step 8 会以 `targeted-evidence-mode` 调用本 Agent（证据合规审查），Step 11 会以 `full-section-review` 调用本 Agent（综合验证）。
 
 ## Input Schema
 
@@ -18,7 +18,9 @@ evidence_map:
       verification_status: "verified" | "unverified" | "blocked"
 preceding_status:
   prose_debt: "open" | "closed"
-  evidence_debt: "open" | "closed"      # 来自 Step 7 的输出
+  citation_debt: "open" | "closed"
+  evidence_debt: "open" | "closed"
+  figure_debt: "open" | "closed"
   thin_draft: boolean
   frozen_claims:
     - claim: string
@@ -29,7 +31,7 @@ preceding_status:
 
 ## Output Schema
 
-遵循 `../../shared/schemas/verification-report.md` 中定义的 Verification Report Schema：
+遵循 `references/schemas/verification-report.md` 中定义的 Verification Report Schema：
 
 ```yaml
 verification_report:
@@ -41,6 +43,9 @@ verification_report:
       status: "pass" | "fail" | "na"
       details: string
   prose_debt: "open" | "closed"
+  citation_debt: "open" | "closed"
+  evidence_debt: "open" | "closed"
+  figure_debt: "open" | "closed"
   thin_draft: boolean
   frozen_claims:
     - claim: string
@@ -85,7 +90,7 @@ revised_draft: string                   # 吸收修改点后的草稿
 | 第 3 轮 | 最后一轮审查 | failed → escalated（见上）；passed → 交付 |
 
 ## Delegation
-本 Agent 由 `academic-paper-writer` 核心编排器在 Step 9 委托调用。
+本 Agent 由 `academic-paper-writer` 核心编排器在 Step 8 和 Step 11 委托调用。
 
 ## Red Lines
 1. **只修改论文草稿——禁止修改项目代码或数据文件**：审修 agent 只修改传入的论文草稿文本，**绝对不得修改项目中的源代码、配置文件、数据文件或实验脚本**。

@@ -1,11 +1,15 @@
 ---
 name: academic-experiments
-description: "Use when user needs to audit, run, or verify experimental evidence for academic papers. Triggers on: 复核实验, run experiments, 实验结果, experiment evidence, verify results, 实验验证."
+description: "Audit, run, or verify experimental evidence for CS/AI/ML papers. Produces Evidence Inventory with evidence_type annotations and Protocol Risk assessments."
 ---
 
 # Academic Experiments
 
 将此 skill 视为"实验取证代理"，目标是建立最短且可信的证据链，而不是尽量多跑实验。
+
+## 触发条件
+
+复核实验, run experiments, 实验结果, experiment evidence, verify results, 实验验证, evidence inventory, protocol risk
 
 ## Red Lines（绝对禁止）
 
@@ -99,7 +103,7 @@ description: "Use when user needs to audit, run, or verify experimental evidence
 
 ### Step 5: 输出
 
-输出按 `../shared/schemas/evidence-inventory.md` 中的 Evidence Inventory Schema 组织数据。以下是 Schema 数据的人可读呈现形式：
+输出按 `references/schemas/evidence-inventory.md` 中的 Evidence Inventory Schema 组织数据。以下是 Schema 数据的人可读呈现形式：
 
 ```md
 ## Experiment Evidence
@@ -150,7 +154,7 @@ description: "Use when user needs to audit, run, or verify experimental evidence
 
 ## 输出数据格式
 
-实验结果应按 `../shared/schemas/evidence-inventory.md` 中定义的 Evidence Inventory Schema 组织输出。
+实验结果应按 `references/schemas/evidence-inventory.md` 中定义的 Evidence Inventory Schema 组织输出。
 
 ## 不适用场景
 

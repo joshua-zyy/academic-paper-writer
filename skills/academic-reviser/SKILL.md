@@ -1,17 +1,21 @@
 ---
 name: academic-reviser
-description: "Use when user needs to self-review, audit, or verify academic paper drafts. Triggers on: 审修, self review, 自查, verification, revise, 修订, check draft."
+description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical peer reviewer. Three-round review (evidence→argument→style) with Verification Status and debt tracking."
 ---
 
 # Academic Reviser
 
 将此 skill 视为"挑剔审稿人代理"——像 peer reviewer 一样审查自己的草稿，按证据→论证→风格三轮顺序执行检查，并输出可执行的修订与 Verification 判定。
 
+## 触发条件
+
+审修, self review, 自查, verification, revise, 修订, check draft, 审稿, evidence compliance
+
 ## Red Lines（绝对禁止）
 
 1. 禁止跳过检查顺序：必须证据→论证→风格，不得先修风格再查事实
 2. 禁止输出批评说明后沿用原稿：Revised Draft 必须真正吸收修改点
-3. 禁止在 citation debt / protocol debt / result debt / prose debt 未闭合时判为 passed
+3. 禁止在 citation debt / evidence debt / protocol debt / result debt / prose debt / figure debt 未闭合时判为 passed
 4. 禁止删除占位符而不补真实内容
 5. 禁止因草稿篇幅长就假设它足够可信
 6. 禁止用更华丽的写法掩盖内容不足（如 related work 薄用漂亮 prose 包装）
@@ -29,7 +33,7 @@ description: "Use when user needs to self-review, audit, or verify academic pape
 2. **cross-section-review** — 跨章节一致性检查（摘要 vs 正文 vs 表格 vs 结论）
 3. **verification-only** — 仅执行 Verification 判定（不重做自审）
 4. **targeted-review** — 针对特定问题做定向审查（如仅检查引用闭合）
-5. **targeted-evidence-mode** — 仅执行证据合规审查（由 orchestrator Step 7 委托调用）。检查内容：
+5. **targeted-evidence-mode** — 仅执行证据合规审查（由 orchestrator Step 8 委托调用）。检查内容：
    - 每个 claim 是否有对应的 evidence 支撑（Evidence Map 中的 newly_run / preexisting_artifact）
    - 每个 inline citation 是否对应 Verified References 中已核验条目
    - 所有占位符使用是否符合规范（如 [REF_NEEDED] 含方向说明）
@@ -71,7 +75,7 @@ description: "Use when user needs to self-review, audit, or verify academic pape
 
 ### Step 6: 输出 Section Critique 与 Verification Status
 
-详见 `references/verification-status.md`。输出格式遵循 `../shared/templates/section-critique.md` 中定义的结构。
+详见 `references/verification-status.md`。输出格式遵循 `references/templates/section-critique.md` 中定义的结构。
 
 **Section Critique** 明确：
 - 本节已解决的问题
@@ -82,6 +86,9 @@ description: "Use when user needs to self-review, audit, or verify academic pape
 **Verification Status** 明确：
 - 判定：`passed` / `failed` / `blocked`
 - `prose_debt`: open / closed
+- `citation_debt`: open / closed
+- `evidence_debt`: open / closed
+- `figure_debt`: open / closed
 - `thin_draft`: yes / no
 - 本轮实际做了哪些检查
 - 仍未闭合的问题属于可继续自修，还是外部阻塞
@@ -116,6 +123,9 @@ description: "Use when user needs to self-review, audit, or verify academic pape
 
 - Verdict: passed
 - prose_debt: closed
+- citation_debt: closed
+- evidence_debt: closed
+- figure_debt: closed
 - thin_draft: no
 - Checks performed:
   - [x] 事实与证据检查（13项）
@@ -151,6 +161,9 @@ description: "Use when user needs to self-review, audit, or verify academic pape
 
 - Verdict: blocked
 - prose_debt: closed
+- citation_debt: closed
+- evidence_debt: open
+- figure_debt: closed
 - thin_draft: no
 - Checks performed:
   - [x] 事实与证据检查（13项）
@@ -173,7 +186,7 @@ description: "Use when user needs to self-review, audit, or verify academic pape
 
 ## 输出数据格式
 
-输出应按 `../shared/schemas/verification-report.md` 中定义的 Verification Report Schema 组织。Section Critique 的格式规范见 `../shared/templates/section-critique.md`。
+输出应按 `references/schemas/verification-report.md` 中定义的 Verification Report Schema 组织。Section Critique 的格式规范见 `references/templates/section-critique.md`。
 
 ## Agent 资源
 
@@ -192,8 +205,8 @@ description: "Use when user needs to self-review, audit, or verify academic pape
 | `references/revision-checklist.md` | 执行三轮审查时（Step 2-4） |
 | `references/verification-status.md` | 输出 Verification Status 时（Step 6） |
 | `references/common-pitfalls.md` | 自查是否存在自欺行为时 |
-| `../shared/schemas/verification-report.md` | 理解输出数据格式 |
-| `../shared/templates/section-critique.md` | 组织 Section Critique 输出格式 |
+| `references/schemas/verification-report.md` | 理解输出数据格式 |
+| `references/templates/section-critique.md` | 组织 Section Critique 输出格式 |
 
 ## 不适用场景
 
@@ -211,7 +224,7 @@ description: "Use when user needs to self-review, audit, or verify academic pape
 - 结果、表格、摘要相互一致
 - style brief 与正文不冲突（若适用）
 - 核心章节不再只是骨架式短稿
-- 无未闭合的 citation debt、protocol debt、result debt、prose debt、rationale debt
+- 无未闭合的 citation debt、protocol debt、result debt、prose debt、rationale debt、evidence debt、figure debt
 
 否则，输出"当前最佳版本 + 未闭合问题清单"。
 
