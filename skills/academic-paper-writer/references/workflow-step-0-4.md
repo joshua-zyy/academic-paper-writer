@@ -42,22 +42,51 @@ If venue is known and relevant, read `references/writing-guidelines.md` and form
 
 ## Step 2: Evidence Audit
 
-Create a todo list for evidence items. Dispatch probe agents per section type (parallel when multiple probes are needed):
+Create a todo list for evidence items. Dispatch probe agents per section type.
 
-| Section | Probe tasks |
-|---------|-------------|
-| Introduction | `existing_material` |
-| Related Work | `existing_material` |
-| Method | `code_structure` + `preprocessing` |
-| Experimental Setup | `experiment_setup` |
-| Main Results | `experiment_results` |
-| Ablation | `experiment_results` |
-| Discussion | `interpretability` |
+### 并行 dispatch 规则（强制）
 
-Single probe: dispatch one general subagent with the template below.
-Multiple probes: dispatch multiple subagents simultaneously (inter‑independent), each with its own template.
+所有 probe_type 均设计为**独立可并行**——它们只读文件系统、不产生副作用、不共享状态。
+因此，在以下情况下**必须使用并行 dispatch**，而非串行：
 
-**Dispatch template — 单探查任务：**
+| 场景 | 可并行的探查 | 执行方式 |
+|------|-------------|---------|
+| Method 分析 | `code_structure` + `preprocessing` | **必须并行**（二者互不依赖，探查不同层面） |
+| 轻量全量扫描 | code structure + data & artifacts + config | **必须并行**（Phase 1 的三个探查完全独立） |
+| 其他场景 | 单个 probe | 单 subagent |
+
+**并行执行方式（正确 vs 错误）：**
+
+```
+✅ 正确 — 在一个消息中同时发出多个 Task 调用
+   Task(code_structure) + Task(preprocessing)
+   两者同时运行，互不等待
+
+❌ 错误 — 串行等待
+   Task(code_structure) → 等待返回 → Task(preprocessing)
+   不必要地将探查时间翻倍
+```
+
+### 平台不支持并行时的降级
+
+若当前运行环境不支持同时 dispatch 多个子 Agent，按以下顺序串行执行：
+
+```
+Method 场景:
+  1. code_structure（优先——影响 Method 结构）
+  2. preprocessing
+  合并结果时标注 dispatched_sequentially: true，不影响下游步骤
+
+Phase 1 轻量扫描:
+  1. code structure
+  2. data & artifacts
+  3. config
+```
+
+### 单探查 dispatch 模板
+
+适用于只涉及一个 probe_type 的场景（如 Introduction → existing_material）：
+
 ```yaml
 Task:
   description: "Probe {probe_type} for {section_type}"
@@ -82,10 +111,15 @@ Task:
     返回: 按对应 probe schema 的结构化结果
 ```
 
-**Dispatch template — 并行多探查任务（如 Method → code_structure + preprocessing）：**
+### 并行 dispatch 模板（强制并行）
+
+适用于涉及多个 probe_type 的场景（如 Method → code_structure + preprocessing）。
+**必须同时发出以下所有 Task，不得串行：**
+
 ```yaml
-# 同时 dispatch，互不等待，不共享上下文
-Task ①:
+# ===== 同时发出，互不等待 =====
+
+Task A:
   description: "Probe code_structure for Method"
   subagent_type: "general"
   prompt: |
@@ -106,7 +140,7 @@ Task ①:
 
     返回: 结构化 Module Cards
 
-Task ②:
+Task B:
   description: "Probe preprocessing for Method"
   subagent_type: "general"
   prompt: |
@@ -128,6 +162,22 @@ Task ②:
     返回: 结构化预处理步骤列表
 ```
 
+两个 Task 都返回后，合并结果为完整的 Evidence Map。
+
+### 探查与 section 的对应关系
+
+| Section | Probe tasks | 并行策略 |
+|---------|-------------|---------|
+| Introduction | `existing_material` | 单探查 |
+| Related Work | `existing_material` | 单探查 |
+| Method | `code_structure` + `preprocessing` | **必须并行** |
+| Experimental Setup | `experiment_setup` | 单探查 |
+| Main Results | `experiment_results` | 单探查 |
+| Ablation | `experiment_results` | 单探查 |
+| Discussion | `interpretability` | 单探查 |
+
+### 汇总 Evidence Map
+
 After probes return, aggregate into an Evidence Map. Light-weight, section-targeted inventory only.
 
 Determine paper type: empirical / theory / survey / reproducibility / position.
@@ -142,11 +192,13 @@ List four categories:
 
 首次执行 full-paper-planning 时，Step 2 采用**混合探查策略**：
 
-**Phase 1 — 轻量全量探查（Step 2 执行，并行 dispatch）：**
-同时 dispatch 以下 3 个轻量探查任务（每个只需读取目录级信息和配置文件）：
+**Phase 1 — 轻量全量探查（Step 2 执行，必须并行 dispatch）：**
+同时 dispatch 以下 3 个轻量探查任务（每个只需读取目录级信息和配置文件）。**必须同时发出，不得串行：**
 
 ```yaml
-Task ①:
+# ===== 同时发出，互不等待 =====
+
+Task A:
   description: "Project overview: code structure"
   subagent_type: "general"
   prompt: |
@@ -162,7 +214,7 @@ Task ①:
     1. 只读——禁止修改任何文件
     2. 只探查顶层目录和直接子目录，不递归进 __pycache__/ .git/ 等
 
-Task ②:
+Task B:
   description: "Project overview: data & artifacts"
   subagent_type: "general"
   prompt: |
@@ -177,7 +229,7 @@ Task ②:
     Red Lines:
     1. 只读——禁止修改任何文件
 
-Task ③:
+Task C:
   description: "Project overview: config"
   subagent_type: "general"
   prompt: |
@@ -192,21 +244,21 @@ Task ③:
     1. 只读——禁止修改任何文件
 ```
 
-3 个探查返回后，汇总为 **Project Overview**，作为 Evidence Map 的索引层。
+3 个探查全部返回后，汇总为 **Project Overview**，作为 Evidence Map 的索引层。
 
 **Phase 2 — 按需深度探查（各 section 起草前 dispatch）：**
 以下深层探查**不在此阶段执行**，而是推迟到对应 section 起草前 dispatch：
 
-| Section 起草前 | dispatch 的深层探查 |
-|---------------|-------------------|
-| Method | `code_structure`（逐模块的 Module Cards、张量形状、forward 路径） |
-| Method | `preprocessing`（数据预处理详细步骤） |
-| Experimental Setup | `experiment_setup`（超参数、数据集划分、人口统计） |
-| Main Results | `experiment_results`（主结果、基线对比、消融数值） |
-| Ablation | `experiment_results`（消融实验数值） |
-| Discussion | `interpretability`（可解释性结果、网络重要性） |
+| Section 起草前 | dispatch 的深层探查 | 并行策略 |
+|---------------|-------------------|---------|
+| Method | `code_structure`（逐模块 Module Cards、张量形状、forward 路径） | **与 preprocessing 并行** |
+| Method | `preprocessing`（数据预处理详细步骤） | **与 code_structure 并行** |
+| Experimental Setup | `experiment_setup`（超参数、数据集划分、人口统计） | 单探查 |
+| Main Results | `experiment_results`（主结果、基线对比、消融数值） | 单探查 |
+| Ablation | `experiment_results`（消融实验数值） | 单探查 |
+| Discussion | `interpretability`（可解释性结果、网络重要性） | 单探查 |
 
-每个深层探查使用 Step 2 中定义的 dispatch 模板，传入对应 probe_type。
+每个深层探查使用上方的并行或单探查 dispatch 模板，传入对应 probe_type。
 
 For Introduction / Related Work, also audit exemplar paper candidates.
 For Method, also audit model data flow, module boundaries, tensor shapes, recoverable formulas.

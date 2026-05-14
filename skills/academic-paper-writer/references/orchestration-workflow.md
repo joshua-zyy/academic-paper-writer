@@ -34,7 +34,7 @@
 |------|------|---------|---------|
 | 0 | 判定 mode、scope、当前 section | — | 自动 |
 | 1 | 确认 venue / 语言（Blocking Gate） | — | 自动 |
-| 2 | 证据审计（dispatch probe agents） | — | 自动 |
+| 2 | 证据审计（并行 dispatch probe agents） | — | 自动，涉及多 probe 时**必须并行** |
 | 3 | 文献检索与核验 | `academic-citation`（dispatch 子 Agent） | 自动 |
 | 4 | 实验事实复核 | `academic-experiments`（dispatch 子 Agent） | 自动 |
 | 5 | 生成 Section / Method Blueprint | — | 自动 |
