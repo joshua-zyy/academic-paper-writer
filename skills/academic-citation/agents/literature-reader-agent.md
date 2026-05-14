@@ -8,7 +8,7 @@
 ## Input Schema
 
 ```yaml
-markdown_content: string | null    # 论文全文 MD（null 表示无可读全文）
+markdown_content: string | null    # 论文全文 MD（null 表示无可读全文）。未完成 MD 转换时，也可传入 PDF 路径让 agent 直接读取
 paper_metadata:
   title: string
   authors: string

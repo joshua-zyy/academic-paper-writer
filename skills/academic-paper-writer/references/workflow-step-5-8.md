@@ -157,20 +157,26 @@ Task:
     执行步骤:
     1. 读取 skills/academic-figure/SKILL.md，按 B 路径（arch-prompt）执行
     2. 确认模型结构：核心组件列表、数据流方向、关键连接方式（残差/跨层注意力等）
-    3. 输出结构化描述式提示词
+    3. 按 skills/academic-figure/agents/figure_agent.md 中 B 路径的 Output Schema 输出结构化结果
 
-    输出:
-    - 架构分析说明（组件、数据流、连接方式）
-    - 生图提示词（通用描述式语言，不含 --ar、--style 等工具参数）
-    - 配色建议（学术色板 + 灰度安全）
-    - 使用说明
+    Output Schema (B 路径):
+    ```yaml
+    prompt: string              # 生图提示词（完整可执行的提示词文本，不得包含引用、占位符或 `[见...]` 类标记）
+    figure_description:
+      components: string[]      # 核心组件列表
+      data_flow: string         # 数据流方向说明
+      connections: string[]     # 关键连接方式
+      annotations: string[]     # 标注要求
+    ```
 
-    约束: 遵循 academic-figure SKILL.md 中的 Red Lines
+    约束:
+    - 遵循 academic-figure SKILL.md 中的 Red Lines
+    - `prompt` 字段必须包含完整可执行的提示词文本，不得使用引用或占位符替代
 
-    返回: 架构分析说明 + 生图提示词
+    返回: 严格按上述 YAML 格式输出，不附加任何额外文本
 ```
 
-dispatch 返回后，**必须**将提示词写入 `./docs/paper-drafts/figures/figure_prompts.md`，并将正文中的占位符替换为图编号引用。
+dispatch 返回后，从子代理返回的结构化输出中提取 `prompt` 字段的完整文本内容，原样写入 `./docs/paper-drafts/figures/figure_prompts.md`。**禁止**使用引用、指针或 `[见...]` 类占位符替代实际提示词文本。同时将正文中的占位符替换为图编号引用。
 
 ### 7h. 数据图绘图代码 dispatch 模板（路径 B）
 对数据图类的 `[FIGURE_NEEDED]`，按此模板 dispatch：

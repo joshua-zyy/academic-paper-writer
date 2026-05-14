@@ -45,7 +45,8 @@
 | 9 | Prose Quality Gate（Phase 2） | `academic-polishing`（**内化调用**，主 Agent 自行执行） | 自动 |
 | 10 | Expansion Pass（内容密度检查） | — | 自动 |
 | 11 | Self-Review & Verification | `academic-reviser`（dispatch 子 Agent） | 自动 |
-| 12 | 整合 & 依赖感知 section loop + 引用清单生成 | — | 自动 |
+| 12 | 整合 & 依赖感知 section loop | — | 自动 |
+| 12e | **引用清单生成**（强制） | — | 自动 |
 
 ---
 

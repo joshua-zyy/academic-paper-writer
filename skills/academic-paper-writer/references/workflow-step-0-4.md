@@ -91,9 +91,13 @@ md_output_dir = <local_lit_pdf_dir>/../papersToMd/
 ### 1b.4 延迟等待
 
 当 Step 3 即将开始（Step 2 完成后），检查 `local_lit_md_dir` 目录是否存在且包含 MD 文件：
-- 存在 → 进入 **Step 3a**（本地优先搜索）
-- 不存在 → 在对话中提示"请运行转换命令"，然后继续 Step 3b（仅联网搜索）
-- 用户转换完毕后可随时告知 agent，agent 回到 Step 3a 补充本地搜索
+- 存在 → 进入 **Step 3a**（本地优先搜索，使用 MD 文件）
+- 不存在但有 `local_lit_pdf_dir` 且 PDF 可读 → **降级进入 Step 3a**（使用 PDF 直接搜索）
+  - 使用 agent 的文件读取能力逐篇扫描 PDF，提取摘要/开头内容
+  - `source_of_content` 标记为 `pdf_direct`
+  - 后续引用核验时优先建议用户完成 MD 转换
+- 两者皆不可用 → 在对话中提示"请运行转换命令"，然后继续 Step 3b（仅联网搜索）
+- 用户转换完毕后可随时告知 agent，agent 回到 Step 3a 补充 MD 模式搜索
 
 ## Step 2: Evidence Audit
 

@@ -57,7 +57,7 @@ qa_report:
 ### B 路径（模型架构图）
 
 ```yaml
-prompt: string                        # 生图提示词（工具无关描述式语言）
+prompt: string                        # 生图提示词（工具无关描述式语言）。必须包含完整可执行的提示词文本，不得包含引用、占位符或 `[见...]` 类标记
 figure_description:
   components: string[]                # 核心组件列表
   data_flow: string                   # 数据流方向说明

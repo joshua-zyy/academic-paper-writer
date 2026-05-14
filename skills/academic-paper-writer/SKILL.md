@@ -24,7 +24,7 @@ description: "Use when writing CS/AI/ML papers from scratch, drafting section-by
 
 ## 编排流程
 
-`Step 0(判定mode) → Step 1(确认venue/language+本地文献库) → Step 1b(可选:PDF→MD准备) → Step 2(证据审计) → Step 3(文献检索:3a本地优先+3b联网+3c聚合) → Step 4(实验复核) → Step 5(Section Blueprint) → Step 6(Draft v1) → Step 7(占位符审计+图表生成) → Step 8(证据合规审查) → Step 9(Prose质量门,内化) → Step 10(扩写检查) → Step 11(综合验证) → Step 12(section loop+引用清单)`
+`Step 0(判定mode) → Step 1(确认venue/language+本地文献库) → Step 1b(可选:PDF→MD准备) → Step 2(证据审计) → Step 3(文献检索:3a本地优先+3b联网+3c聚合) → Step 4(实验复核) → Step 5(Section Blueprint) → Step 6(Draft v1) → Step 7(占位符审计+图表生成) → Step 8(证据合规审查) → Step 9(Prose质量门,内化) → Step 10(扩写检查) → Step 11(综合验证) → Step 12(section loop) → Step 12e(引用清单生成)`
 
 每节经历：`Draft v1 → Quality Gate → Expansion → Self-Review → Revision → Verification`。未通过则回到 Step 8 重修。
 
@@ -115,6 +115,7 @@ description: "Use when writing CS/AI/ML papers from scratch, drafting section-by
 1. `paper_draft.md` — 论文正文（逐节追加，含 inline 占位符标记）+ 参考文献列表 + 待补项清单
 2. `figures/figure_prompts.md` — 所有架构图生图提示词汇总（按图编号分节）
 3. `figures/plot_*.py` — 数据结果图的 Python 绘图代码（按图编号命名，不自动执行）
+4. `referenced-literature-checklist.md` — 引用文献清单（**强制，论文完成时必生成**）
 
 对话中仅输出简短进度摘要，不输出完整论文正文。
 
@@ -171,7 +172,8 @@ description: "Use when writing CS/AI/ML papers from scratch, drafting section-by
 | 9 | Prose Quality Gate（Phase 2） | `academic-polishing`（**内化调用**，主 Agent 自行执行） | 自动 |
 | 10 | Expansion Pass（内容密度检查） | — | 自动 |
 | 11 | Self-Review & Verification | `academic-reviser`（dispatch 子 Agent） | 自动 |
-| 12 | 整合 & 依赖感知 section loop + 引用清单生成 | — | 自动 |
+| 12 | 整合 & 依赖感知 section loop | — | 自动 |
+| 12e | **引用清单生成**（强制，论文完成时必执行） | — | 自动 |
 
 **核心约束**：Draft v1 → Evidence Review → Prose Review → Expansion → Verification → Advance（或 Revise）。
 
