@@ -60,8 +60,9 @@ If venue is known and relevant, read `references/writing-guidelines.md` and form
 
 ### 1b.1 生成转换脚本（一次性）
 
-检查 `scripts/convert-pdfs-to-md.py` 是否存在于项目根目录：
-- 不存在 → 使用 Write 工具创建该脚本（写入 `scripts/convert-pdfs-to-md.py`，内容见本文档末尾的"转换脚本内容"）
+检查 `skills/academic-citation/scripts/convert-pdfs-to-md.py` 是否存在：
+- 不存在 → 使用 Write 工具创建该脚本（写入 `skills/academic-citation/scripts/convert-pdfs-to-md.py`）
+- 已存在 → 跳过
 - 已存在 → 跳过
 
 ### 1b.2 确定 MD 输出目录
@@ -81,7 +82,7 @@ md_output_dir = <local_lit_pdf_dir>/../papersToMd/
 本地文献库已确认: <local_lit_pdf_dir>
 将在后台准备 MD 转换，请稍后运行以下命令：
 
-  python scripts/convert-pdfs-to-md.py <local_lit_pdf_dir> <local_lit_md_dir>
+  python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_lit_pdf_dir> <local_lit_md_dir>
 
 转换完毕后请告知我，我将从本地文献库中搜索可引用的文献。
 （在此期间我将先进行项目证据审计和联网文献检索）
