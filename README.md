@@ -28,7 +28,7 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 </tr>
 <tr>
 <td width="4px" bgcolor="#42949E">📐 </td>
-<td><strong>表述不准</strong> — 算法和公式在脑子里很清晰，落笔成文总觉得不对味</td>
+<td><strong>表述不准</strong> — 算法和公式在脑中模糊，只有大概的思路</td>
 </tr>
 <tr>
 <td width="4px" bgcolor="#B64342">🎨</td>
@@ -40,11 +40,11 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 </tr>
 </table>
 </blockquote>
-你不是一个人。学术写作的最大障碍往往不是"做得不够"，而是"不知道怎么写出来"。</td>
+你不是一个人，学术写作的最大障碍往往不是做得不够，而是不知道怎么写出来。</td>
 </tr>
 </table>
 
-**它不是一个简单的"一次性生成整篇论文"的 prompt，而是一套工程化写作系统：** 先把论文拆成多个可独立验证的环节，按证据审计 → 文献检索 → 实验复核 → 起草 → 质量门 → 验证的闭环逐节推进。每个环节都设硬门控，证据不足就阻塞或降级，绝不"硬写"。
+**这不是一个简单的"一次性生成整篇论文"的 prompt，而是一套工程化写作系统：** 先把论文拆成多个可独立验证的环节，按证据审计 → 文献检索 → 实验复核 → 起草 → 质量门 → 验证的闭环逐节推进。每个环节都设硬门控，证据不足就阻塞或降级，绝不"硬写"。
 
 ---
 
@@ -113,16 +113,17 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 每一节经历固定闭环，不允许跳过任何环节：
 
-```mermaid
-flowchart LR
-    Draft["✏️ Draft v1"] --> Audit["📌 占位符审计"]
-    Audit --> Evidence["⚖️ 证据合规审查"]
-    Evidence --> Prose["✨ Prose Quality Gate"]
-    Prose --> Expansion["📏 Expansion Pass"]
-    Expansion --> Review["✅ Self-Review & Verification"]
-    Review --> Advance["▶️ 推进下一节"]
-    Review --> Revise["🔁 修订"]
-    Revise --> Evidence
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                 逐节闭环（每节必须经历）                      │
+│                                                             │
+│   ✏️ Draft v1 → 📌 占位符审计 → ⚖️ 证据合规审查              │
+│       → ✨ Prose Gate → 📏 Expansion → ✅ Self-Review       │
+│       → Verification                                        │
+│              │                                               │
+│              ├── passed  ▶️ 推进下一节                         │
+│              └── failed  🔁 回到 ⚖️ 证据合规审查 重来          │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 - 初稿可以带占位符，但占位符必须被记录、审计和追踪
@@ -164,34 +165,41 @@ flowchart LR
 
 ## 🔄 编排器核心工作流
 
-```mermaid
-flowchart LR
-    subgraph 准备阶段
-        S0["🎯 Step 0<br/>判定任务模式"]
-        S1["🔒 Step 1<br/>确认 venue / 语言"]
-        S2["🔍 Step 2<br/>并行证据审计"]
-    end
-    subgraph 调研阶段
-        S3["📚 Step 3<br/>文献检索与核验"]
-        S4["🔬 Step 4<br/>实验事实复核"]
-    end
-    subgraph 起草阶段
-        S5["🧩 Step 5<br/>Section Blueprint"]
-        S6["✏️ Step 6<br/>Draft v1"]
-        S7["📌 Step 7<br/>占位符审计 + 图表"]
-    end
-    subgraph 质量阶段
-        S8["⚖️ Step 8<br/>证据合规审查"]
-        S9["✨ Step 9<br/>Prose Quality Gate"]
-        S10["📏 Step 10<br/>Expansion Pass"]
-    end
-    subgraph 验证阶段
-        S11["✅ Step 11<br/>Self-Review & Verification"]
-        S12["🔄 Step 12<br/>依赖感知 Section Loop"]
-    end
-
-    S0 --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> S10 --> S11 --> S12
-    S11 -.->|failed| S8
+```text
+┌──────────────────────────────────────────────────────────────────────┐
+│                         编排器核心工作流                              │
+│                                                                      │
+│   🎯 Step 0  判定任务模式                                             │
+│    ↓                                                                │
+│   🔒 Step 1  确认 venue / 语言 （🔴硬阻塞，缺一不可）                   │
+│    ↓                                                                │
+│   🔍 Step 2  并行证据审计 （⚡涉及多 probe 时必须并行 dispatch）         │
+│    ↓                                                                │
+│   ┌──────────────────────────────────────────────────────────────┐   │
+│   │              调研阶段                                          │   │
+│   │  📚 Step 3  文献检索与核验 → 🔬 Step 4  实验事实复核            │   │
+│   └──────────────────────────────────────────────────────────────┘   │
+│    ↓                                                                │
+│   🧩 Step 5  Section Blueprint / Method Blueprint                    │
+│    ↓                                                                │
+│   ✏️ Step 6  Draft v1（含占位符系统 + 待补项清单）                    │
+│    ↓                                                                │
+│   📌 Step 7  占位符审计 + 图表生成                                    │
+│    ↓                                                                │
+│   ┌──────────────────────────────────────────────────────────────┐   │
+│   │              质量门（双阶段审查）                                │   │
+│   │  ⚖️ Step 8  证据合规审查（Phase 1）                              │   │
+│   │  ✨ Step 9  Prose Quality Gate（Phase 2，内化调用）              │   │
+│   │  📏 Step 10 Expansion Pass（内容密度检查）                       │   │
+│   └──────────────────────────────────────────────────────────────┘   │
+│    ↓                                                                │
+│   ✅ Step 11  Self-Review & Verification                             │
+│    │                                                                │
+│    ├── passed  →  🔄 Step 12  依赖感知 Section Loop（推进下一节）    │
+│    └── failed  →  ⬆️ 回到 Step 8 证据合规审查 重来                   │
+│                                                                      │
+│   📌 Abstract 后置 — 所有核心章节全部 passed 后才允许生成              │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
 > - 🔒 Step 1 是硬阻塞，缺少 venue/language 时不能继续
@@ -368,9 +376,9 @@ python scripts/check_schemas.py --skills-root ./skills
 
 ## 📖 参考项目
 
-- ⚡ [superpowers](https://github.com/obra/superpowers) — AgentSkills 规范与工具平台
-- 🌿 [nature-skills](https://github.com/Yuan1z0825/nature-skills) — 自然语言处理 skill 集合
-- 🎓 [academic-research-skills](https://github.com/Imbad0202/academic-research-skills) — 学术研究辅助 skill
+- ⚡ [superpowers](https://github.com/obra/superpowers) 
+- 🌿 [nature-skills](https://github.com/Yuan1z0825/nature-skills)  
+- 🎓 [academic-research-skills](https://github.com/Imbad0202/academic-research-skills) 
 
 ---
 
