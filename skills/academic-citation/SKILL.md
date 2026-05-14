@@ -27,6 +27,9 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
 4. 对 Introduction 或 Related Work，除正文引用外，还必须建立同领域 `Exemplar Set`（3-5 篇 Introduction exemplars + 4-8 篇 Related Work exemplars），用于学习章节组织与论证顺序，而非复制原文措辞。
 5. 每条用于正文的引用必须有对应的 inline citation marker 和 Citation-to-Claim 映射记录。
 6. 参考文献列表只能包含正文中已被引用或以 `[REF_NEEDED: ...]` 声明的条目。
+7. **本地文献库优先**：当提供了 `local_lit_md_dir` 时，必须优先在本地 MD 库中检索和阅读全文，充分搜索后再联网补充。
+8. **Subagent 阅读只提炼不决策**：`literature-reader-agent` 的输出（LiteratureReadingReport）仅作为主 agent 的参考输入，最终是否引用由主 agent 基于论文整体论证结构决定。
+9. **原文 vs 推断隔离**：`literature-reader-agent` 必须严格区分原文提取和自身推断。主 agent 引用时，只能以 `source: 原文` 的内容作为引用依据。
 
 ## 任务模式
 
@@ -34,6 +37,8 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
 2. **targeted-citation-search** — 为特定 claim、section 或主题检索文献
 3. **exemplar-set-only** — 只构建 Exemplar Set 用于学习章节组织，不强制全部进入正文引用
 4. **citation-verification** — 核验已有候选文献列表的元数据准确性
+5. **local-citation-pass** — 优先从本地文献库（`papersToMd/`）检索与核验引用，不足时再联网补充。依赖 `literature-reader-agent` 进行全文阅读。
+6. **citation-verification-with-reading** — 对已下载到本地文献库的引用文献，逐篇阅读全文并验证引用合理性（claim_accuracy 检查）。用于论文撰写完毕后的引用确认流程。
 
 ## 工作流
 
@@ -42,6 +47,19 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
 - 明确当前是为哪个 section 做引用（Introduction / Related Work / Method / Experiments / Discussion）
 - 提取关键检索词：任务名、方法家族、数据集、模态
 - 若为 Introduction 或 Related Work，额外确认是否需要 Exemplar Set
+
+### Step 1a: 本地文献库优先检索
+
+当配置了 `local_lit_md_dir` 时，在联网检索之前执行：
+
+1. 读取 `<local_lit_md_dir>/_index.json`，用关键词搜索索引
+2. 命中的候选文献，dispatch `literature-reader-agent` 并行阅读 MD 全文
+3. 每个阅读任务产出 LiteratureReadingReport，包含核心主张、方法概述、关键结果、可引用 claim 列表、关联度评估、引用建议
+4. 主 agent 综合所有报告，决定是否引用及用于何处
+5. 若本地搜索结果充分且内容匹配 → 跳过联网检索
+6. 若不足或不匹配 → 进入 Step 2 联网检索
+
+**并行 dispatch 规则**：当有 2 篇以上候选文献时，**必须并行** dispatch reader agent（同一次消息中发出多个 Task），不得串行等待。
 
 ### Step 2: 执行多轮检索
 
@@ -61,6 +79,25 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
 逐篇确认：标题准确、作者列表准确、venue 准确、年份准确、来源链接可定位到原始论文页面。
 
 全部确认 → `VERIFIED`。任一无法确认 → `UNVERIFIED`，不得写入正文确定性引用。
+
+### Step 3a: 联网文献全文获取与阅读
+
+对 Step 3 中检索到的非本地候选文献：
+
+1. **优先获取全文**：
+   - 尝试从 arXiv、OpenReview、PMLR、ACL Anthology 等开放来源获取全文 HTML 或 PDF
+   - 获取成功 → 将内容转化为纯文本，dispatch `literature-reader-agent` 阅读全文
+   - 获取失败（付费墙等）→ 降级为摘要 + 元数据，标注 `source_of_content: abstract_only`
+2. **并行 dispatch**：多篇候选文献的阅读**必须并行**执行
+3. 阅读报告参与引用决策：以 report 中的 `citable_claims`（`source: 原文`）为主要引用依据
+
+### Step 3b: Subagent 阅读结果聚合
+
+所有 `literature-reader-agent` 返回后：
+
+1. 按 `relevance_to_current_work` + `recommendation` 排序
+2. 主 agent 逐条评估：该文献是否写入 Verified References？关联到哪个 claim？插入哪个 section？
+3. 将采纳的文献写入 Citation-to-Claim Map
 
 ### Step 4: 构建 Exemplar Set（Introduction / Related Work 时）
 
@@ -134,8 +171,11 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
 | 文件 | 用途 |
 |------|------|
 | `agents/citation_agent.md` | 文献检索策略（4 类查询模板、输出 schema） |
+| `agents/literature-reader-agent.md` | 文献阅读与提炼代理（输入 MD 全文，输出 LiteratureReadingReport） |
 
 **使用方式**：由 `academic-paper-writer` 核心编排器在 Step 3 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只执行检索与核验，绝对不得修改项目中的任何文件，也不得独立撰写论文正文**。
+
+`literature-reader-agent` 由 `citation_agent` 或 `academic-paper-writer` 在 Step 3a/3b 中并行 dispatch，用于阅读本地 MD 文献或联网获取的全文。
 
 ## 何时读取 references/
 
@@ -145,6 +185,8 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
 | `references/verification-protocol.md` | 核验候选文献时（Step 3） |
 | `references/citation-mapping.md` | 建立 Citation-to-Claim 映射时（Step 5） |
 | `references/schemas/verified-references.md` | 理解输出数据格式（Step 6） |
+| `references/schemas/literature-reading-report.md` | subagent 阅读输出格式（Step 1a/3a） |
+| `agents/literature-reader-agent.md` | 文献阅读代理模板（Step 1a/3a 并行 dispatch） |
 
 ## 不适用场景
 

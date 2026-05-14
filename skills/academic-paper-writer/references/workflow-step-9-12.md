@@ -183,7 +183,53 @@ When generating Abstract:
 - Do not introduce new claims, methods, or terminology not present in the body
 - Place Abstract at the beginning of the final Cumulative Draft output
 
-### 12e. Progress Report（auto 模式下每节完成后输出）
+### 12e. External Citation Checklist Generation（全文完成后执行）
+
+Abstract 生成后，在输出最终 Cumulative Draft 之前，生成引用文献清单。
+
+**触发条件**：
+- 所有 core sections Verification = passed
+- Abstract 已生成
+- 如果之前没有做，此步骤在所有论文主体完成后才执行
+
+**执行流程**：
+
+1. 从 Cumulative Draft 中提取所有引用的外部文献条目
+2. 为每篇文献记录：标题、作者、venue、引用章节、引用目的
+3. 写入 `docs/paper-drafts/referenced-literature-checklist.md`
+
+**输出模板**：
+```markdown
+# 引用文献清单
+
+以下文献在论文中被引用。请逐篇下载到本地，agent 可帮助确认引用是否合理。
+
+| # | 文献 | 引用章节 | 引用目的 | 本地确认状态 |
+|---|------|---------|---------|------------|
+| 1 | Author et al., "Title", Venue 2024 | Introduction | 背景事实 | ⬜ |
+| 2 | Author et al., "Title2", NeurIPS 2023 | Method | 基线比较 | ⬜ |
+
+## 确认方式
+
+1. 将上述文献的 PDF 放入本地文献库目录
+2. 运行转换命令：
+   ```
+   python scripts/convert-pdfs-to-md.py <pdf_dir> <papersToMd_dir>
+   ```
+3. 告知 agent："确认引用"
+4. Agent 将 dispatch literature-reader-agent 逐篇阅读，
+   对比论文实际内容与 draft 中的引用描述是否一致
+5. 每篇输出的确认结果：
+   - ✅ **accurate** — 引用准确，描述与原文一致
+   - ⚠️ **needs_downgrade** — 引用略有偏差，需降级描述
+   - ❌ **incorrect** — 引用不准确，建议删除或重写
+
+## 已确认清单
+
+（逐步更新，每确认一篇更新一行）
+```
+
+### 12g. Progress Report（auto 模式下每节完成后输出）
 
 每节 Verification 完成后，在对话中输出简短进度摘要：
 
@@ -192,7 +238,7 @@ When generating Abstract:
 
 此摘要**替代**完整正文的对话输出。完整内容仅在 `./docs/paper-drafts/paper_draft.md` 中可查阅。
 
-### 12f. File Update（强制）
+### 12h. File Update（强制）
 
 每节 Verification 完成后，**必须**使用 Edit 工具更新 `./docs/paper-drafts/paper_draft.md`，将当前节的最新版本追加或替换到论文文件中。
 

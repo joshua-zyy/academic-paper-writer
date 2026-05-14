@@ -36,9 +36,63 @@ Blocking confirmations — must stop and ask if missing:
 3. **Continuation mode**: Default to `auto` (automatic section advancement). If user prefers step-by-step confirmation, record `continuation_mode = step-by-step`.
 4. **Current section**: Determined by Step 0 if user did not specify.
 
+5. **Local literature library**（venue/language 确认后**立即**询问）：
+   - 是否在当前项目中维护了本地文献库（存放待引用 PDF 论文的目录）？
+     - 有 → 记录路径为 `local_lit_pdf_dir`
+     - 没有 → `local_lit_pdf_dir = null`，跳过本地文献流程
+   - 如果有，告知将在其同级创建 `papersToMd/` 目录存放转换后的 MD 文档
+   - 检查 `markitdown` 是否已安装，未安装时提供命令：
+     ```
+     pip install markitdown
+     ```
+   - 接下来进入 **Step 1b** 的 PDF→MD 转换准备
+   - 若用户明确没有本地文献库或跳过转换：`local_lit_md_dir = null`，跳过 Step 1b
+
 If venue is known and relevant, read `references/writing-guidelines.md` and form a brief Venue / Language Brief.
 
 **Failure to confirm venue**: Stop and wait. Do not proceed to Step 2. Do not generate Outline or Section Queue until venue is resolved.
+
+---
+
+## Step 1b: Local Literature PDF→MD Conversion
+
+**条件**: 仅在 `local_lit_pdf_dir != null` 且用户愿意进行转换时执行。与 Step 2 等后续步骤并行进行（不阻塞主流程）。
+
+### 1b.1 生成转换脚本（一次性）
+
+检查 `scripts/convert-pdfs-to-md.py` 是否存在于项目根目录：
+- 不存在 → 使用 Write 工具创建该脚本（写入 `scripts/convert-pdfs-to-md.py`，内容见本文档末尾的"转换脚本内容"）
+- 已存在 → 跳过
+
+### 1b.2 确定 MD 输出目录
+
+计算 MD 输出目录：
+```python
+md_output_dir = <local_lit_pdf_dir>/../papersToMd/
+# 例: D:\AI\literature\ → D:\AI\papersToMd\
+```
+记录为 `local_lit_md_dir`。
+
+### 1b.3 提示用户运行（不阻塞）
+
+在对话中输出以下提示，**然后立即进入 Step 2**，不等待转换完成：
+
+```
+本地文献库已确认: <local_lit_pdf_dir>
+将在后台准备 MD 转换，请稍后运行以下命令：
+
+  python scripts/convert-pdfs-to-md.py <local_lit_pdf_dir> <local_lit_md_dir>
+
+转换完毕后请告知我，我将从本地文献库中搜索可引用的文献。
+（在此期间我将先进行项目证据审计和联网文献检索）
+```
+
+### 1b.4 延迟等待
+
+当 Step 3 即将开始（Step 2 完成后），检查 `local_lit_md_dir` 目录是否存在且包含 MD 文件：
+- 存在 → 进入 **Step 3a**（本地优先搜索）
+- 不存在 → 在对话中提示"请运行转换命令"，然后继续 Step 3b（仅联网搜索）
+- 用户转换完毕后可随时告知 agent，agent 回到 Step 3a 补充本地搜索
 
 ## Step 2: Evidence Audit
 
@@ -263,12 +317,79 @@ Task C:
 For Introduction / Related Work, also audit exemplar paper candidates.
 For Method, also audit model data flow, module boundaries, tensor shapes, recoverable formulas.
 
-## Step 3: Literature Search and Verification
+## Step 3: Literature Search and Verification（三步流程）
+
+本步骤分为三个子步骤：
+- **Step 3a**：本地文献库优先搜索（条件执行）
+- **Step 3b**：联网文献检索 + 全文获取与阅读
+- **Step 3c**：Subagent 阅读结果聚合 + Citation-to-Claim 映射
+
+---
+
+### Step 3a: 本地文献库优先搜索
+
+**条件**: 仅在 `local_lit_md_dir != null` 且目录中存在 MD 文件时执行。
+
+1. 读取 `<local_lit_md_dir>/_index.json`（由 `convert-pdfs-to-md.py` 生成）
+2. 用从 section 提取的关键词在索引中搜索（匹配 title、first_500_chars）
+3. 命中的候选文献，使用 **并行 dispatch** 模板（见下方"并行阅读 dispatch 模板"）同时 dispatch 多个 `literature-reader-agent`
+4. 每个 reader 返回 LiteratureReadingReport
+5. 主 agent 综合报告决定是否引用
+
+**判定路径**：
+- 若本地搜索找到 0 篇候选 → 跳过 Step 3a，直接进入 Step 3b
+- 若找到候选但所有 `recommendation` 均为 `skip` → 进入 Step 3b 补充
+- 若找到候选且至少部分被采纳 → 采纳的进入 Verified References，不足处继续 Step 3b
+
+**并行阅读 dispatch 模板（N 篇候选同时执行）：**
+```yaml
+# ===== 同时发出以下 N 个 Task，互不等待 =====
+
+{R001}:
+  description: "阅读文献 R001 - {section}"
+  subagent_type: "general"
+  prompt: |
+    你已加载 literature-reader-agent（skills/academic-citation/agents/literature-reader-agent.md）。
+
+    任务: 阅读并提炼以下论文
+    markdown_content: {从 local_lit_md_dir/R001.md 读取的全文内容}
+    paper_metadata:
+      title: {title}
+      authors: {authors}
+      year: {year}
+      venue: {venue}
+      source: {local MD}
+    task_context: {当前论文的任务/方法/数据集描述}
+
+    执行步骤:
+    1. 读取 skills/academic-citation/agents/literature-reader-agent.md
+    2. 遵循 Constraints (Red Lines)，严格区分 `[原文]` 与 `[推断]`
+    3. 按 Reading Guidance 顺序提取信息
+    4. 输出遵循 literature-reading-report.md schema
+
+    Red Lines:
+    1. 只阅读，不修改任何文件
+    2. 禁止编造论文中不存在的内容
+    3. 严格区分原文提取与推断
+
+    返回: 完整 LiteratureReadingReport
+
+{R002}:
+  description: "阅读文献 R002 - {section}"
+  # 同上模板，不同的 markdown_content
+```
+
+**所有 Task 返回后**，按 `relevance_to_current_work` + `recommendation` 排序，暂存为 `local_reading_reports`。
+
+---
+
+### Step 3b: 联网文献检索 + 全文获取与阅读
+
+在本地搜索完成后（或跳过 Step 3a 时），执行联网检索：
 
 - Create a todo list for keywords and expected reference counts.
 - Determine search keywords and scope (e.g., task_name, method_family, dataset).
 - Delegate to `academic-citation` via the dispatch template below.
-- Mark todo completed after return.
 
 **Dispatch template：**
 ```yaml
@@ -281,30 +402,57 @@ Task:
     任务: 为 {section} 执行文献检索与核验
     关键词: {keywords}
     目标 venue: {venue}
+    local_lit_md_dir: {local_lit_md_dir | null}
 
     执行步骤:
-    1. 读取 skills/academic-citation/SKILL.md，按 Step 1-6 执行
-    2. 至少覆盖 4 类查询：问题导向 / 方法导向 / 基线导向 / 时间导向
-    3. 逐篇核验元数据，优先一级来源（official proceedings、DOI）
-    4. 完整论文至少 8-15 篇 VERIFIED 文献，短论文至少 4-8 篇
-    5. Introduction/Related Work 时额外构建 Exemplar Set（3-5 篇）
-    6. 输出时同时输出 Citation-to-Claim Map
+    1. 读取 skills/academic-citation/SKILL.md
+    2. 若 local_lit_md_dir != null，先执行 Step 1a（本地搜索）
+    3. 再执行 Step 2（至少 4 类查询）
+    4. 逐篇核验元数据（Step 3），优先一级来源
+    5. 完整论文至少 8-15 篇 VERIFIED，短论文至少 4-8 篇
+    6. 对候选文献，优先获取全文（arXiv/OpenReview/PMLR/ACL Anthology）
+       - 获取成功 → Dispatch literature-reader-agent 阅读
+       - 获取失败 → 降级为摘要 + 元数据
+    7. Introduction/Related Work 时额外构建 Exemplar Set
+    8. 输出 Citation-to-Claim Map
 
     输出:
     - Verified References（含 VERIFIED/UNVERIFIED 状态、来源链接）
+    - LiteratureReadingReports（每篇候选文献的阅读报告）
     - Exemplar Set（Introduction/Related Work 时必选）
-    - Citation-to-Claim Map（每篇引用→对应主张的映射）
+    - Citation-to-Claim Map
     - Missing References（[REF_NEEDED: ...] 方向列表）
 
-    约束: 遵循 academic-citation SKILL.md 中的 Red Lines
+    约束:
+    - 遵循 academic-citation SKILL.md 中的 Red Lines
+    - reader agent 输出必须区分原文 vs 推断
 
     返回: 结构化输出
 ```
 
-Input: current section, research keywords, target venue.
-Output: Verified References, Exemplar Set (for Intro/RW), Citation-to-Claim Map per `academic-citation/references/schemas/verified-references.md`.
+Input: current section, research keywords, target venue, local_lit_md_dir.
+Output: Verified References, Exemplar Set (for Intro/RW), Reading Reports, Citation-to-Claim Map.
 
-Constraint: only VERIFIED references enter the draft body. UNVERIFIED entries stay in candidate lists.
+Constraint: only VERIFIED references enter the draft body.
+
+---
+
+### Step 3c: 聚合与 Citation-to-Claim 映射
+
+合并 Step 3a 的 `local_reading_reports` 和 Step 3b 的返回结果：
+
+1. 对所有候选文献按 `relevance_to_current_work` + `recommendation` 综合排序
+2. 主 agent 逐条评估：
+   - `strongly_cite` / `cite` → 写入 Verified References
+   - `consider` → 记录为候选，判断是否论述需要
+   - `skip` → 放弃
+3. 根据 report 中的 `citable_claims`（仅 `source: 原文`），建立每个引用→正文主张的映射
+4. 输出完整的 Citation-to-Claim Map
+
+**重要规则**：
+- Subagent 的 `recommendation` 仅为参考。主 agent 基于论文整体论证结构做最终决定
+- 仅 `source: 原文` 的 `citable_claims` 可作为确定性引用依据
+- `source: 推断` 的内容最多用于背景描述，且须在正文中降级表述（如"我们认为...可能..."）
 
 For Introduction / Related Work: if retries still produce zero VERIFIED references and the user cannot provide usable seed papers, block before Step 6. Do **not** proceed with a `[REF_NEEDED]`-only draft for these sections.
 

@@ -14,7 +14,7 @@
 
 | 阶段 | Steps | 文件 | 核心任务 |
 |------|-------|------|---------|
-| 准备 | 0–4 | `workflow-step-0-4.md` | 判定模式、确认 venue、**并行**证据审计、文献检索、实验复核 |
+| 准备 | 0–4（含 1b） | `workflow-step-0-4.md` | 判定模式、确认 venue+本地文献库、PDF→MD 转换准备、**并行**证据审计、文献检索、实验复核 |
 | 起草 | 5–8 | `workflow-step-5-8.md` | Section Plan、Draft v1、占位符审计与图表、证据合规审查 |
 | 审查与整合 | 9–12 | `workflow-step-9-12.md` | Prose Gate、Expansion、Verification、Section Loop |
 
@@ -33,9 +33,10 @@
 | Step | 动作 | 委托方式 | 触发方式 |
 |------|------|---------|---------|
 | 0 | 判定 mode、scope、当前 section | — | 自动 |
-| 1 | 确认 venue / 语言（Blocking Gate） | — | 自动 |
+| 1 | 确认 venue / 语言 + 本地文献库（Blocking Gate） | — | 自动 |
+| 1b | 可选: PDF→MD 转换准备（生成脚本，提示用户运行，不阻塞） | — | 自动（条件执行） |
 | 2 | 证据审计（并行 dispatch probe agents） | — | 自动，涉及多 probe 时**必须并行** |
-| 3 | 文献检索与核验 | `academic-citation`（dispatch 子 Agent） | 自动 |
+| 3 | 文献检索与核验（3a 本地优先 + 3b 联网 + 3c 聚合） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 |
 | 4 | 实验事实复核 | `academic-experiments`（dispatch 子 Agent） | 自动 |
 | 5 | 生成 Section / Method Blueprint | — | 自动 |
 | 6 | 起草 Draft v1（含占位符系统 + **待补项清单**） | — | 自动 |
@@ -44,7 +45,7 @@
 | 9 | Prose Quality Gate（Phase 2） | `academic-polishing`（**内化调用**，主 Agent 自行执行） | 自动 |
 | 10 | Expansion Pass（内容密度检查） | — | 自动 |
 | 11 | Self-Review & Verification | `academic-reviser`（dispatch 子 Agent） | 自动 |
-| 12 | 整合 & 依赖感知 section loop | — | 自动 |
+| 12 | 整合 & 依赖感知 section loop + 引用清单生成 | — | 自动 |
 
 ---
 

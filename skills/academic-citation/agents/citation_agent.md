@@ -10,6 +10,7 @@ section: string                     # 目标章节
 keywords: string[] | null           # 检索关键词（null 时自动生成）
 target_venue: string | null         # 目标期刊/会议
 seed_references: string[] | null    # 用户提供的种子文献列表
+local_lit_md_dir: string | null     # 本地文献库 MD 目录（papersToMd/），不为 null 时优先本地搜索
 ```
 
 ### keywords 自动生成策略（用户未提供时）
@@ -61,6 +62,21 @@ query_types:
   - type: citation_oriented
     template: "<seed_paper>" reversed citations  # 仅 seed_paper 已知时
 ```
+
+## 本地文献库优先搜索（新增 Step 1a）
+
+当 `local_lit_md_dir != null` 时，在常规检索**之前**执行：
+
+1. 读取 `<local_lit_md_dir>/_index.json`（由 `convert-pdfs-to-md.py` 生成）
+2. 用关键词在索引中搜索（匹配 title、first_500_chars）
+3. 命中的候选文献，使用 `literature-reader-agent` 阅读其 MD 全文
+4. 产出 LiteratureReadingReport，供引用决策
+5. 若本地搜索结果充分且内容匹配 → 跳过联网检索
+6. 若不足或不匹配 → 继续常规联网检索（从 Step 2 起）
+
+**约束**：
+- 索引搜索只初步过滤，每篇候选仍须由 reader agent 阅读以确认内容匹配
+- 不可仅凭标题匹配就确认引用
 
 ## Output Schema
 
@@ -117,6 +133,38 @@ citation_to_claim_map:       # 额外输出
 4. 禁止因"搜索结果第一页看完了"就停止检索
 5. 禁止只引用与自己最相似的方法而忽略强基线或不利比较
 6. 禁止在正文没有任何 inline citation 的情况下输出参考文献列表
+
+## Local Literature Reading Sub-delegation
+
+当需要阅读本地 MD 文献或联网获取的全文时，dispatch `literature-reader-agent`：
+
+```yaml
+Task:
+  description: "阅读文献 {ref_id}"
+  subagent_type: "general"
+  prompt: |
+    你已加载 literature-reader-agent（skills/academic-citation/agents/literature-reader-agent.md）。
+
+    任务: 阅读并提炼以下论文
+    markdown_content: {从 MD 文件读取的全文内容}
+    paper_metadata:
+      title: {title}
+      authors: {authors}
+      year: {year}
+      venue: {venue}
+      source: {source}
+    task_context: {当前论文的任务/方法/数据集描述}
+
+    执行步骤:
+    1. 读取 skills/academic-citation/agents/literature-reader-agent.md
+    2. 遵循 Constraints (Red Lines)，严格区分 `[原文]` 与 `[推断]`
+    3. 按 Reading Guidance 顺序提取信息
+    4. 输出遵循 literature-reading-report.md schema
+
+    返回: 完整 LiteratureReadingReport
+```
+
+多个候选文献的阅读**必须并行 dispatch**，不串行。
 
 ## Fallback: 检索零结果降级路径
 
