@@ -14,7 +14,7 @@
 
 | 阶段 | Steps | 文件 | 核心任务 |
 |------|-------|------|---------|
-| 准备 | 0–4 | `workflow-step-0-4.md` | 判定模式、确认 venue、证据审计、文献检索、实验复核 |
+| 准备 | 0–4 | `workflow-step-0-4.md` | 判定模式、确认 venue、**并行**证据审计、文献检索、实验复核 |
 | 起草 | 5–8 | `workflow-step-5-8.md` | Section Plan、Draft v1、占位符审计与图表、证据合规审查 |
 | 审查与整合 | 9–12 | `workflow-step-9-12.md` | Prose Gate、Expansion、Verification、Section Loop |
 

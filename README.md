@@ -1,190 +1,203 @@
-# 📝 Academic Paper Writer
-
 <p align="center">
-  <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
-  <img src="https://img.shields.io/badge/domain-CS%2FAI%2FML-brightgreen" alt="Domain">
-  <img src="https://img.shields.io/badge/status-active-success" alt="Status">
+  <h1 align="center">📝 Academic Paper Writer</h1>
+  <p align="center">证据驱动 · 分节闭环 · 模块协作 · 硬门控 · 可验证</p>
+  <p align="center">
+    <a href="https://github.com/joshua-zyy/academic-paper-writer/blob/main/LICENSE">
+      <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
+    </a>
+    <img src="https://img.shields.io/badge/domain-CS%2FAI%2FML-brightgreen" alt="Domain">
+    <img src="https://img.shields.io/badge/status-active-success" alt="Status">
+    <img src="https://img.shields.io/badge/skill%20system-6%20skills-9A4D8E" alt="Skills">
+    <img src="https://img.shields.io/badge/architecture-Core%20%2B%20Subskills-orange" alt="Architecture">
+  </p>
 </p>
 
-面向 `CS / AI / ML` 论文写作场景的**模块化、证据驱动** Agent Skill 集合。
+---
 
-它不是“直接生成整篇论文”的通用 prompt，而是一套把论文写作拆成多个可验证环节的 skill system：先确认 `venue / language`，再审计证据、检索文献、复核实验、起草正文、执行 prose gate、最后做 verification。
+Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化、证据驱动** 的 Agent Skill 集合。
+
+<table>
+<tr>
+<td><strong>你是否也遇到过这些"论文写作焦虑"？</strong>
+<br>
+<blockquote>
+<table>
+<tr>
+<td width="4px" bgcolor="#0F4D92">🤷</td>
+<td><strong>无从下笔</strong> — 模型代码全部跑通，对着空白文档却不知第一句话写什么</td>
+</tr>
+<tr>
+<td width="4px" bgcolor="#42949E">📐 </td>
+<td><strong>表述不准</strong> — 算法和公式在脑子里很清晰，落笔成文总觉得不对味</td>
+</tr>
+<tr>
+<td width="4px" bgcolor="#B64342">🎨</td>
+<td><strong> 图表头秃</strong> — 实验数据堆了一桌子，论文级的可视化不知道从何画起</td>
+</tr>
+<tr>
+<td width="4px" bgcolor="#9A4D8E">🔍</td>
+<td><strong> 缺少支点</strong> — 直觉上知道自己的工作有意义，但找不到让 reviewer 信服的论证锚点</td>
+</tr>
+</table>
+</blockquote>
+你不是一个人。学术写作的最大障碍往往不是"做得不够"，而是"不知道怎么写出来"。</td>
+</tr>
+</table>
+
+**它不是一个简单的"一次性生成整篇论文"的 prompt，而是一套工程化写作系统：** 先把论文拆成多个可独立验证的环节，按证据审计 → 文献检索 → 实验复核 → 起草 → 质量门 → 验证的闭环逐节推进。每个环节都设硬门控，证据不足就阻塞或降级，绝不"硬写"。
 
 ---
 
-## 🎯 项目定位
+## 📑 目录
 
-很多“论文写作 prompt”有三个常见问题：
-
-1. 一次性生成整篇，容易把未核验内容写成定论
-2. 文献、实验、语言润色混在一起，缺少明确职责边界
-3. 缺少失败处理与降级路径，遇到证据缺口时只能硬写
-
-这个项目把这些问题拆开处理：
-
-- 🎯 **证据优先**：先找证据，再写主张
-- 🔄 **逐节闭环**：按 section 推进，而不是一次性整篇输出
-- 🤝 **模块协作**：文献、实验、审修、绘图分别由专门 skill 处理
-- 🚧 **硬门控**：关键步骤不能跳过，证据不足时必须阻塞或降级
-- ✅ **可验证**：用显式 schema、placeholder、verification status 管理缺口
+- [Skills 一览](#-skills-一览)
+- [快速开始](#-快速开始)
+- [核心设计](#-核心设计)
+- [编排器核心工作流](#-编排器核心工作流)
+- [使用示例](#-使用示例)
+- [适用场景](#-适用场景)
+- [文档分层](#-文档分层)
+- [项目结构](#-项目结构)
+- [安全边界](#-安全边界)
+- [维护与验证](#-维护与验证)
+- [参考项目](#-参考项目)
 
 ---
 
-## 📋 Skills 索引
+## 📋 Skills 一览
 
-| Skill | 用途 | 典型触发词 |
-|-------|------|-----------|
-| 🧠 `academic-paper-writer` | 核心编排器。负责完整论文起草、section loop、Hard Gates、子 skill 调度 | `写论文`、`paper draft`、`初稿` |
-| ✨ `academic-polishing` | 文体润色、去 AI 化、claim 强度控制、Method 叙事强化 | `润色`、`去AI`、`claim strength` |
-| 🔍 `academic-citation` | 文献检索、核验、Citation-to-Claim 映射、Exemplar Set 构建 | `找引用`、`文献检索`、`citation pass` |
-| ✅ `academic-reviser` | 证据审查、三轮自审、Verification 判定 | `审修`、`self review`、`verification` |
-| 🔬 `academic-experiments` | 实验证据盘点、最小可复核执行、协议风险审计 | `复核实验`、`verify results` |
-| 📊 `academic-figure` | 论文图表生成：实验数据图 + 模型架构图提示词 | `绘图`、`训练曲线`、`架构图` |
-
----
-
-## 🎭 适用场景
-
-✅ **适合：**
-
-- 📁 有代码仓库、实验日志、结果表、草稿、研究笔记中的一种或多种材料
-- 📑 需要逐节推进 `Introduction / Related Work / Method / Experiments / Discussion / Conclusion`
-- 🧩 需要把"能写的"和"暂时不能下结论的"内容明确区分开
-- 🎛️ 希望对文献、实验、claim 强度、占位符、verification 做显式控制
-
-❌ **不适合：**
-
-- 🚫 非 `CS / AI / ML` 领域论文
-- ⚡ 只想要一个"一次性成稿"的通用 prompt
-- 🎨 纯排版/LaTeX 调整任务
-- ⚠️ 明确要求无视证据边界、强行写成已验证结论的场景
-
----
-
-## 🏗️ 核心设计
-
-### 1. 🔍 证据优先，逐节闭环
-
-每一节都不是“写完就算完”，而是经历固定闭环：
-
-`Draft -> Evidence Review -> Prose Gate -> Expansion -> Self-Review -> Verification`
-
-- 初稿可以带占位符
-- 但占位符必须被记录、审计和追踪
-- `Verification` 未通过时不能假装通过
-
-### 2. 🧩 Core + Subskills 架构
-
-核心编排器负责：
-
-- 判断任务模式
-- 确认 `venue / language`
-- 组织 section queue
-- 维护 cumulative draft
-- 吸收子 skill 的专项结果
-
-子 skills 负责专项任务：
-
-| Core 环节 | 委托 Skill |
-|-----------|-----------|
-| 🔍 文献检索与核验 | `academic-citation` |
-| 🔬 实验证据复核 | `academic-experiments` |
-| 📊 图表 / 架构图 | `academic-figure` |
-| ✨ Prose Quality Gate | `academic-polishing` |
-| ✅ 证据审查与 Verification | `academic-reviser` |
-
-### 3. 🚧 Hard Gates + 数据契约
-
-跨 skill 交换不是自由文本，而是通过显式数据契约进行：
-
-- 📦 `Evidence Inventory`
-- ✅ `Verified References`
-- 📋 `Verification Report`
-
-核心编排器还维护 3 道不可跳过的门控：
-
-- 🅰️ **Gate A**：当前节是否有足够证据可写
-- 🅱️ **Gate B**：当前节是否有足够可用引用
-- 🚪 **Gate C**：当前节是否通过 verification，能否推进到下一节
-
----
-
-## 📚 文档分层
-
-这个仓库采用了两层核心文档：
-
-- `skills/academic-paper-writer/SKILL.md`
-  作用：高层规则、触发条件、Hard Gates 摘要、数据契约、reference 导航
-
-- `skills/academic-paper-writer/references/orchestration-workflow.md`
-  作用：唯一的详细执行手册，包含 dispatch 模板、step-by-step 流程、fallback 路径、verification 细则
-
-- 改“规则摘要、使用边界、导航”优先看 `SKILL.md`
-- 改“具体执行步骤、模板、失败路径”优先看 `orchestration-workflow.md`
-
----
-
-## 📁 项目结构
-
-README 只保留高层目录，避免和文件级细节长期漂移：
-
-```text
-academic-paper-writer/
-├── README.md
-├── LICENSE
-└── skills/
-    ├── shared/
-    │   ├── schemas/        # 跨技能数据契约
-    │   ├── references/     # 共享概念与边界规则
-    │   └── templates/      # 通用输出模板
-    ├── academic-paper-writer/
-    │   ├── SKILL.md
-    │   ├── agents/
-    │   └── references/
-    ├── academic-polishing/
-    ├── academic-citation/
-    ├── academic-reviser/
-    ├── academic-experiments/
-    └── academic-figure/
-```
-
-建议按这个顺序读：
-
-1. 👉 `README.md`
-2. 👉 `skills/academic-paper-writer/SKILL.md`
-3. 👉 `skills/academic-paper-writer/references/orchestration-workflow.md`
-4. 👉 `skills/shared/schemas/*`
-5. 👉 你关心的子 skill `SKILL.md`
+| Skill | 角色 | 用途 | 典型触发词 |
+|-------|------|------|-----------|
+| 🧠 **academic-paper-writer** | **核心编排器** | 完整论文起草、section loop、Hard Gates、子 skill 调度 | `写论文`、`paper draft` |
+| 🔍 **academic-citation** | 文献取证 | 文献检索、核验、Citation-to-Claim 映射、Exemplar Set | `找引用`、`citation pass` |
+| 🔬 **academic-experiments** | 实验取证 | 实验证据盘点、最小可复核执行、协议风险审计 | `复核实验`、`verify results` |
+| ✅ **academic-reviser** | 审稿人 | 证据审查、三轮自审、Verification 判定 | `审修`、`self review` |
+| ✨ **academic-polishing** | 文体打磨 | Prose Quality Gate、Claim Strength Audit、去 AI 化 | `润色`、`claim strength` |
+| 📊 **academic-figure** | 图表生成 | 实验数据图（Python 代码） + 架构图提示词 | `绘图`、`训练曲线`、`架构图` |
 
 ---
 
 ## 🚀 快速开始
 
-### 1. 📦 获取仓库
+### 1. 获取仓库
 
 ```bash
 git clone https://github.com/joshua-zyy/academic-paper-writer.git
 ```
 
-### 2. 🔌 在支持 Skill 机制的 Agent 平台中加载
+### 2. 加载 Skill
 
-本项目本身不依赖额外 Python 包或 Node 运行时；它的主要内容是 skill 文档、reference、schema 和少量辅助脚本。
+在支持 Skill 机制的 Agent 平台中加载对应 SKILL.md：
 
-常见使用方式：
+| 场景 | 加载方式 |
+|------|---------|
+| 📄 **完整论文工作流** | 加载 `skills/academic-paper-writer/SKILL.md` |
+| 🎯 **单一专项任务** | 直接加载对应子 skill 的 `SKILL.md` |
 
-- **完整论文工作流**：加载 `skills/academic-paper-writer/SKILL.md`
-- **单一专项任务**：直接加载对应子 skill 的 `SKILL.md`
+本项目本身不依赖额外 Python 包或 Node 运行时，主要内容是 skill 文档、reference、schema 和辅助脚本。
 
-### 3. 📝 准备输入材料
+### 3. 准备输入材料
 
-越完整的输入，skill 的表现越稳定。常见输入包括：
+越完整的输入，skill 的表现越稳定：
 
-- 📂 代码仓库路径
-- 🏛️ 目标会议 / 期刊
-- 🌐 写作语言
-- 📊 现有实验日志、CSV、结果表、checkpoint
-- 📄 现有草稿或 outline
-- 📝 研究摘要 / 贡献点草稿
+<pre>
+📂 代码仓库路径    🏛️ 目标会议 / 期刊    🌐 写作语言
+📊 实验日志 / CSV  📄 已有草稿 / outline  📝 研究摘要 / 贡献点
+</pre>
+
+---
+
+## 🏗️ 核心设计
+
+### 🔍 证据优先，逐节闭环
+
+每一节经历固定闭环，不允许跳过任何环节：
+
+```mermaid
+flowchart LR
+    Draft["✏️ Draft v1"] --> Audit["📌 占位符审计"]
+    Audit --> Evidence["⚖️ 证据合规审查"]
+    Evidence --> Prose["✨ Prose Quality Gate"]
+    Prose --> Expansion["📏 Expansion Pass"]
+    Expansion --> Review["✅ Self-Review & Verification"]
+    Review --> Advance["▶️ 推进下一节"]
+    Review --> Revise["🔁 修订"]
+    Revise --> Evidence
+```
+
+- 初稿可以带占位符，但占位符必须被记录、审计和追踪
+- `Verification` 未通过时不能假装通过
+
+### 🧩 Core + Subskills 架构
+
+核心编排器负责：判断任务模式 → 确认 venue/language → 组织 section queue → 维护 cumulative draft → 吸收子 skill 的专项结果。
+
+| Core 环节 | 委托 Skill | 处理方式 |
+|-----------|-----------|---------|
+| 🔍 文献检索与核验 | `academic-citation` | dispatch 子 Agent |
+| 🔬 实验证据复核 | `academic-experiments` | dispatch 子 Agent |
+| 📊 图表 / 架构图 | `academic-figure` | dispatch 子 Agent |
+| ✨ Prose Quality Gate | `academic-polishing` | **内化调用**（主 Agent 自行执行） |
+| ✅ 证据审查与 Verification | `academic-reviser` | dispatch 子 Agent |
+
+> **设计原则**：主 Agent 直接撰写论文正文，确保叙事风格一致。子 Agent 仅提供工具型专项输出，不得直接修改 Cumulative Draft。
+
+### 🚧 Hard Gates + 数据契约
+
+三个不可跳过的基础关卡：
+
+| Gate | 触发位置 | 核心条件 | 失败处理 |
+|------|---------|---------|---------|
+| 🅰️ **A：证据完备** | Step 2 → Step 6 | 至少一条可引用证据 | 降级路径或阻塞 |
+| 🅱️ **B：引用就绪** | Step 3 → Step 6 | 至少一条 VERIFIED 引用 | Intro/RW 阻塞；Method 可占位 |
+| 🚪 **C：Verification** | Step 11 → Step 12 | 所有 debt 闭合 + 内容达标 | passed/blocked/failed |
+
+跨 skill 之间通过显式 **数据契约** 交换信息：
+
+```yaml
+📦 Evidence Inventory    # 实验证据盘点   → academic-experiments → orchestrator
+✅ Verified References    # 核验文献清单   → academic-citation    → orchestrator
+📋 Verification Report   # 验证状态报告   → academic-reviser     → orchestrator
+```
+
+---
+
+## 🔄 编排器核心工作流
+
+```mermaid
+flowchart LR
+    subgraph 准备阶段
+        S0["🎯 Step 0<br/>判定任务模式"]
+        S1["🔒 Step 1<br/>确认 venue / 语言"]
+        S2["🔍 Step 2<br/>并行证据审计"]
+    end
+    subgraph 调研阶段
+        S3["📚 Step 3<br/>文献检索与核验"]
+        S4["🔬 Step 4<br/>实验事实复核"]
+    end
+    subgraph 起草阶段
+        S5["🧩 Step 5<br/>Section Blueprint"]
+        S6["✏️ Step 6<br/>Draft v1"]
+        S7["📌 Step 7<br/>占位符审计 + 图表"]
+    end
+    subgraph 质量阶段
+        S8["⚖️ Step 8<br/>证据合规审查"]
+        S9["✨ Step 9<br/>Prose Quality Gate"]
+        S10["📏 Step 10<br/>Expansion Pass"]
+    end
+    subgraph 验证阶段
+        S11["✅ Step 11<br/>Self-Review & Verification"]
+        S12["🔄 Step 12<br/>依赖感知 Section Loop"]
+    end
+
+    S0 --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> S10 --> S11 --> S12
+    S11 -.->|failed| S8
+```
+
+> - 🔒 Step 1 是硬阻塞，缺少 venue/language 时不能继续
+> - 📐 `section-drafting` 也要走完整闭环，只是缩小证据范围
+> - 🚧 Introduction / Related Work 在零 VERIFIED 引用时必须阻塞
+> - ⚡ Step 2 涉及多个 probe 时**必须并行** dispatch，不得串行
 
 ---
 
@@ -194,108 +207,175 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 ```text
 我有一个图神经网络项目仓库，想写一篇投 NeurIPS 的论文。
-请先确认 venue 和语言，然后按 section 逐节推进，不要一次性生成整篇。
+请先确认 venue 和语言，然后按 section 逐节推进，
+不要一次性生成整篇。
 ```
 
 ### ✨ 单独润色 Method
 
 ```text
-帮我把这段 Method 改成论文正文口吻，但不要把不确定的设计动机写成已确认事实。
+帮我把这段 Method 改成论文正文口吻，
+但不要把不确定的设计动机写成已确认事实。
 ```
 
 ### 🔗 单独做引用核验
 
 ```text
-帮我为 Introduction 找 5-8 篇 VERIFIED 引用，并生成 Citation-to-Claim Map。
+帮我为 Introduction 找 5-8 篇 VERIFIED 引用，
+并生成 Citation-to-Claim Map。
 ```
 
 ### 🔬 单独做实验复核
 
 ```text
-先盘点这个仓库里的 checkpoint、日志和结果表，尽量用最小可复核方式确认 Main Results。
+先盘点这个仓库里的 checkpoint、日志和结果表，
+尽量用最小可复核方式确认 Main Results。
 ```
 
 ---
 
-## 🔄 编排器核心工作流
+## 🎭 适用场景
+
+<table>
+<tr>
+<td width="50%" align="center">
+
+### ✅ 适合
+
+</td>
+<td width="50%" align="center">
+
+### ❌ 不适合
+
+</td>
+</tr>
+<tr>
+<td>
+
+- 📁 有代码仓库、实验日志、结果表、草稿、研究笔记
+- 📑 需要逐节推进完整论文
+- 🧩 需要区分"能写的"和"暂时不能下结论的"
+- 🎛️ 希望对文献、实验、claim 强度做显式控制
+
+</td>
+<td>
+
+- 🚫 非 CS/AI/ML 领域论文
+- ⚡ 只想要一次性成稿的通用 prompt
+- 🎨 纯排版 / LaTeX 调整任务
+- ⚠️ 要求无视证据边界强行写成已验证结论
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📚 文档分层
+
+| 层级 | 文件 | 作用 |
+|------|------|------|
+| **战略层** | `SKILL.md` | 高层规则、触发条件、Hard Gates 摘要、数据契约、reference 导航 |
+| **战术导航** | `orchestration-workflow.md` | 导航索引，指引到按阶段拆分的执行文件 |
+| **战术执行** | `workflow-step-0-4.md`<br/>`workflow-step-5-8.md`<br/>`workflow-step-9-12.md` | 拆分为 3 个文件的详细执行手册，每个包含独立 dispatch 模板、step-by-step 流程、fallback 路径。**按阶段加载以节省上下文窗口** |
+
+> 💡 **阅读建议**：改规则摘要、使用边界、导航 → 看 `SKILL.md`。改具体执行步骤、模板、失败路径 → 按 Step 阶段加载对应的 `workflow-step-*.md`。
+
+---
+
+## 📁 项目结构
 
 ```text
-Step  0 🎯 判定任务模式
-Step  1 🔒 确认 venue / 语言（Blocking Gate）
-Step  2 🔍 审计当前节证据
-Step  3 📚 文献检索与核验
-Step  4 🔬 实验事实复核
-Step  5 🧩 生成 Section Blueprint / Method Blueprint
-Step  6 ✏️ 起草 Draft v1（含占位符系统）
-Step  7 📌 占位符审计 + 架构图预生成
-Step  8 ⚖️ 证据合规审查
-Step  9 ✨ Prose Quality Gate
-Step 10 📏 Expansion Pass（内容密度检查）
-Step 11 ✅ Self-Review & Verification
-Step 12 🔄 整合 & 依赖感知 Section Loop
+academic-paper-writer/
+├── README.md
+├── LICENSE
+├── scripts/                          # 项目级工具脚本
+│   └── check_schemas.py              # 跨技能 schema 一致性检查
+└── skills/
+    ├── shared/
+    │   ├── schemas/                  # 跨技能数据契约（3 个 schema）
+    │   ├── references/               # 共享概念与边界规则
+    │   └── templates/                # 通用输出模板
+    ├── academic-paper-writer/        # 📌 核心编排器
+    │   ├── SKILL.md
+    │   ├── agents/                   # probe agent 定义
+    │   └── references/               # 工作流（导航索引 + 3 阶段文件）
+    ├── academic-polishing/           # ✨ 文体打磨
+    ├── academic-citation/            # 🔍 文献取证
+    │   └── scripts/                  # citation_audit.py
+    ├── academic-reviser/             # ✅ 审修验证
+    │   └── scripts/                  # placeholder_audit.py
+    ├── academic-experiments/         # 🔬 实验取证
+    │   └── scripts/                  # evidence_scanner.py
+    └── academic-figure/              # 📊 图表生成
+        ├── scripts/                  # chart_template.py + qa_figure.py
+        └── references/               # 设计理论、QA 规范
 ```
 
-说明：
+### 建议阅读顺序
 
-- 🔒 `Step 1` 是硬阻塞，缺少 `venue / language` 时不能继续
-- 📐 `section-drafting` 也要走完整闭环，只是缩小证据范围
-- 🚧 `Introduction / Related Work` 在零 `VERIFIED` 引用时必须阻塞，不能只靠 `[REF_NEEDED]` 直接起草
+```
+1️⃣ README.md
+2️⃣ skills/academic-paper-writer/SKILL.md
+3️⃣ references/orchestration-workflow.md（导航索引）
+4️⃣ references/workflow-step-*.md（按 Step 阶段加载）
+5️⃣ skills/shared/schemas/*
+6️⃣ 你关心的子 skill SKILL.md
+```
 
 ---
 
 ## 🛡️ 安全边界
 
-这个项目最重要的不是“写得快”，而是“不越界”。
+> 这个项目最重要的不是"写得快"，而是**不越界**。
 
-核心边界包括：
+| 边界 | 说明 |
+|------|------|
+| 🚫 不编造 | 禁止编造文献、作者、年份、venue、DOI、arXiv 编号、实验结果、图表、命令或日志 |
+| ⚠️ 不混淆 | 不把 `UNVERIFIED` 文献写成 `VERIFIED`，不把 `user_claim` 写成可引用证据 |
+| 📛 不夸大 | 不把内部验证包装成 `SOTA`、`generalization`、`strong evidence` |
+| 📌 不静默 | 缺失信息必须显式保留 `[REF_NEEDED]`、`[RESULT_NEEDED]` 等占位符，不得静默略过 |
 
-- 🚫 不编造文献、实验结果、图表、命令或日志
-- ⚠️ 不把 `UNVERIFIED` 文献写成 `VERIFIED`
-- 🧪 不把 `user_claim` 写成可直接引用的证据
-- 📛 不把内部验证包装成 `SOTA`、`generalization`、`strong evidence`
-- 📌 缺失信息必须显式保留 placeholder，而不是静默略过
-
-它允许输出“当前最佳草稿”，但不允许输出“伪装成已验证完成稿的草稿”。
+> 它允许输出"当前最佳草稿"，但不允许输出"伪装成已验证完成稿的草稿"。
 
 ---
 
 ## 🔧 维护与验证
 
-### 1. 🔗 结构一致性检查
+### 结构一致性检查
 
-重点确认：
+```bash
+# 使用自动化脚本检查跨技能 schema 对齐
+python scripts/check_schemas.py --skills-root ./skills
+```
 
-- 🔢 `README.md`、`SKILL.md`、`orchestration-workflow.md` 的步骤编号一致
-- ⚡ Core 与子 skill 的 dispatch 架构没有冲突
-- 🔗 shared schema 的生产者 / 消费者关系仍闭合
+检查项：
+- ✅ 各子 skill schema 是否指向 `shared/schemas/` 的权威版本
+- ✅ 所有 debt 字段在 schema 和 SKILL.md 之间是否对齐
+- ✅ SKILL.md 中引用的 reference 文件是否存在
+- ✅ 步骤编号是否一致
 
-### 2. 💪 压力场景验证
+### 压力场景验证
 
-至少跑下面几类场景：
-
-- 📄 `Introduction` 文献不足
-- 🧠 `Method` 设计动机无法稳定恢复
-- 📊 `Results` 只能使用 `preexisting_artifact`
-
-建议检查：
-
-- ✅ 是否正确阻塞或降级
-- 📌 是否保留必要 placeholder
-- ⚠️ 是否错误放行强结论
-- 📋 `Verification Status` 是否与规则一致
-
-参考：`skills/academic-paper-writer/references/test-scenarios.md`
+| 场景 | 文件 | 核心验证点 |
+|------|------|-----------|
+| 📄 Introduction 文献不足 | `test/pressure-scenarios/scenario-1-phantom-citation.md` | 是否阻塞虚构文献 |
+| 🧠 Method 设计动机缺失 | `test/pressure-scenarios/scenario-2-evidence-gap.md` | 缺证据时是否降级 |
+| 📊 Results 仅 preexisting | `test/pressure-scenarios/scenario-3-batch-output.md` | 是否遵循逐节推进 |
+| ⚠️ 弱 claim 试图升级 | `test/pressure-scenarios/scenario-4-weak-claim-upgrade.md` | Claim 强度是否匹配 |
 
 ---
 
 ## 📖 参考项目
 
-1. ⚡ [superpowers](https://github.com/obra/superpowers)
-2. 🌿 [nature-skills](https://github.com/Yuan1z0825/nature-skills)
-3. 🎓 [academic-research-skills](https://github.com/Imbad0202/academic-research-skills)
+- ⚡ [superpowers](https://github.com/obra/superpowers) — AgentSkills 规范与工具平台
+- 🌿 [nature-skills](https://github.com/Yuan1z0825/nature-skills) — 自然语言处理 skill 集合
+- 🎓 [academic-research-skills](https://github.com/Imbad0202/academic-research-skills) — 学术研究辅助 skill
+
+---
 
 ## 📄 许可
 
 [MIT License](LICENSE)
 
-> **免责声明**：本项目旨在辅助学术写作的结构化与质量控制，最终论文的学术诚信、实验真实性、引用准确性与投稿合规性由使用者本人负责。
+> ⚠️ **免责声明**：本项目旨在辅助学术写作的结构化与质量控制，最终论文的学术诚信、实验真实性、引用准确性与投稿合规性由使用者本人负责。
