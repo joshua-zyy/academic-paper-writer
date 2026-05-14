@@ -83,7 +83,8 @@ def check_reference_files_exist(skills_root: Path) -> list:
             continue
 
         content = skill_md.read_text(encoding="utf-8")
-        refs = re.findall(r'references/([^\s\|`]+\.md)', content)
+        # Only match relative references/ paths, not cross-skill paths
+        refs = re.findall(r'(?<![a-z-]/)references/([^\s\|`]+\.md)', content)
         for ref in refs:
             ref_path = skill_dir / "references" / ref
             if not ref_path.exists():
