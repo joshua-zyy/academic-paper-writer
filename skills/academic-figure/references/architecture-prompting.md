@@ -11,6 +11,15 @@ scientific diagram, white background, flat 2D vector illustration style,
 clean and minimal, no shadows, no 3D effects, publication-quality
 ```
 
+### 顶会风格参考
+生成的提示词应参考 NeurIPS / CVPR / AAAI / ICLR / ICML 等顶会论文的插图风格：
+- **简洁扁平化**：避免 3D 效果、渐变、阴影和过度装饰
+- **学术色板**：使用色盲友好、灰度打印安全的配色（蓝 #0F4D92、绿 #27AE60、橙 #E67E22、红 #B64342、紫 #8E44AD、灰 #A0A0A0）
+- **字体**：统一 Arial / Helvetica，无衬线
+- **对齐**：模块间距均匀，水平和垂直居中精确
+- **标注**：字体大小确保在最终出版尺寸（单栏 85mm / 双栏 175mm）下可读
+- **连接**：实线箭头表示数据流，虚线表示残差/跳跃连接，线宽 1.5-2px
+
 ### 布局控制
 | 架构类型 | 推荐布局 |
 |---------|---------|

@@ -23,7 +23,7 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
 
 1. 只有经过核验的文献才能进入 `Verified References`；未核验条目必须标 `UNVERIFIED`。
 2. 优先使用一级来源（官方 proceedings、期刊官网、OpenReview、PMLR、ACL Anthology、IEEE Xplore、ACM Digital Library、PubMed、arXiv、DBLP）核验元数据。
-3. 检索结束的标准是覆盖充分，而非看了几页搜索结果。完整论文至少达到 8-15 篇 VERIFIED 文献，短论文至少 4-8 篇。
+3. 检索结束的标准是覆盖充分，而非看了几页搜索结果。整篇完整论文的总引用数（去重后）应达到至少 35 篇（含本地文献库和外部文献）。单节检索不应少于 4 类查询覆盖。
 4. 对 Introduction 或 Related Work，除正文引用外，还必须建立同领域 `Exemplar Set`（3-5 篇 Introduction exemplars + 4-8 篇 Related Work exemplars），用于学习章节组织与论证顺序，而非复制原文措辞。
 5. 每条用于正文的引用必须有对应的 inline citation marker 和 Citation-to-Claim 映射记录。
 6. 参考文献列表只能包含正文中已被引用或以 `[REF_NEEDED: ...]` 声明的条目。

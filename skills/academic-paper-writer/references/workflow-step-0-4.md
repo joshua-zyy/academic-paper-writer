@@ -83,8 +83,11 @@ md_output_dir = <local_lit_pdf_dir>/../papersToMd/
 
 ```
 本地文献库已确认: <local_lit_pdf_dir>
-将在后台准备 MD 转换，请稍后运行以下命令：
 
+请先确保 markitdown 已安装（如未安装）：
+  pip install markitdown
+
+然后从项目根目录运行以下命令：
   python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_lit_pdf_dir> <local_lit_md_dir>
 
 转换完毕后请告知我，我将从本地文献库中搜索可引用的文献。
@@ -389,6 +392,7 @@ For Method, also audit model data flow, module boundaries, tensor shapes, recove
 - [ ] 输出 Verified References（含 VERIFIED / UNVERIFIED 状态）
 - [ ] 输出 Citation-to-Claim Map（每篇引用→对应主张）
 - [ ] Introduction / Related Work 时额外构建 Exemplar Set
+- [ ] 目标：全篇各节累计达到至少 35 篇引用（当前节尽可能多收集）
 
 **未完成 checklist 前，不得进入 Step 4。Dispatch `academic-citation` 完成检索：**
 
@@ -441,7 +445,31 @@ Constraint: only VERIFIED references enter the draft body.
 
 For Introduction / Related Work: if retries still produce zero VERIFIED references and the user cannot provide usable seed papers, block before Step 6. Do **not** proceed with a `[REF_NEEDED]`-only draft for these sections.
 
-## Step 4: Experiment Evidence Verification
+### Step 3d: 生成引用文献清单文件（过程记录）
+
+**用途**：生成一个独立于论文正文的引用清单文件，方便用户随时查看已引用文献、逐篇下载 PDF。
+
+**执行时机**：Step 3c 完成后立即执行。后续每完成一个 section 的起草，追加该节新增的引用。
+
+1. 将当前所有 Verified References 写入 `./docs/paper-drafts/referenced-literature-inventory.md`
+2. 每篇记录：标题、作者、venue、年份、DOI/arXiv、来源链接、引用章节
+3. 后续每完成一个 section，检查该节新增的引用并追加到此文件
+
+**输出格式**：
+```markdown
+# 引用文献清单（过程记录）
+
+以下文献在论文撰写过程中被引用。可据此逐篇下载 PDF。
+
+| # | 文献 | Venue | 年份 | DOI/arXiv | 来源 | 引用章节 |
+|---|------|-------|------|-----------|------|---------|
+| 1 | Author et al., "Title" | NeurIPS | 2024 | arXiv:2401.12345 | https://arxiv.org/abs/2401.12345 | Introduction |
+| 2 | Author et al., "Title2" | CVPR | 2023 | 10.1109/CVPR.2023.00123 | https://openaccess.thecvf.com/... | Method |
+```
+
+**与 Step 12e 的区别**：
+- Step 3d = 过程记录，逐节追加，方便用户随时下载
+- Step 12e = 终版核验清单，论文完成后一次性生成，用于确认引用合理性
 
 - Create a todo list for experiment evidence items.
 - Delegate to `academic-experiments` via the dispatch template below (only when empirical paper and current section needs experiment facts).

@@ -24,7 +24,10 @@ from pathlib import Path
 try:
     from markitdown import MarkItDown
 except ImportError:
-    print("错误: 需要 markitdown 库。请运行: pip install markitdown")
+    print("错误: 需要 markitdown 库。请在当前 Python 环境中运行:")
+    print("  pip install markitdown")
+    print("  (如果使用 conda 环境: conda activate <环境名> && pip install markitdown)")
+    print("  注意: markitdown 只能通过 pip 安装，conda install 不支持")
     sys.exit(1)
 
 

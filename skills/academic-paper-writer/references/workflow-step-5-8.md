@@ -36,8 +36,38 @@
   | Main Results / Ablation | `experiment_results`（主结果、基线对比、消融数值） | 单探查 |
   | Discussion | `interpretability`（可解释性结果、网络分析） | 单探查 |
   | Introduction / Related Work | 无需深层探查（已在 Step 2 完成） | — |
-  - 需要探查 → **必须先 dispatch 再起草**，不得跳过。dispatch 模板见 Step 2 的并行/单探查 dispatch 模板。
+  - 需要探查 → **必须先 dispatch 再起草**，不得跳过。
+  - dispatch 模板见 `references/workflow-step-0-4.md` 的 `### 单探查 dispatch 模板` 和 `### 并行 dispatch 模板（强制并行）`。
+  - Method 场景也可直接使用下方的内联模板。
   - 不需要 → 跳过，记录 "deep_probe: skipped"
+
+**Method 深层探查内联 dispatch 模板（**必须同时发出，互不等待**）**：
+```yaml
+Task A:
+  description: "Probe code_structure for Method"
+  subagent_type: "general"
+  prompt: |
+    Role: 项目探查代理（只读）
+    probe_type: code_structure
+    target_path: <项目根目录>
+    section_type: method
+    加载 skills/academic-paper-writer/agents/probe-agent.md 的 code_structure schema。
+    输出 Module Cards 表 + 张量形状。
+    Red Lines: 只读，不编造，不递归全仓库。
+
+Task B:
+  description: "Probe preprocessing for Method"
+  subagent_type: "general"
+  prompt: |
+    Role: 项目探查代理（只读）
+    probe_type: preprocessing
+    target_path: <项目根目录>
+    section_type: method
+    加载 skills/academic-paper-writer/agents/probe-agent.md 的 preprocessing schema。
+    输出预处理步骤列表。
+    Red Lines: 只读，不编造，不递归全仓库。
+```
+其他 section 类型的单探查 dispatch 见 `references/workflow-step-0-4.md` 的 `### 单探查 dispatch 模板`。
 - Check Evidence Map and Verified References.
 - Generate Draft v1 Markdown body.
 - Mark todos completed.
@@ -158,11 +188,15 @@ Task:
     图用途: {从 [FIGURE_NEEDED] 的 purpose 字段提取}
     path: B
 
-    Figure Contract:
+     Figure Contract:
     - Core conclusion: {Step 7c 中定义的论点}
     - Evidence chain: {面板→论点映射}
     - Archetype: {图分类}
     - Export contract: {尺寸、格式等}
+
+    风格要求：参考 NeurIPS / CVPR / AAAI / ICLR 等顶会论文插图风格。
+    详见 skills/academic-figure/references/architecture-prompting.md 的「顶会风格参考」。
+    确保最终输出达到发表级质量。
 
     执行步骤:
     1. 读取 skills/academic-figure/SKILL.md，按 B 路径（arch-prompt）执行
