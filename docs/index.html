@@ -869,7 +869,7 @@
         <div>
           <p class="section-kicker">Dispatch Model</p>
           <h2>编排器派发 sub-agent，各司其职</h2>
-          <p class="section-desc" style="max-width: 620px; margin-top: 18px;">核心编排器不直接处理所有任务——引用核验、实验复核、图表生成、终审验证通过 <code>task()</code> 派发给专业 sub-agent 独立执行；润色则由编排器内化调用规则自行完成，确保文体风格一致</p>
+          <p class="section-desc" style="max-width: 620px; margin-top: 18px;">核心编排器不直接处理所有任务——写作前通过并行 probe-agent 探查项目，调研阶段顺序派发引用核验和实验复核，章节循环中按需派发图表生成和终审验证；润色则由编排器内化调用规则自行完成，确保文体风格一致</p>
         </div>
         <div class="dispatch" aria-label="编排派发模型">
           <pre><span class="dp-orch">主编排器</span><span class="dp-tb"> ──┬── </span><span class="dp-ag">引用核验</span><span class="dp-tb"> ──── </span><span class="ta">文献检索与 VERIFIED 判定</span>
@@ -877,7 +877,7 @@
 <span class="dp-tb">          ├── </span><span class="dp-na">润色</span><span class="dp-tb"> ──────── </span><span class="ta">Prose Gate · Claim 强度审计</span><span class="dp-tb">  </span><span class="dp-note">(内化执行)</span>
 <span class="dp-tb">          ├── </span><span class="dp-ag">图表生成</span><span class="dp-tb"> ──── </span><span class="ta">数据可视化与架构图代码</span>
 <span class="dp-tb">          └── </span><span class="dp-ag">终审验证</span><span class="dp-tb"> ──── </span><span class="ta">审稿人视角 · 三轮自审</span>
-<span class="dp-tb">          </span><span class="dp-note">4 dispatch · 1 内化 · 并行执行 · 统一 Gate 管控</span></pre>
+<span class="dp-tb">          </span><span class="dp-note">并行探查 → 顺序调研 → 章节循环 · 统一 Gate 管控</span></pre>
         </div>
       </div>
     </section>
@@ -896,8 +896,8 @@
             </div>
             <div class="step">
               <div>
-                <h3>② 派发子任务</h3>
-                <p>编排器通过 <code>task()</code> 向对应 sub-agent 派发任务，各 agent 独立执行互不干扰</p>
+                <h3>② 按阶段派发</h3>
+                <p>并行探查（probe-agent）→ 并行文献阅读（reader-agent）→ 顺序调研（citation、experiments）→ 章节循环（figure、reviser）</p>
               </div>
             </div>
             <div class="step">
@@ -911,14 +911,22 @@
         <div class="codebox" aria-label="dispatch 代码示例">
           <pre>load skills/academic-paper-writer/SKILL.md
 
-# sub-agent 派发（并行执行）
+# 并行探查（写作前，同时 dispatch 3 个 probe-agent）
+task("code_structure",  probe-agent)
+task("data_artifacts",  probe-agent)
+task("config",          probe-agent)
+
+# 并行文献阅读（同时 dispatch N 个 reader-agent）
+task("lit_read", literature-reader-agent)
+
+# 调研阶段（顺序执行）
 task("引用核验", academic-citation)
 task("实验复核", academic-experiments)
+
+# 章节循环（每节重复，顺序执行）
 task("图表生成", academic-figure)
 task("终审验证", academic-reviser)
-
-# 润色由编排器内化执行（不 dispatch 子 agent）
-# 主 agent 读取 polishing 规则后自行完成</pre>
+# 润色由编排器内化执行</pre>
         </div>
       </div>
     </section>
