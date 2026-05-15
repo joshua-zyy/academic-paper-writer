@@ -17,6 +17,6 @@
 
 <p align="center">
   <a href="https://joshua-zyy.github.io/academic-paper-writer">
-    <img src="https://img.shields.io/badge/🌐_访问项目官网-blue?style=for-the-badge" alt="官网">
+    <img src="https://img.shields.io/badge/🌐_访问项目官网页面-blue?style=for-the-badge" alt="官网">
   </a>
 </p>
