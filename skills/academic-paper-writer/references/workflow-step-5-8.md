@@ -28,6 +28,16 @@
 ## Step 6: Draft v1
 
 - Create a todo list for subtopics to cover.
+- **前置检查：是否需要深层探查** — 在起草前检查当前 section 类型，按以下规则决定是否需要 dispatch 深层探查：
+  | 当前 section | 需 dispatch 的探查 | 并行策略 |
+  |-------------|-------------------|---------|
+  | Method | `code_structure`（Module Cards + 张量形状 + forward 路径）+ `preprocessing`（预处理步骤） | **必须并行** |
+  | Experimental Setup | `experiment_setup`（超参数、数据集划分、人口统计） | 单探查 |
+  | Main Results / Ablation | `experiment_results`（主结果、基线对比、消融数值） | 单探查 |
+  | Discussion | `interpretability`（可解释性结果、网络分析） | 单探查 |
+  | Introduction / Related Work | 无需深层探查（已在 Step 2 完成） | — |
+  - 需要探查 → **必须先 dispatch 再起草**，不得跳过。dispatch 模板见 Step 2 的并行/单探查 dispatch 模板。
+  - 不需要 → 跳过，记录 "deep_probe: skipped"
 - Check Evidence Map and Verified References.
 - Generate Draft v1 Markdown body.
 - Mark todos completed.
@@ -251,12 +261,14 @@ Task:
     Verified References: <传入已核验引用>
     placeholder_debt: <传入占位符统计>
 
-    执行步骤:
-    1. 读取 skills/academic-reviser/SKILL.md，按 targeted-evidence-mode 执行
-    2. 检查每个 claim 是否在 Evidence Map 中有对应的 newly_run 或 preexisting_artifact 支撑
-    3. 检查每个 inline citation 是否对应 Verified References 中已核验条目
-    4. 检查所有占位符使用是否符合规范（如 [REF_NEEDED] 含方向说明）
-    5. 检查是否存在无证据支撑的"裸 claim"
+     执行步骤:
+     1. 读取 skills/academic-reviser/SKILL.md，按 targeted-evidence-mode 执行
+     2. 检查每个 claim 是否在 Evidence Map 中有对应的 newly_run 或 preexisting_artifact 支撑
+     3. 检查每个 inline citation 是否对应 Verified References 中已核验条目
+     4. 检查是否存在"正文有引用但 Verified References 中无对应条目"
+     5. 检查是否存在"只有搜索列表但没有 Verified References + Citation-to-Claim Map"的未完成状态
+     6. 检查所有占位符使用是否符合规范（如 [REF_NEEDED] 含方向说明）
+     7. 检查是否存在无证据支撑的"裸 claim"
 
     输出: evidence_debt (open/closed) + evidence_issues 清单
     **不允许修改正文。**

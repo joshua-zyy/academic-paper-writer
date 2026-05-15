@@ -36,19 +36,22 @@ Blocking confirmations — must stop and ask if missing:
 3. **Continuation mode**: Default to `auto` (automatic section advancement). If user prefers step-by-step confirmation, record `continuation_mode = step-by-step`.
 4. **Current section**: Determined by Step 0 if user did not specify.
 
-5. **Local literature library**（venue/language 确认后**立即**询问）：
-   - 是否在当前项目中维护了本地文献库（存放待引用 PDF 论文的目录）？
-     - 有 → 记录路径为 `local_lit_pdf_dir`
-     - 没有 → `local_lit_pdf_dir = null`，跳过本地文献流程
-   - 如果有，告知将在其同级创建 `papersToMd/` 目录存放转换后的 MD 文档
-   - 检查 `markitdown` 是否已安装，未安装时提供命令：
-     ```
-     pip install markitdown
-     ```
-   - 接下来进入 **Step 1b** 的 PDF→MD 转换准备
-   - 若用户明确没有本地文献库或跳过转换：`local_lit_md_dir = null`，跳过 Step 1b
-
 If venue is known and relevant, read `references/writing-guidelines.md` and form a brief Venue / Language Brief.
+
+### 本地文献库（强制询问，与 venue 同属 Blocking Gate）
+
+**venue/language 确认后立即询问，在进入 Step 2 前必须给出明确答案**：
+
+- 是否在当前项目中维护了本地文献库（存放待引用 PDF 论文的目录）？
+  - 有 → 记录路径为 `local_lit_pdf_dir`
+  - 没有 → `local_lit_pdf_dir = null`，跳过本地文献流程
+- 如果有，告知将在其同级创建 `papersToMd/` 目录存放转换后的 MD 文档
+- 检查 `markitdown` 是否已安装，未安装时提供命令：
+  ```
+  pip install markitdown
+  ```
+- 接下来进入 **Step 1b** 的 PDF→MD 转换准备
+- 若用户明确没有本地文献库或跳过转换：`local_lit_md_dir = null`，跳过 Step 1b
 
 **Failure to confirm venue**: Stop and wait. Do not proceed to Step 2. Do not generate Outline or Section Queue until venue is resolved.
 
@@ -305,19 +308,7 @@ Task C:
 
 3 个探查全部返回后，汇总为 **Project Overview**，作为 Evidence Map 的索引层。
 
-**Phase 2 — 按需深度探查（各 section 起草前 dispatch）：**
-以下深层探查**不在此阶段执行**，而是推迟到对应 section 起草前 dispatch：
-
-| Section 起草前 | dispatch 的深层探查 | 并行策略 |
-|---------------|-------------------|---------|
-| Method | `code_structure`（逐模块 Module Cards、张量形状、forward 路径） | **与 preprocessing 并行** |
-| Method | `preprocessing`（数据预处理详细步骤） | **与 code_structure 并行** |
-| Experimental Setup | `experiment_setup`（超参数、数据集划分、人口统计） | 单探查 |
-| Main Results | `experiment_results`（主结果、基线对比、消融数值） | 单探查 |
-| Ablation | `experiment_results`（消融实验数值） | 单探查 |
-| Discussion | `interpretability`（可解释性结果、网络重要性） | 单探查 |
-
-每个深层探查使用上方的并行或单探查 dispatch 模板，传入对应 probe_type。
+**深层探查不在此处执行**。各 section 起草前的深度探查规则已移至 `references/workflow-step-5-8.md` Step 6 的"前置检查：是否需要深层探查"表中。起草对应 section 前须按该表 dispatch。
 
 For Introduction / Related Work, also audit exemplar paper candidates.
 For Method, also audit model data flow, module boundaries, tensor shapes, recoverable formulas.
@@ -390,11 +381,16 @@ For Method, also audit model data flow, module boundaries, tensor shapes, recove
 
 ### Step 3b: 联网文献检索 + 全文获取与阅读
 
-在本地搜索完成后（或跳过 Step 3a 时），执行联网检索：
+**在本地搜索完成后（或跳过 Step 3a 时），执行联网检索。**
 
-- Create a todo list for keywords and expected reference counts.
-- Determine search keywords and scope (e.g., task_name, method_family, dataset).
-- Delegate to `academic-citation` via the dispatch template below.
+**强制 checklist（必须全部完成，缺一不可）**：
+- [ ] 至少覆盖 4 类查询（问题导向 / 方法导向 / 基线导向 / 时间导向）
+- [ ] 逐篇核验元数据（venue / DOI / 年份 / 作者）
+- [ ] 输出 Verified References（含 VERIFIED / UNVERIFIED 状态）
+- [ ] 输出 Citation-to-Claim Map（每篇引用→对应主张）
+- [ ] Introduction / Related Work 时额外构建 Exemplar Set
+
+**未完成 checklist 前，不得进入 Step 4。Dispatch `academic-citation` 完成检索：**
 
 **Dispatch template：**
 ```yaml
@@ -403,36 +399,20 @@ Task:
   subagent_type: "general"
   prompt: |
     你已加载 academic-citation 子 Skill（skills/academic-citation/SKILL.md）。
-
     任务: 为 {section} 执行文献检索与核验
-    关键词: {keywords}
-    目标 venue: {venue}
+    关键词: {keywords} | 目标 venue: {venue}
     local_lit_md_dir: {local_lit_md_dir | null}
 
-    执行步骤:
-    1. 读取 skills/academic-citation/SKILL.md
-    2. 若 local_lit_md_dir != null，先执行 Step 1a（本地搜索）
-    3. 再执行 Step 2（至少 4 类查询）
-    4. 逐篇核验元数据（Step 3），优先一级来源
-    5. 完整论文至少 8-15 篇 VERIFIED，短论文至少 4-8 篇
-    6. 对候选文献，优先获取全文（arXiv/OpenReview/PMLR/ACL Anthology）
-       - 获取成功 → Dispatch literature-reader-agent 阅读
-       - 获取失败 → 降级为摘要 + 元数据
-    7. Introduction/Related Work 时额外构建 Exemplar Set
-    8. 输出 Citation-to-Claim Map
+    必须完成以下所有产出，缺一不可：
+    1. 4 类查询覆盖 + 本地检索（如有）
+    2. 逐篇元数据核验 + 全文获取尝试
+    3. Verified References（含 VERIFIED/UNVERIFIED 标注）
+    4. LiteratureReadingReports（每篇候选文献）
+    5. Citation-to-Claim Map
+    6. Exemplar Set（Introduction/Related Work 时）
 
-    输出:
-    - Verified References（含 VERIFIED/UNVERIFIED 状态、来源链接）
-    - LiteratureReadingReports（每篇候选文献的阅读报告）
-    - Exemplar Set（Introduction/Related Work 时必选）
-    - Citation-to-Claim Map
-    - Missing References（[REF_NEEDED: ...] 方向列表）
-
-    约束:
-    - 遵循 academic-citation SKILL.md 中的 Red Lines
-    - reader agent 输出必须区分原文 vs 推断
-
-    返回: 结构化输出
+    约束: 遵循 academic-citation Red Lines；reader 输出必须区分原文与推断
+    返回: 完整结构化输出
 ```
 
 Input: current section, research keywords, target venue, local_lit_md_dir.
