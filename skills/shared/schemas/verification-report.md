@@ -2,7 +2,7 @@
 
 **用途**: 审修技能到论文编排器之间的验证状态交换格式。
 **生产者**: `academic-reviser`
-**消费者**: `academic-paper-writer` (Step 11)
+**消费者**: `academic-paper-writer` (Step 6.8)
 
 ## 结构
 

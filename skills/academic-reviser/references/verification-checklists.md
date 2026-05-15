@@ -1,6 +1,6 @@
 # Section-Specific Verification Checklists
 
-本文件为 Gate C（Verification）提供按 section 类型分类的验证检查清单。在 Step 11 Self-Review & Verification 中，根据当前 section 类型加载对应清单逐项检查。
+本文件为 Gate C（Verification）提供按 section 类型分类的验证检查清单。在 Step 6.8 Self-Review & Verification 中，根据当前 section 类型加载对应清单逐项检查。
 
 ## Introduction
 
@@ -73,7 +73,7 @@
 
 ## 使用方式
 
-在 Step 11 Verification 中，根据 `section` 字段选择对应清单：
+在 Step 6.8 Verification 中，根据 `section` 字段选择对应清单：
 
 ```
 section_type = "Introduction"     → 加载 Introduction 清单

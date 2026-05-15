@@ -183,8 +183,8 @@ pip install markitdown pymupdf
 |------|---------|---------|---------|
 | 🅰️ **A：证据完备** | Step 2 → Step 6 | 至少一条可引用证据 | 降级路径或阻塞 |
 | 🅱️ **B：引用就绪** | Step 3 → Step 6 | 至少一条 VERIFIED 引用 | Intro/RW 阻塞；Method 可占位 |
-| 🚪 **C：Verification** | Step 11 → Step 12 | 所有 debt 闭合 + 内容达标 | passed/blocked/failed |
-| 📚 **D：引用数量** | Step 12e → 输出 | 全文去重引用 >= `min_citations` 篇（默认 35） | 未达标时提醒，可补充后重检 |
+| 🚪 **C：Verification** | Step 6.8 → Step 7 | 所有 debt 闭合 + 内容达标 | passed/blocked/failed |
+| 📚 **D：引用数量** | Step 8 → 输出 | 全文去重引用 >= `min_citations` 篇（默认 35） | 未达标时提醒，可补充后重检 |
 
 跨 skill 之间通过显式 **数据契约** 交换信息：
 
@@ -224,22 +224,22 @@ pip install markitdown pymupdf
 │    ↓                                                                    │
 │   ✏️ Step 6  Draft v1（前置深度探查检查 + 占位符系统 + 待补项清单）       │
 │    ↓                                                                    │
-│   📌 Step 7  占位符审计 + 图表生成                                       │
+│   📌 Step 6.4  占位符审计 + 图表生成                                       │
 │    ↓                                                                    │
 │   ┌──────────────────────────────────────────────────────────────────┐   │
 │   │              质量门（双阶段审查）                                    │   │
-│   │  ⚖️ Step 8  证据合规审查（Phase 1）                                 │   │
-│   │  ✨ Step 9  Prose Quality Gate（Phase 2，内化调用）                  │   │
-│   │  📏 Step 10 Expansion Pass（内容密度检查）                           │   │
+│   │  ⚖️ Step 6.5  证据合规审查（Phase 1）                                 │   │
+│   │  ✨ Step 6.6  Prose Quality Gate（Phase 2，内化调用）                  │   │
+│   │  📏 Step 6.7 Expansion Pass（内容密度检查）                           │   │
 │   └──────────────────────────────────────────────────────────────────┘   │
 │    ↓                                                                    │
-│   ✅ Step 11  Self-Review & Verification                                 │
+│   ✅ Step 6.8  Self-Review & Verification                                 │
 │    │                                                                    │
-│   ├── passed  →  🔄 Step 12  依赖感知 Section Loop（推进下一节）          │
-│   └── failed  →  ⬆️ 回到 Step 8 证据合规审查 重来                        │
+│   ├── passed  →  🔄 Step 7  依赖感知 Section Loop（推进下一节）          │
+│   └── failed  →  ⬆️ 回到 Step 6.5 证据合规审查 重来                        │
 │                                                                          │
 │   📌 Abstract 后置 — 所有核心章节全部 passed 后才允许生成                  │
-│   📋 Step 12e  引用清单生成（**强制**，核验 >= `min_citations` 篇引用，默认 35）                │
+│   📋 Step 8  引用清单生成（**强制**，核验 >= `min_citations` 篇引用，默认 35）                │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -247,7 +247,7 @@ pip install markitdown pymupdf
 > - 📐 `section-drafting` 也要走完整闭环，只是缩小证据范围
 > - 🚧 Introduction / Related Work 在零 VERIFIED 引用时必须阻塞
 > - ⚡ Step 2 涉及多个 probe 时**必须并行** dispatch，不得串行
-> - 📋 论文完成时 Step 12e **强制**生成引用清单，核验 >= `min_citations` 篇引用（默认 35）
+> - 📋 论文完成时 Step 8 **强制**生成引用清单，核验 >= `min_citations` 篇引用（默认 35）
 
 ---
 

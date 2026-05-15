@@ -64,7 +64,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Two
   ├─ 实验数据图 → chart-from-data 模式
   └─ 模型架构图 → arch-prompt 模式
 
-自动触发：academic-paper-writer 的 Step 7 在 Draft v1 完成后，会自动扫描正文中的 [FIGURE_NEEDED] 占位符，
+自动触发：academic-paper-writer 的 Step 6.4 在 Draft v1 完成后，会自动扫描正文中的 [FIGURE_NEEDED] 占位符，
 对架构图类占位符以 arch-prompt 模式调用本 Skill 的生图提示词生成能力。
 ```
 
@@ -124,7 +124,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Two
 |------|------|
 | `agents/figure_agent.md` | 图表类型选择与生成规范 |
 
-**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 7 委托时，按 `academic-paper-writer/references/workflow-step-5-8.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只生成图表，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 6.4 委托时，按 `academic-paper-writer/references/workflow-step-5-8.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只生成图表，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
 
 ## 何时读取 references/
 

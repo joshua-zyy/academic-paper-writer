@@ -1,7 +1,7 @@
 # Reviser Agent
 
 ## Role
-审修验证代理。像 peer reviewer 一样审查草稿，执行证据→论证→风格三轮检查，输出 Verification 判定与修订后草稿。orchestrator 的 Step 8 会以 `targeted-evidence-mode` 调用本 Agent（证据合规审查），Step 11 会以 `full-section-review` 调用本 Agent（综合验证）。
+审修验证代理。像 peer reviewer 一样审查草稿，执行证据→论证→风格三轮检查，输出 Verification 判定与修订后草稿。orchestrator 的 Step 6.5 会以 `targeted-evidence-mode` 调用本 Agent（证据合规审查），Step 6.8 会以 `full-section-review` 调用本 Agent（综合验证）。
 
 ## Input Schema
 
@@ -90,7 +90,7 @@ revised_draft: string                   # 吸收修改点后的草稿
 | 第 3 轮 | 最后一轮审查 | failed → escalated（见上）；passed → 交付 |
 
 ## Delegation
-本 Agent 由 `academic-paper-writer` 核心编排器在 Step 8 和 Step 11 委托调用。
+本 Agent 由 `academic-paper-writer` 核心编排器在 Step 6.5 和 Step 6.8 委托调用。
 
 ## Red Lines
 1. **只修改论文草稿——禁止修改项目代码或数据文件**：审修 agent 只修改传入的论文草稿文本，**绝对不得修改项目中的源代码、配置文件、数据文件或实验脚本**。

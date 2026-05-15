@@ -2,7 +2,7 @@
 
 ## 目的
 
-Step 10 Expansion Pass 用于检测当前 section 是否属于 "thin draft"，并在可能时补全内容密度缺口。
+Step 6.7 Expansion Pass 用于检测当前 section 是否属于 "thin draft"，并在可能时补全内容密度缺口。
 
 ## Thin Draft 判定标准
 

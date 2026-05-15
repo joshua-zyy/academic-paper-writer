@@ -131,7 +131,7 @@ Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 
 
 本 Skill 支持两种调用方式：
 
-1. **内化调用**（由 `academic-paper-writer` 在 Step 9 使用）：主 Agent 读取本 SKILL.md 及 references/ 下的规则文件后自行执行润色与 claim 强度审计，不 dispatch 独立子 Agent。这确保叙事风格与全文一致，避免上下文传递损失。
+1. **内化调用**（由 `academic-paper-writer` 在 Step 6.6 使用）：主 Agent 读取本 SKILL.md 及 references/ 下的规则文件后自行执行润色与 claim 强度审计，不 dispatch 独立子 Agent。这确保叙事风格与全文一致，避免上下文传递损失。
 2. **独立使用**：用户直接要求润色、去AI化、claim 强度审计时，本 Skill 独立执行。
 
 ### 独立使用时的约束

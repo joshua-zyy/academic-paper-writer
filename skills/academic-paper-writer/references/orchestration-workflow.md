@@ -62,7 +62,7 @@ When executing a concrete step in this file:
 
 ## 迭代上限与降级规则
 
-修订循环（Step 10→11→12）最多执行 3 轮。每轮完成后记录 `revision_round` 计数。
+修订循环（Step 6.7→6.8→7）最多执行 3 轮。每轮完成后记录 `revision_round` 计数。
 
 ### 达到上限后的处理
 

@@ -29,7 +29,7 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 2. **cross-section-review** — 跨章节一致性检查（摘要 vs 正文 vs 表格 vs 结论）
 3. **verification-only** — 仅执行 Verification 判定（不重做自审）
 4. **targeted-review** — 针对特定问题做定向审查（如仅检查引用闭合）
-5. **targeted-evidence-mode** — 仅执行证据合规审查（由 orchestrator Step 8 委托调用）。检查内容：
+5. **targeted-evidence-mode** — 仅执行证据合规审查（由 orchestrator Step 6.5 委托调用）。检查内容：
    - 每个 claim 是否有对应的 evidence 支撑（Evidence Map 中的 newly_run / preexisting_artifact）
    - 每个 inline citation 是否对应 Verified References 中已核验条目
    - 所有占位符使用是否符合规范（如 [REF_NEEDED] 含方向说明）
@@ -105,7 +105,7 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 |------|------|
 | `agents/reviser_agent.md` | 三轮审查流程与 Verification 判定规范 |
 
-**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 8 和 Step 11 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只审查论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 6.5 和 Step 6.8 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只审查论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
 
 ## 何时读取 references/
 

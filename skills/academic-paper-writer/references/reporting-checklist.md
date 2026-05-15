@@ -1,6 +1,6 @@
 # CS/AI/ML 论文报告规范 Checklist
 
-本 checklist 定义 CS/AI/ML 实证论文必须报告的项目。在 Step 8（证据合规审查）和 Step 11（Verification）中按类别逐项检查。
+本 checklist 定义 CS/AI/ML 实证论文必须报告的项目。在 Step 6.5（证据合规审查）和 Step 6.8（Verification）中按类别逐项检查。
 
 ## 计算资源 (Computational Resources)
 
@@ -44,6 +44,6 @@
 
 ## 使用方式
 
-在 `academic-paper-writer` 的 Step 8（证据合规审查）中，主 Agent 按此 checklist 逐项检查当前 section 是否覆盖了相关报告项。未覆盖项记录为 `protocol_debt`，在 Verification 中作为评审依据。
+在 `academic-paper-writer` 的 Step 6.5（证据合规审查）中，主 Agent 按此 checklist 逐项检查当前 section 是否覆盖了相关报告项。未覆盖项记录为 `protocol_debt`，在 Verification 中作为评审依据。
 
 在 `academic-reviser` 的 Step 2（证据与事实检查）中，reviser Agent 参照此 checklist 检查实验相关 section 是否遗漏关键报告项。

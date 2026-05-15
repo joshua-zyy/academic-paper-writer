@@ -2,7 +2,7 @@
 
 ## 用途
 
-定义 section 之间的前置依赖、后影响（当某节被修订时哪些节需要回检）、共享 claims（两节共同依赖的论点）和 rewrite_trigger（哪些变更会触发本节省略）。编排器在 Step 10 执行 section loop 时感知此矩阵，避免跨节一致性问题。
+定义 section 之间的前置依赖、后影响（当某节被修订时哪些节需要回检）、共享 claims（两节共同依赖的论点）和 rewrite_trigger（哪些变更会触发本节省略）。编排器在 Step 6.7 执行 section loop 时感知此矩阵，避免跨节一致性问题。
 
 ## 矩阵定义
 

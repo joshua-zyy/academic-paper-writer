@@ -148,7 +148,7 @@ Draft v1 生成后，**必须**立即将正文内容写入 `./docs/paper-drafts/
 
 > **{Section}**: Draft v1 已写入文件，进入审查阶段
 
-## Step 7: Placeholder Audit, Figure Contract, Architecture Figure Pre-generation, and Debt List（**强制执行，不可跳过**）
+## Step 6.4: Placeholder Audit, Figure Contract, Architecture Figure Pre-generation, and Debt List（**强制执行，不可跳过**）
 
 After Draft v1, **必须**自动执行以下子步骤：
 
@@ -180,13 +180,13 @@ After Draft v1, **必须**自动执行以下子步骤：
 对每个 `[FIGURE_NEEDED]` 按 Figure Contract 的分类结果进行双路径处理：
 
 **路径 A — 架构图类**（purpose 含 architecture / structure / pipeline / diagram / network / flow / 架构 / 模块图 等）：
-- 按下文 Step 7g 的 dispatch 模板委托 `academic-figure` 的 arch-prompt 模式
+- 按下文 Step 6.4g 的 dispatch 模板委托 `academic-figure` 的 arch-prompt 模式
 - 生成的提示词写入 `./docs/paper-drafts/figures/figure_prompts.md`（按图编号分节）
 - 正文中的占位符替换为图编号引用（如 `Figure X` 或 `图X`）
 - 若 `figures/figure_prompts.md` 不存在，使用 Write 工具创建；若已存在，使用 Edit 工具追加
 
 **路径 B — 数据图类**（purpose 含 curve / comparison / ablation / result / 曲线 / 对比 / 消融 / 结果 等）：
-- 按下文 Step 7h 的 dispatch 模板生成 Python 绘图代码
+- 按下文 Step 6.4h 的 dispatch 模板生成 Python 绘图代码
 - 绘图代码写入 `./docs/paper-drafts/figures/plot_fig{N}.py`
 - 正文保留占位符，记入待补项列表
 - **不自动执行绘图代码**
@@ -212,7 +212,7 @@ After Draft v1, **必须**自动执行以下子步骤：
 ```
 
 ### 7f. 报告审计结果
-将占位符统计信息（`placeholder_debt`）纳入 Section Critique，供 Step 11 Verification 引用。
+将占位符统计信息（`placeholder_debt`）纳入 Section Critique，供 Step 6.8 Verification 引用。
 
 ### 7g. 架构图 dispatch 模板（路径 A）
 对架构图类的 `[FIGURE_NEEDED]`，按此模板 dispatch：
@@ -229,7 +229,7 @@ Task:
     path: B
 
      Figure Contract:
-    - Core conclusion: {Step 7c 中定义的论点}
+    - Core conclusion: {Step 6.4c 中定义的论点}
     - Evidence chain: {面板→论点映射}
     - Archetype: {图分类}
     - Export contract: {尺寸、格式等}
@@ -275,7 +275,7 @@ Task:
     数据来源: {实验数据路径或 Evidence Map 中的对应条目}
 
     Figure Contract:
-    - Core conclusion: {Step 7c 中定义的论点}
+    - Core conclusion: {Step 6.4c 中定义的论点}
     - Evidence chain: {面板→论点映射}
     - Archetype: {图分类}
     - Export contract: SVG + PNG 300dpi
@@ -315,7 +315,7 @@ Task:
 
 dispatch 返回后，**必须**将绘图代码写入 `./docs/paper-drafts/figures/plot_fig{N}.py`。**不自动执行代码**。
 
-## Step 8: Evidence Compliance Review (Phase 1 of Two-Phase Review)
+## Step 6.5: Evidence Compliance Review (Phase 1 of Two-Phase Review)
 
 - Create a todo list for evidence compliance checks.
 - Delegate to `academic-reviser` in `targeted-evidence-mode` via the dispatch template below.
@@ -354,9 +354,9 @@ Task:
 
 This is Phase 1. Only proceed to Phase 2 (prose polishing) after `evidence_debt = closed`.
 
-Input: Draft v1 text, Evidence Map, Verified References, placeholder_debt from Step 7.
+Input: Draft v1 text, Evidence Map, Verified References, placeholder_debt from Step 6.4.
 Output: `evidence_debt` (open|closed), `evidence_issues` list.
 
 If protocol risks from Step 4 materially weaken a claim's support (for example: no independent test set, missing strong baselines, or single-run results used for strong conclusions), keep `evidence_debt = open` for that claim until the text is downgraded, the risk is made explicit, or the claim is frozen/blocked.
 
-If `evidence_debt = open`, record issues and return to Step 6. Do not proceed to Step 9 while open.
+If `evidence_debt = open`, record issues and return to Step 6. Do not proceed to Step 6.6 while open.

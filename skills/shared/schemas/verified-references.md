@@ -2,7 +2,7 @@
 
 **用途**: 文献检索技能到论文编排器之间的引用数据交换格式。
 **生产者**: `academic-citation`
-**消费者**: `academic-paper-writer` (Step 6), `academic-polishing` (Step 9)
+**消费者**: `academic-paper-writer` (Step 6), `academic-polishing` (Step 6.6)
 
 ## 结构
 

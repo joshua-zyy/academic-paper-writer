@@ -2,7 +2,7 @@
 
 **用途**: 论文编排器、实验复核、审修技能之间的证据盘点数据交换格式。
 **生产者**: `academic-experiments`, `academic-paper-writer` (Step 2)
-**消费者**: `academic-paper-writer` (Step 6), `academic-reviser` (Step 8/11)
+**消费者**: `academic-paper-writer` (Step 6), `academic-reviser` (Step 6.5/6.8)
 
 ## 结构
 

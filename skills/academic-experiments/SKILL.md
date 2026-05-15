@@ -95,7 +95,7 @@ description: "Audit, run, or verify experimental evidence for CS/AI/ML papers. P
 | 指标定义模糊 | 指标计算方式是否与标准定义一致 |
 | 图表溯源不明 | 图表是否可追溯到对应脚本和 checkpoint |
 
-若某项协议风险足以削弱正文主张的证据强度（如无独立测试集、缺少关键 baseline、仅单次运行却写成强结论），后续 Step 8 应保持对应 claim 的 `evidence_debt = open`，直到该主张被降级、风险被显式写出，或该 claim 被冻结/阻塞。
+若某项协议风险足以削弱正文主张的证据强度（如无独立测试集、缺少关键 baseline、仅单次运行却写成强结论），后续 Step 6.5 应保持对应 claim 的 `evidence_debt = open`，直到该主张被降级、风险被显式写出，或该 claim 被冻结/阻塞。
 
 ### Step 5: 输出
 

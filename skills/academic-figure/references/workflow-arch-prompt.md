@@ -4,7 +4,7 @@
 
 用户请求 → 判断为模型架构图 → arch-prompt 模式
 
-自动触发：academic-paper-writer 的 Step 7 在 Draft v1 完成后，会自动扫描正文中的 `[FIGURE_NEEDED]` 占位符，对架构图类占位符以 arch-prompt 模式调用本 Skill。
+自动触发：academic-paper-writer 的 Step 6.4 在 Draft v1 完成后，会自动扫描正文中的 `[FIGURE_NEEDED]` 占位符，对架构图类占位符以 arch-prompt 模式调用本 Skill。
 
 ## Step 1：确认模型结构
 

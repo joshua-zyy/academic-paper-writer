@@ -1,15 +1,15 @@
-# Orchestration Workflow — Part 3: Review & Integration (Step 9–12)
+# Orchestration Workflow — Part 3: Review & Integration (Step 6.6–7)
 
-本文件包含编排器 Step 9–12 的详细执行流程。按需加载，避免一次性加载全部步骤。
+本文件包含编排器 Step 6.6–7 的详细执行流程。按需加载，避免一次性加载全部步骤。
 
 完整步骤索引见 `orchestration-workflow.md`。
 
 ---
 
-## Step 9: Prose Quality Gate (Phase 2 of Two-Phase Review) — 内化调用
+## Step 6.6: Prose Quality Gate (Phase 2 of Two-Phase Review) — 内化调用
 
 - Create a todo list for prose checks.
-- Confirm Step 8 `evidence_debt = closed` before executing.
+- Confirm Step 6.5 `evidence_debt = closed` before executing.
 - **内化调用 `academic-polishing`**：主 Agent 读取 `skills/academic-polishing/SKILL.md` 的规则后自行执行润色与 claim 强度审计，不 dispatch 子 Agent。
 
 **执行方式**：
@@ -54,7 +54,7 @@ Prose rewrite loop: max 2 rounds. If still open after 2 rounds, carry `prose_deb
 - 无上下文传递损失
 - 润色后的文本与前后节风格一致
 
-## Step 10: Expansion Pass (Content Density Check)
+## Step 6.7: Expansion Pass (Content Density Check)
 
 - Create a todo list for thin-draft checks.
 
@@ -67,7 +67,7 @@ Thin-draft conditions（详见 `references/content-density.md`）:
 
 Expansion principle: use only existing evidence and compliant placeholders. Prioritize filling "reader understanding chain" gaps.
 
-## Step 11: Self-Review & Verification
+## Step 6.8: Self-Review & Verification
 
 - Create a todo list for review items.
 - Delegate to `academic-reviser` via the dispatch template below（full-section-review mode）.
@@ -130,7 +130,7 @@ For `full-paper-planning`, do not end after one section revision.
 
 ### 7a. Status Update
 
-- If `failed` and not externally blocked → keep current section active, continue next Step 11 round.
+- If `failed` and not externally blocked → keep current section active, continue next Step 6.8 round.
 - If `blocked` and `safe_to_continue = yes` → write blockers to Revision Queue, freeze claims, advance.
 - If `blocked` and `safe_to_continue = no` → keep active, wait for external evidence.
 - Merge into Cumulative Draft; update Section Queue and Revision Queue.
