@@ -1,6 +1,6 @@
 ---
 name: academic-figure
-description: "Create, revise, or audit academic figures for CS/AI/ML papers. Two paths: architecture figure prompting and data figure code generation with publication-ready Python scripts."
+description: "Create, revise, or audit academic figures for CS/AI/ML papers. Two paths: architecture figure prompting (tool-agnostic structured prompts) and data figure code generation (publication-ready Python scripts with matplotlib/seaborn). Use when: generating model architecture diagram prompts, creating publication-quality data plots from experiment results, auditing existing figures for publication standards, suggesting figure types for paper sections, revising figure colors/layouts/labels. Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, model architecture, plot, publication figure, 数据可视化, generate plot, architecture diagram."
 ---
 
 # Academic Figure
@@ -74,147 +74,29 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Two
 
 ### 路径 A — chart-from-data（实验数据图）
 
-参考 `references/chart-types.md` 和 `references/api.md`。
-
-**Step 1：确认图表用途与核心结论**
-- 谁在什么数据上做了什么对比？
-- 支持论文中的哪个 claim？
-- 目标期刊/会议的图表规范（宽度、格式、dpi）
-
-**Step 2：选择图表类型**
-根据数据维度和 claim 类型匹配最佳图表：
-
-| 数据特征 | 推荐图表类型 |
-|---------|-------------|
-| 单变量随 epoch 变化（多条方法） | 训练/验证曲线（line + std band） |
-| 离散分组 + 数值（含 baseline） | 分组柱状图（+ error bar） |
-| 矩阵形式（分类结果、相关性） | 热力图（混淆矩阵） |
-| 高维嵌入（t-SNE/UMAP output） | 散点图（聚类着色） |
-| 多轮实验分布 | 箱线图 / 小提琴图 |
-| 多维度对比（速度/精度/参数量） | 雷达图 |
-| 多数据集效果汇总 | 森林图 / 点范围图 |
-
-**Step 3：生成 Figure Contract（参考 `references/figure-contract.md`）**
-含核心结论、图表类型、面板映射、目标 venue 要求
-
-**Step 4：检查 Python 运行时**
-```python
-required = ["matplotlib", "seaborn", "numpy", "pandas", "scipy"]
-```
-若缺失 → 报告 blocker 并提供安装命令，不得自动 fallback
-
-**Step 5：生成 Python 代码**
-- 使用 `references/api.md` 中定义的辅助函数
-- 设置全局样式：`apply_pub_style()`
-- 按合约布局生成各面板
-- 代码中嵌入数据读取（CSV/TSV/Numpy）
-- 使用色板 `PALETTE`（参考 `references/design-theory.md`）
-
-**Step 6：执行代码并导出**
-- 主格式：SVG（`svg.fonttype='none'`，文字可编辑）
-- 副格式：PDF（`pdf.fonttype=42`）
-- 位图预览：TIFF 300-600dpi
-- 源数据（CSV/TSV）随图交付
-
-**Step 7：QA Contract（参考 `references/qa-contract.md`）**
-逐项检查 → 若失败则修订代码并重跑 → 最多 2 轮
-
-**Step 8：交付**
-- 绘图脚本（`.py`）
-- 源数据文件（CSV/TSV）
-- SVG（矢量主文件）
-- PDF / TIFF（副格式）
-- QA 报告
+详见 `references/workflow-chart-from-data.md`。核心步骤：确认用途 → 选择图表类型 → Figure Contract → 检查运行时 → 生成代码 → 执行导出 → QA Contract → 交付。
 
 ### 路径 B — arch-prompt（模型架构图）
 
-参考 `references/architecture-prompting.md`。
-
-**Step 1：确认模型结构**
-用户提供或 agent 从论文上下文中提取：
-- 核心组件列表（Embedding、Encoder × N、Decoder、Classifier 等）
-- 数据流方向
-- 关键连接方式（残差、跨层、注意力连接）
-- 输出形式
-
-**Step 2：选择提示词模板**
-按架构类型（参考 `references/architecture-prompting.md`）：
-- CNN / Encoder-Decoder / Transformer / GNN / 多模态 / MoE
-
-**Step 3：生成结构化提示词**
-- 风格控制：`scientific diagram, white background, flat 2D, vector illustration`
-- 结构描述：自左向右或自顶向下布局、模块分组
-- 标注要求：关键模块标注技术名称
-- 配色方案：不同功能组用不同色系
-- 连接方式：实线箭头=数据流，虚线=残差/跳跃连接
-
-**Step 4：输出提示词 + 使用说明**
-- 提示词正文（通用描述式，不限定生图工具）
-- 建议的后续步骤（用户自行出图后，可回传让 agent 协助排版/标注）
-
-**Step 5（可选）：用户回传图后的协助**
-- 调整 panel 布局
-- 添加标注文字 / 箭头
-- 与实验图整合为 multi-panel 总图
+详见 `references/workflow-arch-prompt.md`。核心步骤：确认模型结构 → 选择提示词模板 → 生成结构化提示词 → 输出 + 使用说明。
 
 ### figure-blueprint 模式
 
-**Step 1：确认论文上下文**
-- 当前论文的章节结构
-- 目标 venue 的图表惯例（单栏/双栏、格式限制）
-
-**Step 2：扫描章节，识别可图示化的内容**
-- 方法流程 → 建议架构图
-- 实验结果 → 建议训练曲线 / 对比柱状图 / 消融实验等
-- 分析/讨论 → 建议分布图 / 散点图
-
-**Step 3：输出建议清单**
-每个建议含：
-- 图类型
-- 对应章节
-- 支持的核心 claim
-- 所需数据来源
-- 是否已有数据覆盖
+**Step 1**：确认论文上下文（章节结构、venue 图表惯例）。
+**Step 2**：扫描章节，识别可图示化内容（方法流程→架构图，实验结果→训练曲线/对比图，分析→分布图/散点图）。
+**Step 3**：输出建议清单（图类型、对应章节、核心 claim、数据来源、是否已有数据覆盖）。
 
 ### figure-audit 模式
 
-**Step 1：确认审查范围**
-- 审查单张图还是全文所有图
-- 是否有目标期刊的图表规范需要对照
-
-**Step 2：逐项执行 QA（参考 `references/qa-contract.md`）**
-重点检查：
-- 核心结论是否一目了然
-- 配色是否色盲友好 + 灰度打印友好
-- 文字是否在最终尺寸下可读
-- 统计信息是否标注（误差棒含义、样本量、检验方法）
-- SVG 文字是否可编辑
-- 坐标轴伦理（截断标记、零起点等）
-
-**Step 3：输出审查报告**
-```md
-## Figure Audit Report
-- Figure: [编号/文件名]
-- Verdict: pass | fail | needs-revision
-- Passed items: [...]
-- Failed items: [具体问题 + 修改建议]
-- Risk flags: [reviewer 可能质疑的问题]
-```
+**Step 1**：确认审查范围（单张图或全文所有图）。
+**Step 2**：逐项执行 QA（详见 `references/qa-contract.md`）：核心结论、配色、可读性、统计信息、SVG 可编辑性、坐标轴伦理。
+**Step 3**：输出审查报告（Figure、Verdict、Passed items、Failed items、Risk flags）。
 
 ### figure-revision 模式
 
-**Step 1：确认修改目标**
-- 确定要修改的图（文件路径或现有图描述）
-- 明确修改内容（换色板、调布局、添加/修改标注、修改图表类型、合并拆分面板）
-
-**Step 2：判断可执行路径**
-- 若用户提供了原始绘图脚本 → 直接修改脚本并重跑
-- 若用户只提供了图片 → 仅在简单调整（添加 panel label、修改图例位置）时可用；复杂修改须建议用户提供源数据或脚本
-- 若为架构图 → 修改提示词，重新生成
-
-**Step 3：执行修改 → QA → 交付**
-- 修改后执行 QA Contract
-- 交付修改后的脚本 / 提示词 + 图表
+**Step 1**：确认修改目标（文件路径、修改内容）。
+**Step 2**：判断可执行路径（有脚本→修改重跑，仅有图片→简单调整，架构图→修改提示词）。
+**Step 3**：执行修改 → QA → 交付。
 
 ## 默认交付物
 

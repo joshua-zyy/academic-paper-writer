@@ -1,6 +1,6 @@
 ---
 name: academic-paper-writer
-description: "Use when writing CS/AI/ML papers from scratch, drafting section-by-section, coordinating evidence audit, citation search, experiment verification, prose polishing, peer review, and figure generation across sub-skills."
+description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordinates evidence audit, citation search, experiment verification, prose polishing, peer review, and figure generation across 6 sub-skills. Uses section-by-section drafting with Draft→Quality Gate→Expansion→Self-Review→Revision→Verification closed loop. Use when: writing a full paper draft from research notes or code repo, drafting paper sections one-by-one, coordinating multi-skill paper writing workflow, managing evidence-to-citation closed loop. Triggers on: 写论文, paper draft, 初稿, write introduction, draft method, 论文起草, full paper outline, section-by-section drafting, 证据闭环, 分节起草, academic paper writing, research paper drafting, write CS paper, draft AI paper, 从零写论文, 逐节写作."
 ---
 
 # Academic Paper Writer (Core Orchestrator)
@@ -61,6 +61,7 @@ description: "Use when writing CS/AI/ML papers from scratch, drafting section-by
 14. **引用产物必输出**：Step 3 完成后，必须在上下文中维护 Verified References 列表和 Citation-to-Claim Map。缺少任一 → 不得进入 Step 6。
 15. **探查前置**：起草任何 section（Step 6）前，必须先检查是否需要深层探查。需要 → 先 dispatch 再起草；不需要 → 记录 `deep_probe: skipped`。
 16. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 35 篇。论文完成后 Step 12e 生成引用清单时自动核验。
+17. **两阶段写作**：Step 5 Blueprint 可使用 bullet points 和提纲式结构，但 Step 6 Draft v1 必须是完整 prose 段落。bullet points 仅用于规划阶段，不得出现在最终论文正文中。
 
 ## 文件输出规范
 
@@ -87,6 +88,23 @@ description: "Use when writing CS/AI/ML papers from scratch, drafting section-by
 
 - 用户可在启动时指定模式，也可在过程中随时切换
 - Step 1 的 venue/language 确认为一次性操作，确认后全程不再重复询问
+
+## Decision Points
+
+在以下关键节点，Agent 会暂停并展示阶段性成果，等待用户确认（step-by-step 模式）或仅展示摘要（auto 模式）：
+
+| DP | 位置 | Agent 展示 | 用户操作 |
+|----|------|-----------|---------|
+| DP-1 | Step 1 完成后 | Venue Brief 摘要（venue、语言、本地文献库状态） | 确认/修正 venue 和语言 |
+| DP-2 | Step 5 Blueprint 完成后 | Section Blueprint（章节结构、每节要点、证据来源） | 确认/调整 Blueprint |
+| DP-3 | Step 6 Draft v1 完成后 | Draft 摘要（当前节、段落数、待补项清单摘要） | 确认方向/指出问题 |
+| DP-4 | Step 11 Verification 完成后 | Verification Status（verdict、overall score、未闭合问题） | 确认通过/要求修订 |
+
+**模式行为**：
+- `auto` 模式：DP 仅输出简短摘要，不暂停，继续推进
+- `step-by-step` 模式：DP 暂停，等待用户确认后继续
+
+用户可在任何时候切换模式。
 
 ## 任务模式
 
@@ -124,6 +142,17 @@ description: "Use when writing CS/AI/ML papers from scratch, drafting section-by
 5. `referenced-literature-inventory.md` — 引用文献过程记录（Step 3c 后生成，逐节追加）
 
 对话中仅输出简短进度摘要，不输出完整论文正文。
+
+## 可选产物（用户请求时生成）
+
+以下产物不纳入强制流程，在用户明确要求或 venue 需要时生成：
+
+| 产物 | 说明 | 何时需要 |
+|------|------|---------|
+| `abstract.md` | 单独提取的 Abstract | venue 要求独立提交时 |
+| `cover-letter.md` | 投稿信模板 | 期刊投稿时 |
+| `highlights.md` | 3-5 条核心贡献 | venue 要求时（如 Cell Press） |
+| `venue-checklist.md` | venue-specific 提交检查清单 | 始终建议生成 |
 
 ## 默认 section queue
 
@@ -248,6 +277,7 @@ Draft v1 生成后，**必须**在正文末尾追加待补项清单。模板见 
 | `references/placeholder-guide.md` | Step 6 生成 Draft |
 | `references/mode-spectrum.md` | Step 0 选择模式 |
 | `references/data-access-levels.md` | 理解数据访问边界 |
+| `references/reporting-checklist.md` | Step 8 证据合规审查 / 实验相关 section 检查 |
 | `skills/academic-citation/scripts/convert-pdfs-to-md.py` | Step 1b PDF→MD |
 | `shared/references/concepts.md` | 跨技能共享概念速查 |
 
@@ -275,3 +305,73 @@ Draft v1 生成后，**必须**在正文末尾追加待补项清单。模板见 
 | Abstract 前置 | 证据未稳时就先写 Abstract | Abstract 必须后置，等主体章节证据稳定后再写 |
 | 无证据式 SOTA | 未与强基线比较就声称 SOTA | 任何 SOTA / state-of-the-art 表述必须附 baseline 比较表 |
 | 自我审查赦免 | 因接近截止期就缩短审查流程 | Hard Gates 不可跳过，每种核实步骤都至少执行一遍 |
+
+## Example Usage
+
+### 场景 1: full-paper-planning — 从研究概要启动完整论文
+
+**用户输入**：
+> 我有一个基于双分支 Transformer 的 EEG 情绪识别项目，代码在 `./eeg-emotion/`，想用这个仓库写一篇完整论文投到 IEEE T-AFFC。
+
+**执行流程摘要**：
+```
+Step 0: mode=full-paper-planning, scope=empirical CS/AI paper
+Step 1: Venue Brief → IEEE T-AFFC, 英文, 双栏, 12页
+Step 2: 并行 dispatch probe agents 探查代码/数据/配置
+Step 3: 并行 dispatch citation agent + literature reader → Verified References (12篇本地+8篇外部)
+Step 4: dispatch experiment agent → Evidence Inventory (3个newly_run结果, 2个preexisting_artifact)
+Step 5: Section Blueprint → 8节结构 + 每节要点
+Step 6: Draft v1 (Introduction) → 5段完整prose + 待补项清单
+Step 7: arch-prompt 生成架构图提示词
+Step 8: evidence compliance review → evidence_debt: closed
+Step 9: prose quality gate → prose_debt: closed
+Step 10: expansion pass → thin_draft: no
+Step 11: verification → Verdict: passed, Score: 8/10
+Step 12: 推进到 Related Work...
+```
+
+**对话输出**（auto 模式）：
+> ✅ Introduction 完成 | Verdict: passed | Score: 8/10 | 下一节: Related Work
+
+---
+
+### 场景 2: section-drafting — 聚焦单节起草
+
+**用户输入**：
+> 帮我写 Method 节，代码在 `./model/`，重点讲清楚双分支架构和注意力机制。
+
+**执行流程摘要**：
+```
+Step 0: mode=section-drafting, section=Method
+Step 2: probe agent 探查代码 → 识别核心模块 (TemporalBranch, SpatialBranch, FusionModule)
+Step 3: 文献检索 → 相关 attention 机制文献 (6篇VERIFIED)
+Step 5: Blueprint → 整体框架 → 模块拆解 → 训练目标
+Step 6: Draft v1 → 完整prose + [FIGURE_NEEDED: overall architecture] + 待补项清单
+Step 7: arch-prompt 生成分支架构图提示词
+Step 8-11: 审查闭环 → Verdict: passed
+```
+
+**输出片段**（Draft v1 Method 开头）：
+> The proposed dual-branch Transformer architecture processes EEG signals through
+> parallel temporal and spatial pathways... [后续展开模块细节]
+
+---
+
+### 场景 3: section-revision — 修订已有草稿
+
+**用户输入**：
+> 这是我的 Related Work 草稿，帮我审查修订：[粘贴草稿文本]
+
+**执行流程摘要**：
+```
+Step 0: mode=section-revision, section=Related Work
+Step 8: evidence compliance review → 发现3处裸claim无citation
+Step 9: prose quality gate → prose_debt: open (罗列式段落)
+Step 10: expansion pass → 补充work cluster综合比较
+Step 11: verification → Verdict: passed, Score: 7/10
+```
+
+**输出**（Section Critique 摘要）：
+> - Issues fixed: 补充3处inline citation, 将罗列式段落重组为2个work clusters
+> - Claims weakened: "outperforms all existing methods" → "achieves competitive results"
+> - Evidence still missing: [REF_NEEDED: recent GNN-based EEG methods]

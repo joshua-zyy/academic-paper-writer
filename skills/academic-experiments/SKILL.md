@@ -1,6 +1,6 @@
 ---
 name: academic-experiments
-description: "Audit, run, or verify experimental evidence for CS/AI/ML papers. Produces Evidence Inventory with evidence_type annotations and Protocol Risk assessments."
+description: "Audit, run, or verify experimental evidence for CS/AI/ML papers. Produces Evidence Inventory with evidence_type annotations (newly_run/preexisting_artifact/user_claim) and Protocol Risk assessments. Use when: checking if experiment results are reproducible, auditing existing experiment artifacts, running minimal reproducible commands, evaluating checkpoints without full retraining, documenting protocol risks like data leakage or missing baselines. Triggers on: 复核实验, run experiments, 实验结果, experiment evidence, verify results, 实验验证, evidence inventory, protocol risk, 跑实验, check results, reproduce experiments, 实验审计."
 ---
 
 # Academic Experiments

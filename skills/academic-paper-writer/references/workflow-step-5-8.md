@@ -25,6 +25,46 @@
 - Core vs. standard modules
 - Module Card per core module: position, bottleneck, design choice, rationale, expected benefit, cost/limit/boundary, evidence source
 
+## Two-Stage Writing Process
+
+**Stage 1: Blueprint (Bullet Points)** — Step 5 输出
+- 使用 bullet points 组织论点结构
+- 标注关键引用位置
+- 规划段落职责和论证顺序
+
+**Stage 2: Draft v1 (Flowing Prose)** — Step 6 输出
+- 将 bullet points 转换为完整段落
+- 添加过渡句和逻辑连接
+- 自然融入 inline citations
+- 确保段落内因果/递进/转折的深层逻辑
+
+**转换示例**：
+
+Blueprint (Stage 1):
+```
+- Background: Transformer 在 NLP 中成功，但在 EEG 中应用有限
+  * Cite: Vaswani 2017 (attention), Recent EEG-transformer attempts
+- Gap: EEG 的时间-空间双重特性未被现有 transformer 充分建模
+  * 现有方法只处理时间或空间，未联合建模
+- Our approach: 双分支 transformer 联合建模时空特征
+  * 时间分支: temporal self-attention
+  * 空间分支: graph attention on electrode topology
+```
+
+Draft v1 (Stage 2):
+```
+The Transformer architecture has achieved remarkable success in natural
+language processing since its introduction by Vaswani et al. (2017), yet its
+application to electroencephalography (EEG) signals remains limited. Unlike
+textual data, EEG recordings exhibit dual temporal-spatial characteristics:
+temporal dynamics within each electrode channel and spatial correlations
+across the electrode topology. Existing approaches typically address only
+one of these dimensions—either applying temporal self-attention to
+individual channels or using spatial graph convolution without modeling
+temporal dependencies—leaving the joint spatiotemporal modeling problem
+unresolved. To bridge this gap, we propose a dual-branch Transformer that...
+```
+
 ## Step 6: Draft v1
 
 - Create a todo list for subtopics to cover.

@@ -13,6 +13,7 @@
 verification_report:
   section: string
   verdict: enum               # passed / failed / blocked
+  overall_score: integer      # 1-10, 快速质量指示
   checks_run:
     - check_id: string
       check_name: string
@@ -36,6 +37,7 @@ verification_report:
 
 | 字段 | 含义 | 判定标准 |
 |------|------|---------|
+| `overall_score` | 整体质量评分（1-10） | 9-10: 所有 debt 闭合，内容充实; 7-8: 硬 debt 闭合，少量可改进; 5-6: 主要 debt 闭合，中等改进空间; 3-4: 部分 debt 未闭合; 1-2: 多个 debt 未闭合 |
 | `prose_debt` | 文体质量缺口 | `academic-polishing` Step 9 输出 |
 | `citation_debt` | 引用缺口 | 正文中存在未闭合 `[REF_NEEDED]` 或裸 claim |
 | `evidence_debt` | 证据缺口 | 存在无证据支撑的 claim 或 `[RESULT_UNVERIFIED]` |

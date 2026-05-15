@@ -65,6 +65,18 @@
 
 ---
 
+## CS/AI/ML 报告规范检查
+
+详见 `skills/academic-paper-writer/references/reporting-checklist.md`。对 Experimental Setup / Main Results / Ablation 等实验相关 section，按以下类别检查：
+- 计算资源（GPU、训练时长、内存）
+- 可复现性（随机种子、代码链接、环境配置）
+- 实验设计（交叉验证、超参数搜索、早停策略）
+- 基线比较（实现来源、公平比较、超参数调优）
+- 统计显著性（方差/置信区间、统计检验方法）
+- 伦理声明（数据许可、隐私保护、偏见分析）
+
+---
+
 ## Method 专项检查
 
 若当前 section 是 Method，额外检查：

@@ -1,6 +1,6 @@
 ---
 name: academic-polishing
-description: "Polish academic prose, de-AI-ify text, control claim strength, or rewrite method sections for CS/AI/ML papers. Executes Prose Quality Gate, Claim Strength Audit, and de-AI pass."
+description: "Polish academic prose, de-AI-ify text, control claim strength, or rewrite method sections for CS/AI/ML papers. Executes Prose Quality Gate, Claim Strength Audit, and de-AI pass. Use when: removing AI writing patterns from paper text, adjusting claim strength to match evidence level, rewriting method sections with proper narrative flow, improving academic writing quality, checking for overclaiming. Triggers on: 润色, polish, improve writing, 去AI, de-AI, claim strength, 改写, rewrite method, prose quality, 降级表述, remove AI patterns, academic writing polish, 学术润色, 去AI化, 降级结论."
 ---
 
 # Academic Polishing
