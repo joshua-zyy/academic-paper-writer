@@ -45,6 +45,12 @@
     code, pre {
       font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
     }
+    p code {
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(255,255,255,.08);
+      font-size: .92em;
+    }
 
     .shell {
       width: min(var(--max), calc(100% - 40px));
@@ -535,18 +541,6 @@
       color: #e1edff;
     }
 
-    .scenario {
-      display: flex;
-      gap: 14px;
-      padding: 18px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.065);
-      border: 1px solid var(--line);
-    }
-
-    .scenario strong { display: block; margin-bottom: 4px; }
-    .scenario p { margin: 0; color: var(--muted); font-size: 14px; }
-
     .ok-bad {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -600,6 +594,30 @@
     .tree .tl-s { color: var(--blue); }
     .tree .tl-n { color: var(--cyan); }
     .tree .tl-e { color: var(--purple); }
+
+    .dispatch {
+      display: flex;
+      align-items: center;
+      padding: 20px 24px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      overflow-x: auto;
+    }
+
+    .dispatch pre {
+      margin: 0;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre;
+    }
+
+    .dispatch .dp-orch { color: #fff; font-weight: 600; }
+    .dispatch .dp-tb   { color: rgba(255,255,255,.2); }
+    .dispatch .dp-ag   { color: var(--cyan); }
+    .dispatch .dp-na   { color: var(--muted); font-style: italic; }
+    .dispatch .dp-note { color: var(--muted); font-style: normal; }
 
     .feedback {
       text-align: center;
@@ -663,6 +681,7 @@
         <a href="#pain">痛点</a>
         <a href="#skills">Skills</a>
         <a href="#workflow">工作流</a>
+        <a href="#dispatch">派发</a>
         <a href="#start">快速开始</a>
         <a href="#boundary">安全边界</a>
       </div>
@@ -845,63 +864,61 @@
       </div>
     </section>
 
-    <section id="start">
+    <section id="dispatch">
       <div class="shell split">
         <div>
-          <p class="section-kicker">Quick Start</p>
-          <h2>三步加载，材料越完整越稳定</h2>
-          <div class="steps">
-            <div class="step">
-              <div>
-                <h3>获取仓库</h3>
-                <p>clone 项目到本地，先阅读 README 和核心 SKILL.md</p>
-              </div>
-            </div>
-            <div class="step">
-              <div>
-                <h3>加载 Skill</h3>
-                <p>完整论文加载核心编排器；单项任务可直接加载对应子 skill</p>
-              </div>
-            </div>
-            <div class="step">
-              <div>
-                <h3>准备输入材料</h3>
-                <p>提供代码仓库、目标 venue、实验日志、草稿、outline 和贡献点</p>
-              </div>
-            </div>
-          </div>
+          <p class="section-kicker">Dispatch Model</p>
+          <h2>编排器派发 sub-agent，各司其职</h2>
+          <p class="section-desc" style="max-width: 620px; margin-top: 18px;">核心编排器不直接处理所有任务——引用核验、实验复核、图表生成、终审验证通过 <code>task()</code> 派发给专业 sub-agent 独立执行；润色则由编排器内化调用规则自行完成，确保文体风格一致</p>
         </div>
-        <div class="codebox" aria-label="快速开始代码">
-          <pre>git clone https://github.com/joshua-zyy/academic-paper-writer.git
-
-# 完整论文工作流
-load skills/academic-paper-writer/SKILL.md
-
-# 单一专项任务
-load skills/academic-citation/SKILL.md
-load skills/academic-experiments/SKILL.md
-load skills/academic-reviser/SKILL.md
-load skills/academic-polishing/SKILL.md
-load skills/academic-figure/SKILL.md</pre>
+        <div class="dispatch" aria-label="编排派发模型">
+          <pre><span class="dp-orch">主编排器</span><span class="dp-tb"> ──┬── </span><span class="dp-ag">引用核验</span><span class="dp-tb"> ──── </span><span class="ta">文献检索与 VERIFIED 判定</span>
+<span class="dp-tb">          ├── </span><span class="dp-ag">实验复核</span><span class="dp-tb"> ──── </span><span class="ta">实验日志与结果表核验</span>
+<span class="dp-tb">          ├── </span><span class="dp-na">润色</span><span class="dp-tb"> ──────── </span><span class="ta">Prose Gate · Claim 强度审计</span><span class="dp-tb">  </span><span class="dp-note">(内化执行)</span>
+<span class="dp-tb">          ├── </span><span class="dp-ag">图表生成</span><span class="dp-tb"> ──── </span><span class="ta">数据可视化与架构图代码</span>
+<span class="dp-tb">          └── </span><span class="dp-ag">终审验证</span><span class="dp-tb"> ──── </span><span class="ta">审稿人视角 · 三轮自审</span>
+<span class="dp-tb">          </span><span class="dp-note">4 dispatch · 1 内化 · 并行执行 · 统一 Gate 管控</span></pre>
         </div>
       </div>
     </section>
 
-    <section id="examples">
-      <div class="shell">
-        <div class="section-head">
-          <div>
-            <p class="section-kicker">Use Cases</p>
-            <h2>典型使用方式</h2>
+    <section id="start">
+      <div class="shell split">
+        <div>
+          <p class="section-kicker">Quick Start</p>
+          <h2>三步走：加载 → 派发 → 汇总</h2>
+          <div class="steps">
+            <div class="step">
+              <div>
+                <h3>① 加载编排器</h3>
+                <p>加载核心 <code>SKILL.md</code>，自动注册 5 个 built-in sub-agent 及其能力边界</p>
+              </div>
+            </div>
+            <div class="step">
+              <div>
+                <h3>② 派发子任务</h3>
+                <p>编排器通过 <code>task()</code> 向对应 sub-agent 派发任务，各 agent 独立执行互不干扰</p>
+              </div>
+            </div>
+            <div class="step">
+              <div>
+                <h3>③ 汇总验证</h3>
+                <p>编排器收集各 agent 输出，执行 Hard Gates 验证，通过后推进到下一节</p>
+              </div>
+            </div>
           </div>
-          <p class="section-desc">可以完整写论文，也可以只做引用核验、实验复核、Method 润色或图表生成</p>
         </div>
+        <div class="codebox" aria-label="dispatch 代码示例">
+          <pre>load skills/academic-paper-writer/SKILL.md
 
-        <div class="grid-2">
-          <div class="scenario"><span>📄</span><div><strong>完整论文起草</strong><p>“我有一个图神经网络项目仓库，想写一篇投 NeurIPS 的论文请按 section 逐节推进”</p></div></div>
-          <div class="scenario"><span>✨</span><div><strong>单独润色 Method</strong><p>“帮我改成论文正文口吻，但不要把不确定的设计动机写成已确认事实”</p></div></div>
-          <div class="scenario"><span>🔗</span><div><strong>单独做引用核验</strong><p>“帮我为 Introduction 找 5–8 篇 VERIFIED 引用，并生成 Citation-to-Claim Map”</p></div></div>
-          <div class="scenario"><span>🔬</span><div><strong>单独做实验复核</strong><p>“先盘点 checkpoint、日志和结果表，尽量用最小可复核方式确认 Main Results”</p></div></div>
+# sub-agent 派发（并行执行）
+task("引用核验", academic-citation)
+task("实验复核", academic-experiments)
+task("图表生成", academic-figure)
+task("终审验证", academic-reviser)
+
+# 润色由编排器内化执行（不 dispatch 子 agent）
+# 主 agent 读取 polishing 规则后自行完成</pre>
         </div>
       </div>
     </section>
