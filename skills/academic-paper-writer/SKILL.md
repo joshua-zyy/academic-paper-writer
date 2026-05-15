@@ -20,7 +20,82 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 ## 编排流程
 
-`Step 0(判定mode) → Step 1(确认venue/language+本地文献库) → Step 1b(可选:PDF→MD准备) → Step 2(证据审计) → Step 3(文献检索:3a本地优先+3b联网+3c聚合) → Step 4(实验复核) → Step 5(Section Blueprint) → Step 6(Draft v1) → Step 7(占位符审计+图表生成) → Step 8(证据合规审查) → Step 9(Prose质量门,内化) → Step 10(扩写检查) → Step 11(综合验证) → Step 12(section loop) → Step 12e(引用清单生成)`
+`Step 0(判定mode) → Step 1(Checklist:venue/language/min_citations+本地文献库) → Step 1b(可选:PDF→MD) → Step 2(证据审计) → Step 3(文献检索) → Step 4(实验复核) → Step 5(Blueprint) → Step 6(Section Complete Loop:探查+Draft+审查+润色+验证) → Step 12(section loop) → Step 12e(引用清单)`
+
+**核心概念：Section Complete Loop（Step 6）**
+
+每节是一个完整的闭环，包含以下阶段，**不可跳过任何阶段**：
+
+```
+Step 6: Section Complete Loop
+├── Phase 1: 起草
+│   ├── 6.1 前置探查（按section类型dispatch）
+│   ├── 6.2 Draft v1（含占位符+待补项清单）
+│   └── 6.3 写入paper_draft.md
+├── Phase 2: 审查与润色（自动执行，不暂停）
+│   ├── 6.4 占位符审计 + 图表生成
+│   ├── 6.5 证据合规审查
+│   ├── 6.6 Prose质量门
+│   ├── 6.7 扩写检查
+│   └── 6.8 综合验证
+└── Phase 3: 整合
+    └── 6.9 更新Cumulative Draft → 推进到下一节
+```
+
+**Draft v1 ≠ 初稿完成**。只有完成Step 6.8（综合验证）的section才算初稿完成。
+
+## Step 1 执行清单（Blocking Gate）
+
+执行Step 1时，**必须按以下顺序逐项完成**。任一未完成不得进入Step 2。
+
+```markdown
+## Step 1 Checklist
+
+- [ ] 1. **确认venue**（Blocking）
+      - 询问："目标期刊/会议是？"
+      - 用户未决定 → 提供2-3个建议
+      - 用户说"你决定" → agent自主选择并告知
+      
+- [ ] 2. **确认language**
+      - 询问："论文用中文还是英文撰写？"
+      - 未指定 → 默认英文
+      
+- [ ] 3. **确认min_citations**
+      - 询问："预期参考文献数量？（默认35篇，short paper建议20，workshop建议15）"
+      - 未指定 → 默认35
+      
+- [ ] 4. **询问本地文献库**
+      - 询问："是否有本地文献库（存放PDF的目录）？"
+      - 有 → 记录路径，进入第5项
+      - 没有 → 跳过第5项
+      
+- [ ] 5. **本地文献库处理**（仅当第4项为"有"时）
+      - 检查markitdown是否已安装
+      - 未安装 → 提供安装命令：`pip install markitdown`
+      - 输出PDF→MD转换提示（见下方模板）
+      - 确认用户已收到提示
+      
+- [ ] 6. **以上全部完成** → 进入Step 2
+```
+
+### Step 1b 转换提示模板（第5项使用）
+
+当用户有本地文献库时，**必须**输出以下提示：
+
+```
+本地文献库已确认: <local_lit_pdf_dir>
+
+请先确保 markitdown 已安装（如未安装）：
+  pip install markitdown
+
+然后从项目根目录运行以下命令：
+  python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_lit_pdf_dir> <local_lit_md_dir>
+
+转换完毕后请告知我，我将从本地文献库中搜索可引用的文献。
+（在此期间我将先进行项目证据审计和联网文献检索）
+```
+
+输出提示后，**立即进入Step 2**，不等待转换完成。
 
 ## Red Lines（绝对禁止）
 
@@ -47,14 +122,13 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 8. **审查备注分离**：审查备注、Critique/Audit Notes 不得混入论文正文。论文正文写入 `paper_draft.md`，审查备注在 agent 上下文中维护或按需在对话中输出。
 9. **Abstract/Conclusion 后置**：必须等到主要证据稳定后再写，不得在结果未稳时抢先写成完整定稿。
 10. **引用闭合**：需要文献支撑的段落必须有 inline citation 或 `[REF_NEEDED: ...]`。参考文献列表只能包含正文中被引用或已声明的条目。
-11. **一轮闭环**：当前 section 至少经历 Draft v1 → Prose Quality Gate → Expansion → Self-Review → Revised Draft v2 → Verification。不得把 v1 当作完成稿交付。
+11. **Section Complete Loop**：每节必须完成 Step 6 的完整闭环（Phase 1 起草 → Phase 2 审查润色 → Phase 3 整合）。**Draft v1 ≠ 初稿完成**，只有完成 Step 6.8（综合验证）的section才算初稿完成。
 12. **失败不伪装**：Verification 未通过且非外部阻塞时，必须继续下一轮修订，不得直接结束或假装通过。
-13. **完整流程执行**：执行 full-paper-planning 时，必须按 Step 0→1→1b(若适用)→2→3(3a→3b→3c)→4→5→...→12 的顺序逐一执行，不得跳步。用户催促时也不得跳过证据审计（Step 2）、文献检索（Step 3）、实验复核（Step 4）、Hard Gates（A/B/C）中的任何一个。
+13. **完整流程执行**：执行 full-paper-planning 时，必须按 Step 0→1→1b(若适用)→2→3(3a→3b→3c)→4→5→6→12 的顺序逐一执行，不得跳步。用户催促时也不得跳过证据审计（Step 2）、文献检索（Step 3）、实验复核（Step 4）、Hard Gates（A/B/C）中的任何一个。
 14. **引用产物必输出**：Step 3 完成后，必须在上下文中维护 Verified References 列表和 Citation-to-Claim Map。缺少任一 → 不得进入 Step 6。
-15. **探查前置**：起草任何 section（Step 6）前，必须先检查是否需要深层探查。需要 → 先 dispatch 再起草；不需要 → 记录 `deep_probe: skipped`。
-16. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 `min_citations`（默认 35，用户可在 Step 0 指定；short paper 建议 20，workshop 建议 15）。论文完成后 Step 12e 生成引用清单时自动核验。
-17. **两阶段写作**：Step 5 Blueprint 可使用 bullet points 和提纲式结构，但 Step 6 Draft v1 必须是完整 prose 段落。bullet points 仅用于规划阶段，不得出现在最终论文正文中。
-18. **最大迭代次数**：修订循环（Step 10→11→12）最多执行 3 轮。3 轮后仍有未闭合 debt 时，标记为 `unresolvable`，输出修订报告并终止循环，不得继续重试。
+15. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 `min_citations`（默认 35，short paper 建议 20，workshop 建议 15）。**Step 1 必须询问用户预期引用数量**，用户指定时记录为 `min_citations`，未指定时使用默认值。论文完成后 Step 12e 生成引用清单时自动核验。
+16. **两阶段写作**：Step 5 Blueprint 可使用 bullet points 和提纲式结构，但 Step 6 Draft v1 必须是完整 prose 段落。bullet points 仅用于规划阶段，不得出现在最终论文正文中。
+17. **最大迭代次数**：修订循环（Step 6.7→6.8→12）最多执行 3 轮。3 轮后仍有未闭合 debt 时，标记为 `unresolvable`，输出修订报告并终止循环，不得继续重试。
 
 ## 文件输出规范
 
@@ -85,10 +159,10 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 | DP | 位置 | Agent 展示 | 用户操作 |
 |----|------|-----------|---------|
-| DP-1 | Step 1 完成后 | Venue Brief 摘要（venue、语言、本地文献库状态） | 确认/修正 venue 和语言 |
+| DP-1 | Step 1 完成后 | Venue Brief 摘要（venue、语言、min_citations、本地文献库状态） | 确认/修正 |
 | DP-2 | Step 5 Blueprint 完成后 | Section Blueprint（章节结构、每节要点、证据来源） | 确认/调整 Blueprint |
-| DP-3 | Step 6 Draft v1 完成后 | Draft 摘要（当前节、段落数、待补项清单摘要） | 确认方向/指出问题 |
-| DP-4 | Step 11 Verification 完成后 | Verification Status（verdict、overall score、未闭合问题） | 确认通过/要求修订 |
+| DP-3 | Step 6.2 Draft v1 完成后 | Draft 摘要（当前节、段落数、待补项清单摘要） | 确认方向/指出问题 |
+| DP-4 | Step 6.8 Verification 完成后 | Verification Status（verdict、overall score、未闭合问题） | 确认通过/要求修订 |
 
 **模式行为**：
 - `auto` 模式：DP 仅输出简短摘要，不暂停，继续推进
@@ -112,13 +186,13 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 ## 完整性门控（Hard Gates）
 
-以下三种门控是不可跳过的完整性检查关卡。任一未通过不得进入下一阶段。详细条件和失败处理见 `references/orchestration-workflow.md`。
+以下门控是不可跳过的完整性检查关卡。任一未通过不得进入下一阶段。详细条件和失败处理见 `references/orchestration-workflow.md`。
 
 | Gate | 触发位置 | 核心条件 | 失败处理 |
 |------|---------|---------|---------|
 | A: 证据完备 | Step 2 → Step 6 | 至少一条可引用证据（`newly_run`/`preexisting_artifact`） | 降级路径或阻塞 |
 | B: 引用就绪 | Step 3 → Step 6 | 至少一条 `VERIFIED` 引用或明确"无需文献" | 按 section 分流，Intro/RW 阻塞，Method 可占位 |
-| C: Verification | Step 11 → Step 12 | 所有 debt 闭合 + `thin_draft = no` | passed/blocked/failed，详细见 workflow |
+| C: Verification | Step 6.8 → Step 12 | 所有 debt 闭合 + `thin_draft = no` | passed/blocked/failed，详细见 workflow |
 | D: 引用数量 | Step 12e → 输出 | 全文去重后引用总数 >= `min_citations`（默认 35） | 未达标时提醒用户，可继续补充后重检 |
 
 ## 默认交付物
@@ -167,11 +241,16 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 详见 `references/iteration-control.md`。
 
-节级最小闭环：`Draft v1 → 证据合规审查 → Prose Quality Gate → Expansion → Self-Review → Revised Draft v2 → Verification`。
+节级最小闭环（Step 6 Section Complete Loop）：
+```
+Phase 1: 6.1 前置探查 → 6.2 Draft v1 → 6.3 写入文件
+Phase 2: 6.4 占位符审计+图表 → 6.5 证据合规 → 6.6 Prose质量门 → 6.7 扩写检查 → 6.8 综合验证
+Phase 3: 6.9 整合 → 推进到下一节
+```
 
 退出当前 section 的条件：
-- Verification passed
-- Verification blocked 且 safe_to_continue = yes
+- Step 6.8 Verification passed
+- Step 6.8 Verification blocked 且 safe_to_continue = yes
 - 用户明确要求暂停
 
 不退出条件：
@@ -185,26 +264,62 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 | Step | 动作 | 委托方式 | 触发方式 |
 |------|------|---------|---------|
 | 0 | 判定 mode、scope、当前 section | — | 自动 |
-| 1 | 确认 venue / 语言 + 本地文献库询问（Blocking Gate） | — | 自动 |
-| 1b | 可选：PDF→MD 转换准备（生成脚本+提示用户，不阻塞） | — | 自动（条件执行） |
+| 1 | **Checklist**：确认 venue/language/min_citations + 本地文献库（Blocking Gate） | — | 自动 |
+| 1b | 可选：PDF→MD 转换（提示用户运行，不阻塞） | — | 自动（条件执行） |
 | 2 | 证据审计（dispatch probe agents） | — | 自动 |
 | 3 | 文献检索与核验（3a 本地优先 + 3b 联网 + 3c 聚合） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 |
 | 4 | 实验事实复核 | `academic-experiments`（dispatch 子 Agent） | 自动 |
 | 5 | 生成 Section / Method Blueprint | — | 自动 |
-| 6 | 起草 Draft v1（含占位符系统 + **待补项清单**） | — | 自动 |
-| 7 | 占位符审计 + 图表生成 | `academic-figure`（dispatch 子 Agent，arch-prompt） | 自动 |
-| 8 | 证据合规审查（Phase 1） | `academic-reviser`（dispatch 子 Agent） | 自动 |
-| 9 | Prose Quality Gate（Phase 2） | `academic-polishing`（**内化调用**，主 Agent 自行执行） | 自动 |
-| 10 | Expansion Pass（内容密度检查） | — | 自动 |
-| 11 | Self-Review & Verification | `academic-reviser`（dispatch 子 Agent） | 自动 |
+| **6** | **Section Complete Loop**（见下方详细说明） | — | 自动 |
 | 12 | 整合 & 依赖感知 section loop | — | 自动 |
 | 12e | **引用清单生成**（强制，论文完成时必执行） | — | 自动 |
 
-各步骤的详细 dispatch 模板、输入输出格式、子步骤顺序与失败处理见 `references/orchestration-workflow.md` 和 `references/workflow-step-*.md`。
+### Step 6: Section Complete Loop（详细说明）
 
-### Step 6 必附：待补项清单
+每节必须完成以下完整流程，**Draft v1 ≠ 初稿完成**：
 
-Draft v1 生成后，**必须**在正文末尾追加待补项清单。模板见 `references/workflow-step-5-8.md` Step 7d。
+```markdown
+## Step 6 执行清单
+
+### Phase 1: 起草
+- [ ] 6.1 前置探查（按section类型dispatch，见下方探查规则表）
+- [ ] 6.2 生成Draft v1（含占位符系统 + 待补项清单）
+- [ ] 6.3 写入paper_draft.md
+
+### Phase 2: 审查与润色（自动执行，不暂停）
+- [ ] 6.4 占位符审计 + 图表生成（academic-figure）
+- [ ] 6.5 证据合规审查（academic-reviser）
+- [ ] 6.6 Prose质量门（academic-polishing，内化调用）
+- [ ] 6.7 扩写检查（内容密度）
+- [ ] 6.8 综合验证（academic-reviser）
+
+### Phase 3: 整合
+- [ ] 6.9 更新Cumulative Draft → 推进到下一节
+```
+
+### 6.1 前置探查规则表
+
+在起草前，**必须**按以下规则决定是否dispatch探查：
+
+| Section | 探查任务 | 并行策略 |
+|---------|---------|---------|
+| **Method** | `code_structure` + `preprocessing` | **必须并行**（同时发出两个Task） |
+| **Experimental Setup** | `experiment_setup` | 单探查 |
+| **Main Results / Ablation** | `experiment_results` | 单探查 |
+| **Discussion** | `interpretability` | 单探查 |
+| **Introduction / Related Work** | 无需深层探查（Step 2 已完成） | — |
+
+**dispatch模板**见 `references/workflow-step-0-4.md` 的 `### 单探查 dispatch 模板` 和 `### 并行 dispatch 模板`。
+
+### 各步骤详细参考
+
+| 子步骤 | 详细说明 | 委托方式 |
+|--------|---------|---------|
+| 6.4 占位符审计 + 图表生成 | `references/workflow-step-5-8.md` Step 7 | `academic-figure`（dispatch） |
+| 6.5 证据合规审查 | `references/workflow-step-5-8.md` Step 8 | `academic-reviser`（dispatch） |
+| 6.6 Prose质量门 | `references/workflow-step-9-12.md` Step 9 | `academic-polishing`（内化） |
+| 6.7 扩写检查 | `references/workflow-step-9-12.md` Step 10 | 主Agent自行执行 |
+| 6.8 综合验证 | `references/workflow-step-9-12.md` Step 11 | `academic-reviser`（dispatch） |
 
 ## 跨技能数据契约（Schemas）
 
@@ -236,14 +351,14 @@ Agent 定义与 dispatch 模板见各子 skill 的 `agents/` 目录。
 | Step 3 | `academic-citation` | `citation_agent.md` | `skills/academic-citation/agents/` | 检索与核验 |
 | Step 3a/3b | `academic-citation` | `literature-reader-agent.md` | `skills/academic-citation/agents/` | 阅读并输出报告 |
 | Step 4 | `academic-experiments` | `experiment_agent.md` | `skills/academic-experiments/agents/` | 实验复核 |
-| Step 7 | `academic-figure` | `figure_agent.md` | `skills/academic-figure/agents/` | 图表生成 |
-| Step 8/11 | `academic-reviser` | `reviser_agent.md` | `skills/academic-reviser/agents/` | 审查与验证 |
+| Step 6.4 | `academic-figure` | `figure_agent.md` | `skills/academic-figure/agents/` | 图表生成 |
+| Step 6.5/6.8 | `academic-reviser` | `reviser_agent.md` | `skills/academic-reviser/agents/` | 审查与验证 |
 
 ### 内化调用
 
 | 步骤 | Skill | 说明 |
 |------|-------|------|
-| Step 9 | `academic-polishing` | 主 Agent 自行执行，确保风格一致 |
+| Step 6.6 | `academic-polishing` | 主 Agent 自行执行，确保风格一致 |
 
 ### 职责边界
 
@@ -257,14 +372,14 @@ Agent 定义与 dispatch 模板见各子 skill 的 `agents/` 目录。
 | `references/paper-structure.md` | 选章节结构时 |
 | `references/writing-guidelines.md` | venue 风格适配时 |
 | `references/iteration-control.md` | 进入修订循环时 |
-| `references/content-density.md` | Step 10 Expansion Pass |
-| `references/figure-generation-guide.md` | Step 7 生成图表时 |
+| `references/content-density.md` | Step 6.7 扩写检查 |
+| `references/figure-generation-guide.md` | Step 6.4 生成图表时 |
 | `references/exemplar-introduction.md` 等 | 写对应章节前（Exemplar < 3 篇时） |
 | `references/evidence-classification.md` | Step 2 证据审计 |
-| `references/placeholder-guide.md` | Step 6 生成 Draft |
+| `references/placeholder-guide.md` | Step 6.2 生成 Draft |
 | `references/mode-spectrum.md` | Step 0 选择模式 |
 | `references/data-access-levels.md` | 理解数据访问边界 |
-| `references/reporting-checklist.md` | Step 8 证据合规审查 / 实验相关 section 检查 |
+| `references/reporting-checklist.md` | Step 6.5 证据合规审查 / 实验相关 section 检查 |
 | `skills/academic-citation/scripts/convert-pdfs-to-md.py` | Step 1b PDF→MD |
 | `shared/references/concepts.md` | 跨技能共享概念速查 |
 

@@ -35,18 +35,23 @@ Blocking confirmations — must stop and ask if missing:
    - **一次性确认**：语言确认后全程不再重复询问。
 3. **Continuation mode**: Default to `auto` (automatic section advancement). If user prefers step-by-step confirmation, record `continuation_mode = step-by-step`.
 4. **Current section**: Determined by Step 0 if user did not specify.
+5. **预期引用数量（min_citations）**：**必须询问**用户预期的参考文献数量。
+   - 询问方式："您预期这篇论文的参考文献数量大约是多少篇？（默认 35 篇，short paper 建议 20 篇，workshop 建议 15 篇）"
+   - 用户指定时记录为 `min_citations`
+   - 用户未指定或说"默认"时使用默认值 35
+   - **一次性确认**：确认后全程不再重复询问，Step 12e 生成引用清单时自动核验。
 
 If venue is known and relevant, read `references/writing-guidelines.md` and form a brief Venue / Language Brief.
 
 ### 本地文献库（强制询问，与 venue 同属 Blocking Gate）
 
-**venue/language 确认后立即询问，在进入 Step 2 前必须给出明确答案**：
+**venue/language/min_citations 确认后立即询问，在进入 Step 2 前必须给出明确答案**：
 
 - 是否在当前项目中维护了本地文献库（存放待引用 PDF 论文的目录）？
   - 有 → 记录路径为 `local_lit_pdf_dir`
   - 没有 → `local_lit_pdf_dir = null`，跳过本地文献流程
 - 如果有，告知将在其同级创建 `papersToMd/` 目录存放转换后的 MD 文档
-- 检查 `markitdown` 是否已安装，未安装时提供命令：
+- **必须检查 `markitdown` 是否已安装**，未安装时提供命令：
   ```
   pip install markitdown
   ```
@@ -77,9 +82,9 @@ md_output_dir = <local_lit_pdf_dir>/../papersToMd/
 ```
 记录为 `local_lit_md_dir`。
 
-### 1b.3 提示用户运行（不阻塞）
+### 1b.3 提示用户运行（强制，不可跳过）
 
-在对话中输出以下提示，**然后立即进入 Step 2**，不等待转换完成：
+**必须**在对话中输出以下提示，**然后立即进入 Step 2**，不等待转换完成。此提示为强制输出，不得因任何原因跳过：
 
 ```
 本地文献库已确认: <local_lit_pdf_dir>
