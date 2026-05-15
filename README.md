@@ -52,7 +52,7 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 
 ## 💬 反馈与改进
 
-我是一名在读硕士研究生，目前独自迭代与维护这个项目，必然会陷入思维逻辑的困境，所以非常重视与欢迎各位researcher提出在实际使用中遇到的问题以及对项目的改进想法。
+目前独自迭代与维护这个项目，必然会陷入思维逻辑的困境，所以非常重视与欢迎各位researcher提出在实际使用中遇到的问题以及对项目的改进想法。
 
 如果您在使用过程中：
 
@@ -60,7 +60,7 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 - 💡 **有改进建议** — 觉得某个步骤可以优化、需要新的 skill 或 probe
 - 🤔 **有疑问** — 不确定某个设计为什么这样、或者想了解最佳实践
 
-欢迎通过 [GitHub Issues](https://github.com/joshua-zyy/academic-paper-writer/issues) 提交反馈。每条 issue 描述清楚复现步骤或期望行为即可，我会定期查看并纳入迭代计划。
+通过 [GitHub Issues](https://github.com/joshua-zyy/academic-paper-writer/issues) 提交反馈。每条 issue 描述清楚复现步骤或期望行为即可，我会定期查看并纳入迭代计划。
 
 项目正在积极优化中，欢迎各位researcher star 和 fork 项目，一起推动项目发展。
 
