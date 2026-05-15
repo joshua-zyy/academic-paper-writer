@@ -1,9 +1,8 @@
 # Evidence Inventory Schema — 跨技能数据契约
 
-本文件的权威版本维护在 `skills/shared/schemas/evidence-inventory.md`。
-如需查看完整结构定义和示例，请读取该文件。
+**本文件为权威版本（source of truth）。**
 
-**用途**: 论文编排器、实验复核、审修技能之间的证据盘点数据交换格式。
+**用途**: 实验技能到论文编排器之间的实验证据数据交换格式。
 **生产者**: `academic-experiments`, `academic-paper-writer` (Step 2)
 **消费者**: `academic-paper-writer` (Step 6), `academic-reviser` (Step 8/11)
 

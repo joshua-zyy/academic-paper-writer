@@ -1,7 +1,6 @@
 # Verified References Schema — 跨技能数据契约
 
-本文件的权威版本维护在 `skills/shared/schemas/verified-references.md`。
-如需查看完整结构定义和示例，请读取该文件。
+**本文件为权威版本（source of truth）。**
 
 **用途**: 文献检索技能到论文编排器之间的引用数据交换格式。
 **生产者**: `academic-citation`

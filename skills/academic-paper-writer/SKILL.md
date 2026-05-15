@@ -219,16 +219,15 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 Draft v1 生成后，**必须**在正文末尾追加待补项清单。模板见 `references/workflow-step-5-8.md` Step 7d。
 
-## 跨技能数据契约
+## 跨技能数据契约（Schemas）
 
-数据契约定义在各子 Skill 的 `references/schemas/` 中：
+| Schema 文件 | 生产者 | 消费者 | 用途 |
+|------------|--------|--------|------|
+| `skills/academic-citation/references/schemas/verified-references.md` | academic-citation | paper-writer, polishing | 引用数据交换 |
+| `skills/academic-experiments/references/schemas/evidence-inventory.md` | academic-experiments | paper-writer | 实验证据交换 |
+| `skills/academic-reviser/references/schemas/verification-report.md` | academic-reviser | paper-writer | 验证报告交换 |
 
-| 契约 | 生产者 → 消费者 |
-|------|----------------|
-| `academic-experiments/references/schemas/evidence-inventory.md` | `academic-experiments` → Step 6 |
-| `academic-citation/references/schemas/verified-references.md` | `academic-citation` → Step 6 |
-| `academic-citation/references/schemas/literature-reading-report.md` | `literature-reader-agent` → Step 3 |
-| `academic-reviser/references/schemas/verification-report.md` | `academic-reviser` → Step 11 |
+每个 schema 文件为其生产者 skill 的权威版本（source of truth）。
 
 各 Skill 的独立参考文件：
 

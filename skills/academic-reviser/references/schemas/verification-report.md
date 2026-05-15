@@ -1,11 +1,10 @@
 # Verification Report Schema — 跨技能数据契约
 
-本文件的权威版本维护在 `skills/shared/schemas/verification-report.md`。
-如需查看完整结构定义和示例，请读取该文件。
+**本文件为权威版本（source of truth）。**
 
 **用途**: 审修技能到论文编排器之间的验证状态交换格式。
 **生产者**: `academic-reviser`
-**消费者**: `academic-paper-writer` (Step 11)
+**消费者**: `academic-paper-writer` (Step 11, Step 12)
 
 ## 结构
 
