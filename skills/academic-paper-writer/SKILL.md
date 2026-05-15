@@ -52,7 +52,7 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 13. **完整流程执行**：执行 full-paper-planning 时，必须按 Step 0→1→1b(若适用)→2→3(3a→3b→3c)→4→5→...→12 的顺序逐一执行，不得跳步。用户催促时也不得跳过证据审计（Step 2）、文献检索（Step 3）、实验复核（Step 4）、Hard Gates（A/B/C）中的任何一个。
 14. **引用产物必输出**：Step 3 完成后，必须在上下文中维护 Verified References 列表和 Citation-to-Claim Map。缺少任一 → 不得进入 Step 6。
 15. **探查前置**：起草任何 section（Step 6）前，必须先检查是否需要深层探查。需要 → 先 dispatch 再起草；不需要 → 记录 `deep_probe: skipped`。
-16. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 35 篇。论文完成后 Step 12e 生成引用清单时自动核验。
+16. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 `min_citations`（默认 35，用户可在 Step 0 指定；short paper 建议 20，workshop 建议 15）。论文完成后 Step 12e 生成引用清单时自动核验。
 17. **两阶段写作**：Step 5 Blueprint 可使用 bullet points 和提纲式结构，但 Step 6 Draft v1 必须是完整 prose 段落。bullet points 仅用于规划阶段，不得出现在最终论文正文中。
 18. **最大迭代次数**：修订循环（Step 10→11→12）最多执行 3 轮。3 轮后仍有未闭合 debt 时，标记为 `unresolvable`，输出修订报告并终止循环，不得继续重试。
 
@@ -119,7 +119,7 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 | A: 证据完备 | Step 2 → Step 6 | 至少一条可引用证据（`newly_run`/`preexisting_artifact`） | 降级路径或阻塞 |
 | B: 引用就绪 | Step 3 → Step 6 | 至少一条 `VERIFIED` 引用或明确"无需文献" | 按 section 分流，Intro/RW 阻塞，Method 可占位 |
 | C: Verification | Step 11 → Step 12 | 所有 debt 闭合 + `thin_draft = no` | passed/blocked/failed，详细见 workflow |
-| D: 引用数量 | Step 12e → 输出 | 全文去重后引用总数 >= 35 篇（含本地+外部） | 未达标时提醒用户，可继续补充后重检 |
+| D: 引用数量 | Step 12e → 输出 | 全文去重后引用总数 >= `min_citations`（默认 35） | 未达标时提醒用户，可继续补充后重检 |
 
 ## 默认交付物
 
