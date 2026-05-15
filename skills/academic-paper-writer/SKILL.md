@@ -62,6 +62,7 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 15. **探查前置**：起草任何 section（Step 6）前，必须先检查是否需要深层探查。需要 → 先 dispatch 再起草；不需要 → 记录 `deep_probe: skipped`。
 16. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 35 篇。论文完成后 Step 12e 生成引用清单时自动核验。
 17. **两阶段写作**：Step 5 Blueprint 可使用 bullet points 和提纲式结构，但 Step 6 Draft v1 必须是完整 prose 段落。bullet points 仅用于规划阶段，不得出现在最终论文正文中。
+18. **最大迭代次数**：修订循环（Step 10→11→12）最多执行 3 轮。3 轮后仍有未闭合 debt 时，标记为 `unresolvable`，输出修订报告并终止循环，不得继续重试。
 
 ## 文件输出规范
 

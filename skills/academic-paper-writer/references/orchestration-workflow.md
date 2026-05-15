@@ -57,3 +57,29 @@ Cross-skill data contracts, shared concept references, and reference-loading gui
 When executing a concrete step in this file:
 - read the referenced schema under the relevant sub-skill's `references/schemas/` if the step consumes or produces structured cross-skill data
 - read the referenced file under `references/` when that step explicitly calls for it
+
+---
+
+## 迭代上限与降级规则
+
+修订循环（Step 10→11→12）最多执行 3 轮。每轮完成后记录 `revision_round` 计数。
+
+### 达到上限后的处理
+
+当 `revision_round >= 3` 且仍有未闭合 debt 时：
+
+1. 将所有未闭合 debt 标记为 `unresolvable`（而非 `open`）
+2. 生成 `Revision Limit Report`：
+   - 列出每个 unresolvable debt 的内容
+   - 说明为何无法闭合（证据不足/结构问题/风格分歧）
+   - 建议用户手动处理的方向
+3. Verdict 设为 `blocked`，终止循环
+4. 输出最终 Draft 并附带 Revision Limit Report
+
+### 各轮次行为差异
+
+| 轮次 | 行为 |
+|------|------|
+| 1 | 正常修订，修复所有 identified debt |
+| 2 | 聚焦未闭合 debt，不修改已闭合部分 |
+| 3 | 仅修复高优先级 debt，低优先级 debt 标记为 unresolvable |
