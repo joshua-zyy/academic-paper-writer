@@ -7,10 +7,6 @@ description: "Polish academic prose, de-AI-ify text, control claim strength, or 
 
 将此 skill 视为"学术文体打磨代理"——不是简单润色，而是执行 prose 质量闸门、去AI化改写、claim 强度控制和 Method 专项叙事强化。
 
-## 触发条件
-
-润色, polish, improve writing, 去AI, de-AI, claim strength, 改写, rewrite method, prose quality, 降级表述
-
 ## Red Lines（绝对禁止）
 
 1. 禁止将编造内容包装成学术表述

@@ -7,10 +7,6 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 
 将此 skill 视为"挑剔审稿人代理"——像 peer reviewer 一样审查自己的草稿，按证据→论证→风格三轮顺序执行检查，并输出可执行的修订与 Verification 判定。
 
-## 触发条件
-
-审修, self review, 自查, verification, revise, 修订, check draft, 审稿, evidence compliance
-
 ## Red Lines（绝对禁止）
 
 1. 禁止跳过检查顺序：必须证据→论证→风格，不得先修风格再查事实

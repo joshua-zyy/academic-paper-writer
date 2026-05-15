@@ -7,10 +7,6 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Two
 
 将此 skill 视为"学术论文图表代理"——负责 CS/AI/ML 论文中两类图表的生产：
 
-## 触发条件
-
-绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, model architecture, plot, publication figure
-
 | 路径 | 类型 | 产出方式 |
 |------|------|---------|
 | **A** | 实验数据图（训练曲线、消融实验、性能对比、混淆矩阵等） | Python (matplotlib/seaborn) 生成代码→执行→SVG/PDF/TIFF |

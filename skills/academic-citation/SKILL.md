@@ -7,10 +7,6 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
 
 将此 skill 视为"文献取证代理"，而不是搜索结果搬运器。
 
-## 触发条件
-
-找引用, 文献检索, citation pass, find references, reference check, 补文献, citation verification, Exemplar Set
-
 ## Red Lines（绝对禁止）
 
 1. 禁止编造文献、作者、年份、venue、DOI、arXiv 编号

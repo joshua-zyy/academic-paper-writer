@@ -7,10 +7,6 @@ description: "Audit, run, or verify experimental evidence for CS/AI/ML papers. P
 
 将此 skill 视为"实验取证代理"，目标是建立最短且可信的证据链，而不是尽量多跑实验。
 
-## 触发条件
-
-复核实验, run experiments, 实验结果, experiment evidence, verify results, 实验验证, evidence inventory, protocol risk
-
 ## Red Lines（绝对禁止）
 
 1. 禁止编造实验结果、图表、命令或运行日志
