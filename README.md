@@ -52,19 +52,48 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 
 ## 💬 反馈与改进
 
-独自迭代与维护这个项目，必然会陷入思维逻辑的困境，所以非常重视与欢迎各位researcher提出在实际使用中遇到的问题以及对项目的改进想法。
+<p align="center">
+  <em>独自迭代与维护这个项目，必然会陷入思维逻辑的困境</em><br>
+  <strong>非常重视与欢迎各位 researcher 提出在实际使用中遇到的问题以及对项目的改进想法</strong>
+</p>
 
-如果您在使用过程中：
+<table align="center">
+<tr>
+<td align="center"><strong>🐛 遇到问题</strong></td>
+<td align="center"><strong>💡 有改进建议</strong></td>
+<td align="center"><strong>🤔 有疑问</strong></td>
+</tr>
+<tr>
+<td>工作流卡住、gate 误判、文档不清晰</td>
+<td>觉得某个步骤可以优化、需要新的 skill 或 probe</td>
+<td>不确定某个设计为什么这样、或者想了解最佳实践</td>
+</tr>
+</table>
 
-- 🐛 **遇到问题** — 工作流卡住、gate 误判、文档不清晰
-- 💡 **有改进建议** — 觉得某个步骤可以优化、需要新的 skill 或 probe
-- 🤔 **有疑问** — 不确定某个设计为什么这样、或者想了解最佳实践
+<p align="center">
+  <a href="https://github.com/joshua-zyy/academic-paper-writer/issues">
+    <img src="https://img.shields.io/badge/📝_提交反馈-GitHub_Issues-blue?style=for-the-badge" alt="提交反馈">
+  </a>
+</p>
 
-通过 [GitHub Issues](https://github.com/joshua-zyy/academic-paper-writer/issues) 提交反馈。每条 issue 描述清楚复现步骤或期望行为即可，我会定期查看并纳入迭代计划。
+<p align="center">
+  <em>每条 issue 描述清楚复现步骤或期望行为即可，我会定期查看并纳入迭代计划</em>
+</p>
 
-项目正在积极优化中，欢迎各位researcher star 和 fork 项目，一起推动项目发展。
+---
 
-图片绘制、文字润色、文献检索与引用正在积极完善中！！！
+### 🚧 开发进度
+
+<p align="center">
+  <img src="https://img.shields.io/badge/📊_图片绘制-积极完善中-purple" alt="图片绘制">
+  <img src="https://img.shields.io/badge/✨_文字润色-积极完善中-purple" alt="文字润色">
+  <img src="https://img.shields.io/badge/🔍_文献检索-积极完善中-purple" alt="文献检索">
+  <img src="https://img.shields.io/badge/📚_引用管理-积极完善中-purple" alt="引用管理">
+</p>
+
+<p align="center">
+  <strong>项目正在积极优化中，欢迎各位 researcher star 和 fork 项目，一起推动项目发展</strong>
+</p>
 
 ---
 
