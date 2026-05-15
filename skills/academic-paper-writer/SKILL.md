@@ -7,6 +7,19 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 将此 skill 视为"证据闭环型、分节推进的论文编排代理"。它协调证据审计、文献检索、实验复核、prose 润色、审修和图表生成六个专项环节，按 section unit 串行推进，每节经历 Draft → Quality Gate → Expansion → Self-Review → Revision → Verification 闭环。
 
+## ⚠️ Step 1 执行清单（Blocking Gate，必须首先执行）
+
+执行任何其他步骤之前，**必须**先完成以下6项：
+
+- [ ] 1. **确认venue**（Blocking）— 询问："目标期刊/会议是？"
+- [ ] 2. **确认language** — 询问："论文用中文还是英文撰写？"
+- [ ] 3. **确认min_citations** — 询问："预期参考文献数量？（默认35篇）"
+- [ ] 4. **询问本地文献库** — 询问："是否有本地文献库（存放PDF的目录）？"
+- [ ] 5. **本地文献库处理**（若有）— 检查markitdown + 输出转换提示
+- [ ] 6. **以上全部完成** → 进入Step 2
+
+详细说明见下方"Step 1 执行清单（Blocking Gate）"章节。
+
 ## 何时使用本 Skill vs. 子 Skill
 
 | 场景 | 使用 |
@@ -32,10 +45,13 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 **核心概念：Section Complete Loop（Step 6）**
 
-每节是一个完整的闭环，包含以下阶段，**不可跳过任何阶段**：
+**重要**：Step 6不是单个section，而是**每个section都要经历的完整流程**。
+
+对于Section Queue中的每个section（Introduction、Related Work、Method...），
+都必须执行以下6.1-6.9的完整流程，**不可跳过任何阶段**：
 
 ```
-Step 6: Section Complete Loop
+Step 6: Section Complete Loop（每个section的完整流程）
 ├── Phase 1: 起草
 │   ├── 6.1 前置探查（按section类型dispatch）
 │   ├── 6.2 Draft v1（含占位符+待补项清单）
@@ -47,7 +63,18 @@ Step 6: Section Complete Loop
 │   ├── 6.7 扩写检查
 │   └── 6.8 综合验证
 └── Phase 3: 整合
-    └── 6.9 更新Cumulative Draft → 推进到下一节
+    └── 6.9 更新Cumulative Draft → 按Section Queue推进下一节
+```
+
+**示例执行顺序**：
+```
+Step 0-5: 准备阶段
+Step 6 (Introduction): 6.1 → 6.2 → ... → 6.9
+Step 7: 推进到 Related Work
+Step 6 (Related Work): 6.1 → 6.2 → ... → 6.9
+Step 7: 推进到 Method
+Step 6 (Method): 6.1 → 6.2 → ... → 6.9
+...
 ```
 
 **Draft v1 ≠ 初稿完成**。只有完成Step 6.8（综合验证）的section才算初稿完成。
@@ -142,10 +169,11 @@ Step 6: Section Complete Loop
 
 1. **输出目录**：`./docs/paper-drafts/`
 2. **论文文件**：`paper_draft.md` — 论文正文 + 参考文献 + 待补项清单，逐步追加更新
-3. **图片目录**：`figures/` — `figure_prompts.md`（架构图提示词）+ `plot_*.py`（数据图代码）
-4. **对话输出限制**：禁止在对话中输出完整论文正文，仅显示简短进度摘要
-5. **写入时机**：每节 Draft 生成后、Verification 完成后，均须使用 Write/Edit 工具更新 `paper_draft.md`
-6. **中间状态**：Evidence Inventory、Verified References、Revision Queue 等在 agent 上下文中维护
+3. **Blueprint文件**：`section_blueprint.md` — Section Blueprint（Step 5输出，每节更新）
+4. **图片目录**：`figures/` — `figure_prompts.md`（架构图提示词）+ `plot_*.py`（数据图代码）
+5. **对话输出限制**：禁止在对话中输出完整论文正文，仅显示简短进度摘要
+6. **写入时机**：每节 Draft 生成后、Verification 完成后，均须使用 Write/Edit 工具更新 `paper_draft.md`
+7. **中间状态**：Evidence Inventory、Verified References、Revision Queue 等在 agent 上下文中维护
 
 ## 图表生成规范
 
