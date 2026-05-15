@@ -355,6 +355,9 @@
       overflow: hidden;
     }
 
+    a.card { display: block; text-decoration: none; color: inherit; }
+    a.card:hover { border-color: rgba(255,255,255,.25); }
+
     .card::after {
       content: "";
       position: absolute;
@@ -886,7 +889,9 @@
       <div class="shell split">
         <div>
           <p class="section-kicker">Quick Start</p>
-          <h2>三步走：加载 → 派发 → 汇总</h2>
+          <h2>三步走： </h2>
+          <h2>加载 → 派发 → 汇总</h2>
+          <br>
           <div class="steps">
             <div class="step">
               <div>
@@ -894,12 +899,14 @@
                 <p>加载核心 <code>SKILL.md</code>，自动注册 5 个 built-in sub-agent 及其能力边界</p>
               </div>
             </div>
+            <br>
             <div class="step">
               <div>
                 <h3>② 按阶段派发</h3>
                 <p>并行探查（probe-agent）→ 并行文献阅读（reader-agent）→ 顺序调研（citation、experiments）→ 章节循环（figure、reviser）</p>
               </div>
             </div>
+            <br>
             <div class="step">
               <div>
                 <h3>③ 汇总验证</h3>
@@ -908,9 +915,13 @@
             </div>
           </div>
         </div>
-        <div class="codebox" aria-label="dispatch 代码示例">
-          <pre>load skills/academic-paper-writer/SKILL.md
+        <div class="codebox" aria-label="快速开始代码">
+          <pre># 将以下命令复制到你的 agent 中执行
 
+git clone https://github.com/joshua-zyy/academic-paper-writer.git
+load skills/academic-paper-writer/SKILL.md
+
+# 编排器按阶段派发 sub-agent
 # 并行探查（写作前，同时 dispatch 3 个 probe-agent）
 task("code_structure",  probe-agent)
 task("data_artifacts",  probe-agent)
@@ -996,6 +1007,28 @@ task("终审验证", academic-reviser)
           <article class="card"><div class="icon">⚠️</div><h3>不混淆</h3><p>不把 UNVERIFIED 文献写成 VERIFIED，也不把 user claim 写成可引用证据</p></article>
           <article class="card"><div class="icon">📛</div><h3>不夸大</h3><p>不把内部验证包装成 SOTA、generalization 或 strong evidence</p></article>
           <article class="card"><div class="icon">📌</div><h3>不静默</h3><p>缺失信息必须显式保留 REF_NEEDED、RESULT_NEEDED 等占位符</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="references">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">References</p>
+            <h2>参考项目</h2>
+          </div>
+        </div>
+        <div class="grid-3">
+          <a class="card" href="https://github.com/obra/superpowers" target="_blank" rel="noreferrer">
+            <strong>⚡ superpowers</strong>
+          </a>
+          <a class="card" href="https://github.com/Yuan1z0825/nature-skills" target="_blank" rel="noreferrer">
+            <strong>🌿 nature-skills</strong>
+          </a>
+          <a class="card" href="https://github.com/Imbad0202/academic-research-skills" target="_blank" rel="noreferrer">
+            <strong>🎓 academic-research-skills</strong>
+          </a>
         </div>
       </div>
     </section>
