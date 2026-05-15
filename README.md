@@ -150,10 +150,10 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 以下 Python 脚本为可选工具，按需安装：
 
-| 脚本 | 用途 | 依赖 |
-|------|------|------|
-| `skills/academic-citation/scripts/convert-pdfs-to-md.py` | 将本地 PDF 文献转换为 Markdown（本地文献库功能） | Python 3.8+, `markitdown` 或 `PyMuPDF` |
-| `scripts/check_schemas.py` | 验证跨技能 schema 一致性 | Python 3.8+（标准库） |
+| 脚本 | 用途 | 依赖                         |
+|------|------|----------------------------|
+| `skills/academic-citation/scripts/convert-pdfs-to-md.py` | 将本地 PDF 文献转换为 Markdown（本地文献库功能） | Python 3.12+, `markitdown` |
+| `scripts/check_schemas.py` | 验证跨技能 schema 一致性 | Python 3.12+（标准库）          |
 
 安装命令：
 ```bash
