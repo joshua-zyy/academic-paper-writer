@@ -120,7 +120,7 @@ Step 6 (Method): 6.1 → 6.2 → ... → 6.9
 ```
 本地文献库已确认: <local_lit_pdf_dir>
 
-请先确保 markitdown 已安装（如未安装）：
+请先确保 markitdown 已安装（如未安装）, 需注意python版本>=3.12：
   pip install markitdown
 
 然后从项目根目录运行以下命令：
