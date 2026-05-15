@@ -228,8 +228,8 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 | Gate | 触发位置 | 核心条件 | 失败处理 |
 |------|---------|---------|---------|
-| 🅰️ **A：证据完备** | Step 2 → Step 6 | 至少一条可引用证据 | 降级路径或阻塞 |
-| 🅱️ **B：引用就绪** | Step 3 → Step 6 | 至少一条 VERIFIED 引用 | Intro/RW 阻塞；Method 可占位 |
+| 🔬 **A：证据完备** | Step 2 → Step 6 | 至少一条可引用证据 | 降级路径或阻塞 |
+| 📖 **B：引用就绪** | Step 3 → Step 6 | 至少一条 VERIFIED 引用 | Intro/RW 阻塞；Method 可占位 |
 | 🚪 **C：Verification** | Step 6.8 → Step 7 | 所有 debt 闭合 + 内容达标 | passed/blocked/failed |
 | 📚 **D：引用数量** | Step 8 → 输出 | 全文去重引用 >= `min_citations` 篇（默认 35） | 未达标时提醒，可补充后重检 |
 
