@@ -184,7 +184,7 @@ pip install markitdown pymupdf
 | 🅰️ **A：证据完备** | Step 2 → Step 6 | 至少一条可引用证据 | 降级路径或阻塞 |
 | 🅱️ **B：引用就绪** | Step 3 → Step 6 | 至少一条 VERIFIED 引用 | Intro/RW 阻塞；Method 可占位 |
 | 🚪 **C：Verification** | Step 11 → Step 12 | 所有 debt 闭合 + 内容达标 | passed/blocked/failed |
-| 📚 **D：引用数量** | Step 12e → 输出 | 全文去重引用 >= 35 篇 | 未达标时提醒，可补充后重检 |
+| 📚 **D：引用数量** | Step 12e → 输出 | 全文去重引用 >= `min_citations` 篇（默认 35） | 未达标时提醒，可补充后重检 |
 
 跨 skill 之间通过显式 **数据契约** 交换信息：
 
@@ -239,7 +239,7 @@ pip install markitdown pymupdf
 │   └── failed  →  ⬆️ 回到 Step 8 证据合规审查 重来                        │
 │                                                                          │
 │   📌 Abstract 后置 — 所有核心章节全部 passed 后才允许生成                  │
-│   📋 Step 12e  引用清单生成（**强制**，核验 >= 35 篇引用）                │
+│   📋 Step 12e  引用清单生成（**强制**，核验 >= `min_citations` 篇引用，默认 35）                │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -247,7 +247,7 @@ pip install markitdown pymupdf
 > - 📐 `section-drafting` 也要走完整闭环，只是缩小证据范围
 > - 🚧 Introduction / Related Work 在零 VERIFIED 引用时必须阻塞
 > - ⚡ Step 2 涉及多个 probe 时**必须并行** dispatch，不得串行
-> - 📋 论文完成时 Step 12e **强制**生成引用清单，核验 >= 35 篇引用
+> - 📋 论文完成时 Step 12e **强制**生成引用清单，核验 >= `min_citations` 篇引用（默认 35）
 
 ---
 
