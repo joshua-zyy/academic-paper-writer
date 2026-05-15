@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Academic Paper Writer：面向 CS / AI / ML 论文写作的模块化、证据驱动 Agent Skill 集合" />
+  <title>Academic Paper Writer | Evidence-first Paper Writing System</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --bg-soft: #0d1a2c;
+      --panel: rgba(255, 255, 255, 0.075);
+      --panel-strong: rgba(255, 255, 255, 0.12);
+      --text: #edf4ff;
+      --muted: #aab8cf;
+      --soft: #dce7f8;
+      --line: rgba(255, 255, 255, 0.14);
+      --blue: #5db7ff;
+      --cyan: #63e6d6;
+      --purple: #c59cff;
+      --red: #ff8f8f;
+      --yellow: #ffd36e;
+      --green: #7ddf9a;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+      --radius: 28px;
+      --radius-sm: 18px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.65;
+      background:
+        radial-gradient(circle at 8% 12%, rgba(93, 183, 255, 0.24), transparent 30%),
+        radial-gradient(circle at 88% 8%, rgba(197, 156, 255, 0.24), transparent 34%),
+        linear-gradient(135deg, #06101e 0%, #0b1322 48%, #111627 100%);
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    code, pre {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    .shell {
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .17;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, black, transparent 85%);
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(20px);
+      background: rgba(7, 17, 31, 0.72);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-inner {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      box-shadow: 0 14px 34px rgba(93, 183, 255, .24);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font-weight: 750;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .08);
+      color: var(--text);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, .13);
+      border-color: rgba(255,255,255,.26);
+    }
+
+    .btn.primary {
+      border: 0;
+      color: #06111f;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      box-shadow: 0 18px 42px rgba(93, 183, 255, .26);
+    }
+
+    .hero {
+      position: relative;
+      padding: 96px 0 64px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      align-items: center;
+      gap: 48px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(99, 230, 214, .10);
+      color: #bffbf4;
+      border: 1px solid rgba(99, 230, 214, .26);
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    h1 {
+      margin: 22px 0 18px;
+      font-size: clamp(44px, 7vw, 82px);
+      line-height: .98;
+      letter-spacing: -0.065em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #fff 0%, #b6dbff 38%, #d4b7ff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      margin: 0 0 28px;
+      max-width: 710px;
+      color: var(--soft);
+      font-size: clamp(18px, 2vw, 22px);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin: 28px 0 26px;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .badge {
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .hero-card {
+      position: relative;
+      padding: 26px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: -80px -80px auto auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: rgba(197, 156, 255, .22);
+      filter: blur(12px);
+    }
+
+    .terminal {
+      position: relative;
+      border: 1px solid rgba(255,255,255,.15);
+      background: rgba(3, 8, 17, .66);
+      border-radius: 22px;
+      overflow: hidden;
+    }
+
+    .terminal-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .dot { width: 11px; height: 11px; border-radius: 999px; background: var(--red); }
+    .dot:nth-child(2) { background: var(--yellow); }
+    .dot:nth-child(3) { background: var(--green); }
+
+    .terminal pre {
+      margin: 0;
+      padding: 22px;
+      color: #d8e8ff;
+      font-size: 14px;
+      overflow: auto;
+    }
+
+    .terminal .key { color: var(--cyan); }
+    .terminal .val { color: #ffdca0; }
+    .terminal .ok { color: var(--green); }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .metric {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid var(--line);
+    }
+
+    .metric b {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+      letter-spacing: -.03em;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    section { padding: 78px 0; }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .section-kicker {
+      margin: 0 0 10px;
+      color: var(--cyan);
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.1;
+      letter-spacing: -0.045em;
+    }
+
+    .section-desc {
+      max-width: 440px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      position: relative;
+      padding: 24px;
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, .16);
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.10), transparent 38%);
+      pointer-events: none;
+      opacity: .42;
+    }
+
+    .card > * { position: relative; z-index: 1; }
+    .icon {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      font-size: 23px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.12);
+      margin-bottom: 18px;
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      letter-spacing: -0.025em;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .pain .card:nth-child(1) { border-top: 3px solid var(--blue); }
+    .pain .card:nth-child(2) { border-top: 3px solid var(--cyan); }
+    .pain .card:nth-child(3) { border-top: 3px solid var(--red); }
+    .pain .card:nth-child(4) { border-top: 3px solid var(--purple); }
+
+    .statement {
+      padding: 34px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(99, 230, 214, .24);
+      background:
+        linear-gradient(135deg, rgba(99, 230, 214, .12), rgba(197, 156, 255, .08)),
+        rgba(255,255,255,.055);
+      margin-top: 22px;
+    }
+
+    .statement strong {
+      color: #ffffff;
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .skill-card {
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .skill-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .skill-title span:first-child { font-size: 30px; }
+    .skill-title h3 { margin: 0; }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .tag {
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.075);
+      border: 1px solid rgba(255,255,255,.10);
+      color: #d9e7fb;
+      font-size: 12px;
+    }
+
+    .workflow-wrap {
+      padding: 26px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.055);
+      border: 1px solid var(--line);
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .flow-step {
+      min-height: 118px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.13);
+      background: rgba(255,255,255,.07);
+      text-align: center;
+    }
+
+    .flow-step b { font-size: 15px; }
+    .flow-step span { margin-top: 6px; color: var(--muted); font-size: 12px; }
+
+    .gate-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .gate {
+      padding: 18px;
+      border-radius: 16px;
+      background: rgba(5, 12, 24, .46);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .gate b { color: #fff; }
+    .gate p { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+
+    .split {
+      display: grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .steps {
+      counter-reset: step;
+      display: grid;
+      gap: 14px;
+    }
+
+    .step {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 14px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      border-radius: 18px;
+    }
+
+    .step::before {
+      content: counter(step);
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: white;
+      font-weight: 900;
+    }
+
+    .step h3 { margin: 0 0 4px; font-size: 17px; }
+    .step p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .codebox {
+      border-radius: var(--radius-sm);
+      background: rgba(3, 8, 17, .72);
+      border: 1px solid rgba(255,255,255,.12);
+      overflow: hidden;
+    }
+
+    .codebox pre {
+      margin: 0;
+      padding: 22px;
+      overflow: auto;
+      font-size: 14px;
+      color: #e1edff;
+    }
+
+    .scenario {
+      display: flex;
+      gap: 14px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.065);
+      border: 1px solid var(--line);
+    }
+
+    .scenario strong { display: block; margin-bottom: 4px; }
+    .scenario p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .ok-bad {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .list {
+      list-style: none;
+      margin: 18px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .list li {
+      display: flex;
+      gap: 10px;
+      color: var(--soft);
+    }
+
+    .list li::before {
+      content: "✓";
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .list.no li::before { content: "×"; color: var(--red); }
+
+    .tree {
+      display: flex;
+      align-items: center;
+      padding: 20px 24px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      overflow-x: auto;
+    }
+
+    .tree pre {
+      margin: 0;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre;
+    }
+
+    .tree .tr  { color: #fff; font-weight: 600; }
+    .tree .tb  { color: rgba(255,255,255,.18); }
+    .tree .tf  { color: var(--soft); }
+    .tree .ta  { color: var(--muted); font-style: italic; }
+    .tree .tl-s { color: var(--blue); }
+    .tree .tl-n { color: var(--cyan); }
+    .tree .tl-e { color: var(--purple); }
+
+    .feedback {
+      text-align: center;
+      padding: 52px;
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(93, 183, 255, .24), transparent 36%),
+        linear-gradient(135deg, rgba(99, 230, 214, .12), rgba(197, 156, 255, .12));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: var(--shadow);
+    }
+
+    .feedback h2 { margin-bottom: 14px; }
+    .feedback p { max-width: 720px; margin: 0 auto 24px; color: var(--soft); }
+
+    .footer {
+      padding: 42px 0 56px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .split,
+      .ok-bad { grid-template-columns: 1fr; }
+      .grid-4, .grid-3, .skills-grid { grid-template-columns: repeat(2, 1fr); }
+      .flow { grid-template-columns: repeat(2, 1fr); }
+      .gate-row { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      .shell { width: min(100% - 24px, var(--max)); }
+      .hero { padding-top: 64px; }
+      .grid-4, .grid-3, .grid-2, .skills-grid, .metrics, .gate-row { grid-template-columns: 1fr; }
+      .section-head { align-items: start; flex-direction: column; }
+      .flow { grid-template-columns: 1fr; }
+      .feedback { padding: 30px 20px; }
+      h1 { letter-spacing: -0.045em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+
+  <nav class="nav">
+    <div class="shell nav-inner">
+      <a class="brand" href="#top" aria-label="Academic Paper Writer Home">
+        <span class="brand-mark">📝</span>
+        <span>Academic Paper Writer</span>
+      </a>
+      <div class="nav-links" aria-label="页面导航">
+        <a href="#pain">痛点</a>
+        <a href="#skills">Skills</a>
+        <a href="#workflow">工作流</a>
+        <a href="#start">快速开始</a>
+        <a href="#boundary">安全边界</a>
+      </div>
+      <a class="btn" href="https://github.com/joshua-zyy/academic-paper-writer" target="_blank" rel="noreferrer">GitHub ↗</a>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="shell hero-grid">
+      <div>
+        <div class="eyebrow">Evidence-first · Section loop · Hard gates</div>
+        <h1><span class="gradient-text">Academic Paper Writer</span></h1>
+        <p class="subtitle">
+          面向 <strong>CS / AI / ML</strong> 论文写作场景的模块化 Agent Skill 集合它不是一次性生成全文的 prompt，而是一套按证据审计、文献核验、实验复核、逐节起草和验证推进的工程化写作系统
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#start">🚀 开始使用</a>
+          <a class="btn" href="https://github.com/joshua-zyy/academic-paper-writer/issues" target="_blank" rel="noreferrer">💬 提交反馈</a>
+        </div>
+        <div class="badges" aria-label="项目标签">
+          <span class="badge">MIT License</span>
+          <span class="badge">CS / AI / ML</span>
+          <span class="badge">6 Skills</span>
+          <span class="badge">Core + Subskills</span>
+          <span class="badge">Active</span>
+        </div>
+      </div>
+
+      <aside class="hero-card" aria-label="项目核心摘要">
+        <div class="terminal">
+          <div class="terminal-top">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span>writing-system.yaml</span>
+          </div>
+          <pre><span class="key">mission</span>: <span class="val">free researchers from repetitive writing</span>
+<span class="key">domain</span>: <span class="val">CS / AI / ML papers</span>
+<span class="key">loop</span>: evidence → citation → experiment → draft → review
+<span class="key">policy</span>: <span class="ok">block or downgrade when evidence is missing</span>
+<span class="key">promise</span>: verifiable, modular, claim-aware writing</pre>
+        </div>
+        <div class="metrics">
+          <div class="metric"><b>6</b><span>specialized skills</span></div>
+          <div class="metric"><b>4</b><span>hard gates</span></div>
+          <div class="metric"><b>35+</b><span>default citations</span></div>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <main>
+    <section id="pain" class="pain">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Why it exists</p>
+            <h2>论文不是做完就会自然写出来</h2>
+          </div>
+          <p class="section-desc">很多研究者真正卡住的地方，不是没有做工作，而是无法把工作转化为 reviewer 能理解、能相信的论证</p>
+        </div>
+
+        <div class="grid-4">
+          <article class="card">
+            <div class="icon">🤷</div>
+            <h3>无从下笔</h3>
+            <p>模型代码已经跑通，但面对空白文档，不知道如何落笔</p>
+          </article>
+          <article class="card">
+            <div class="icon">📐</div>
+            <h3>表述不准</h3>
+            <p>算法和公式在脑中只是大概思路，写出来容易含糊或过度概括</p>
+          </article>
+          <article class="card">
+            <div class="icon">🎨</div>
+            <h3>图表头秃</h3>
+            <p>实验数据很多，但不知道如何变成论文级、可解释的可视化</p>
+          </article>
+          <article class="card">
+            <div class="icon">🔍</div>
+            <h3>缺少支点</h3>
+            <p>直觉上知道工作有意义，却缺少能支撑 claim 的文献和实验锚点</p>
+          </article>
+        </div>
+
+        <div class="statement">
+          <strong>核心思想: </strong>把论文写作拆成多个可独立验证的环节，通过证据审计 → 文献检索 → 实验复核 → 起草 → 质量门 → 验证的闭环逐节推进证据不足时，系统会阻塞、降级或保留占位符，而不是强行写成已验证结论
+        </div>
+      </div>
+    </section>
+
+    <section id="skills">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Skill System</p>
+            <h2>Core 编排器 + 5 个专项 Subskills</h2>
+          </div>
+          <p class="section-desc">主 Agent 保持论文叙事风格一致，子 skill 只提供文献、实验、审修、润色和图表等工具型输出</p>
+        </div>
+
+        <div class="skills-grid">
+          <article class="card skill-card">
+            <div>
+              <div class="skill-title"><span>🧠</span><h3>academic-paper-writer</h3></div>
+              <p>核心编排器，负责完整论文起草、section loop、Hard Gates 和子 skill 调度</p>
+            </div>
+            <div class="tag-row"><span class="tag">写论文</span><span class="tag">paper draft</span><span class="tag">orchestrator</span></div>
+          </article>
+
+          <article class="card skill-card">
+            <div>
+              <div class="skill-title"><span>🔍</span><h3>academic-citation</h3></div>
+              <p>文献检索、核验、Citation-to-Claim 映射、本地文献库优先搜索与全文阅读</p>
+            </div>
+            <div class="tag-row"><span class="tag">找引用</span><span class="tag">citation pass</span><span class="tag">VERIFIED</span></div>
+          </article>
+
+          <article class="card skill-card">
+            <div>
+              <div class="skill-title"><span>🔬</span><h3>academic-experiments</h3></div>
+              <p>盘点实验日志、checkpoint 和结果表，并用最小可复核方式确认实验事实</p>
+            </div>
+            <div class="tag-row"><span class="tag">复核实验</span><span class="tag">verify results</span><span class="tag">risk audit</span></div>
+          </article>
+
+          <article class="card skill-card">
+            <div>
+              <div class="skill-title"><span>✅</span><h3>academic-reviser</h3></div>
+              <p>以审稿人视角执行证据审查、三轮自审和 Verification 判定</p>
+            </div>
+            <div class="tag-row"><span class="tag">审修</span><span class="tag">self review</span><span class="tag">verification</span></div>
+          </article>
+
+          <article class="card skill-card">
+            <div>
+              <div class="skill-title"><span>✨</span><h3>academic-polishing</h3></div>
+              <p>执行 Prose Quality Gate、Claim Strength Audit 和论文语气打磨</p>
+            </div>
+            <div class="tag-row"><span class="tag">润色</span><span class="tag">claim strength</span><span class="tag">prose gate</span></div>
+          </article>
+
+          <article class="card skill-card">
+            <div>
+              <div class="skill-title"><span>📊</span><h3>academic-figure</h3></div>
+              <p>生成实验数据图的 Python 代码，并辅助构思架构图提示词</p>
+            </div>
+            <div class="tag-row"><span class="tag">绘图</span><span class="tag">训练曲线</span><span class="tag">architecture</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="workflow">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Workflow</p>
+            <h2>逐节闭环，失败就回退</h2>
+          </div>
+          <p class="section-desc">每一节都必须经过占位符审计、证据合规审查、文体质量门、内容密度检查与最终验证</p>
+        </div>
+
+        <div class="workflow-wrap">
+          <div class="flow" aria-label="逐节闭环流程">
+            <div class="flow-step"><b>✏️ Draft v1</b><span>允许占位符</span></div>
+            <div class="flow-step"><b>📌 Placeholder Audit</b><span>记录和追踪 debt</span></div>
+            <div class="flow-step"><b>⚖️ Evidence Check</b><span>claim 与证据匹配</span></div>
+            <div class="flow-step"><b>✨ Prose Gate</b><span>可读性与学术语气</span></div>
+            <div class="flow-step"><b>📏 Expansion</b><span>内容密度检查</span></div>
+            <div class="flow-step"><b>✅ Self Review</b><span>三轮自审</span></div>
+            <div class="flow-step"><b>🔒 Verification</b><span>通过才推进</span></div>
+          </div>
+
+          <div class="gate-row">
+            <div class="gate"><b>Gate A · 证据完备</b><p>至少存在一条可引用证据，否则降级或阻塞</p></div>
+            <div class="gate"><b>Gate B · 引用就绪</b><p>Introduction / Related Work 零 VERIFIED 引用时必须阻塞</p></div>
+            <div class="gate"><b>Gate C · Verification</b><p>所有 debt 闭合且内容达标后，才能进入下一节</p></div>
+            <div class="gate"><b>Gate D · 引用数量</b><p>全文默认要求去重引用不少于 35 篇</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="start">
+      <div class="shell split">
+        <div>
+          <p class="section-kicker">Quick Start</p>
+          <h2>三步加载，材料越完整越稳定</h2>
+          <div class="steps">
+            <div class="step">
+              <div>
+                <h3>获取仓库</h3>
+                <p>clone 项目到本地，先阅读 README 和核心 SKILL.md</p>
+              </div>
+            </div>
+            <div class="step">
+              <div>
+                <h3>加载 Skill</h3>
+                <p>完整论文加载核心编排器；单项任务可直接加载对应子 skill</p>
+              </div>
+            </div>
+            <div class="step">
+              <div>
+                <h3>准备输入材料</h3>
+                <p>提供代码仓库、目标 venue、实验日志、草稿、outline 和贡献点</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="codebox" aria-label="快速开始代码">
+          <pre>git clone https://github.com/joshua-zyy/academic-paper-writer.git
+
+# 完整论文工作流
+load skills/academic-paper-writer/SKILL.md
+
+# 单一专项任务
+load skills/academic-citation/SKILL.md
+load skills/academic-experiments/SKILL.md
+load skills/academic-reviser/SKILL.md
+load skills/academic-polishing/SKILL.md
+load skills/academic-figure/SKILL.md</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="examples">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Use Cases</p>
+            <h2>典型使用方式</h2>
+          </div>
+          <p class="section-desc">可以完整写论文，也可以只做引用核验、实验复核、Method 润色或图表生成</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="scenario"><span>📄</span><div><strong>完整论文起草</strong><p>“我有一个图神经网络项目仓库，想写一篇投 NeurIPS 的论文请按 section 逐节推进”</p></div></div>
+          <div class="scenario"><span>✨</span><div><strong>单独润色 Method</strong><p>“帮我改成论文正文口吻，但不要把不确定的设计动机写成已确认事实”</p></div></div>
+          <div class="scenario"><span>🔗</span><div><strong>单独做引用核验</strong><p>“帮我为 Introduction 找 5–8 篇 VERIFIED 引用，并生成 Citation-to-Claim Map”</p></div></div>
+          <div class="scenario"><span>🔬</span><div><strong>单独做实验复核</strong><p>“先盘点 checkpoint、日志和结果表，尽量用最小可复核方式确认 Main Results”</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="fit">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Fit</p>
+            <h2>适合什么，不适合什么</h2>
+          </div>
+        </div>
+        <div class="ok-bad">
+          <article class="card">
+            <h3>✅ 适合</h3>
+            <ul class="list">
+              <li>已有代码仓库、实验日志、结果表、草稿或研究笔记</li>
+              <li>需要逐节推进完整论文，而不是一次性成稿</li>
+              <li>希望明确区分“能写的”和“暂时不能下结论的”</li>
+              <li>需要对文献、实验和 claim 强度做显式控制</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>❌ 不适合</h3>
+            <ul class="list no">
+              <li>非 CS / AI / ML 领域论文</li>
+              <li>只想要一个一次性生成全文的通用 prompt</li>
+              <li>纯排版或 LaTeX 调整任务</li>
+              <li>要求无视证据边界，把不确定内容写成已验证结论</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="structure">
+      <div class="shell split">
+        <div>
+          <p class="section-kicker">Project Structure</p>
+          <h2>清晰的文档分层和项目结构</h2>
+          <p class="section-desc" style="max-width: 620px; margin-top: 18px;">战略层负责规则与边界，战术导航负责定位具体执行文件，战术执行文件按阶段拆分，避免一次加载过多上下文</p>
+        </div>
+        <div class="tree" aria-label="项目结构摘要">
+          <pre><span class="tr">项目结构</span><span class="tb"> ──┬── <span class="tl tl-s">战略层</span> ──── </span><span class="tf">SKILL.md</span>
+<span class="tb">          │                  </span><span class="ta">规则与边界</span>
+<span class="tb">          ├── <span class="tl tl-n">战术导航</span> ── </span><span class="tf">orchestration-workflow.md</span>
+<span class="tb">          │                  </span><span class="ta">定位具体执行文件</span>
+<span class="tb">          └── <span class="tl tl-e">战术执行</span> ──┬── </span><span class="tf">workflow-step-0-4.md</span>
+<span class="tb">                         ├── </span><span class="tf">workflow-step-5-8.md</span>
+<span class="tb">                         └── </span><span class="tf">workflow-step-9-12.md</span>
+<span class="tb">                             </span><span class="ta">按阶段拆分，避免一次加载过多上下文</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="boundary">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Safety Boundary</p>
+            <h2>最重要的不是写得快，而是不越界</h2>
+          </div>
+          <p class="section-desc">系统允许输出“当前最佳草稿”，但不允许输出“伪装成已验证完成稿的草稿”</p>
+        </div>
+        <div class="grid-4">
+          <article class="card"><div class="icon">🚫</div><h3>不编造</h3><p>禁止编造文献、作者、年份、DOI、实验结果、图表、命令或日志</p></article>
+          <article class="card"><div class="icon">⚠️</div><h3>不混淆</h3><p>不把 UNVERIFIED 文献写成 VERIFIED，也不把 user claim 写成可引用证据</p></article>
+          <article class="card"><div class="icon">📛</div><h3>不夸大</h3><p>不把内部验证包装成 SOTA、generalization 或 strong evidence</p></article>
+          <article class="card"><div class="icon">📌</div><h3>不静默</h3><p>缺失信息必须显式保留 REF_NEEDED、RESULT_NEEDED 等占位符</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="feedback">
+      <div class="shell">
+        <div class="feedback">
+          <h2>欢迎 researcher 提交真实使用反馈</h2>
+          <p>如果你遇到 workflow 卡住、gate 误判、文档不清晰，或者希望增加新的 skill / probe，可以通过 GitHub Issues 描述复现步骤或期望行为</p>
+          <div class="hero-actions" style="justify-content: center; margin-bottom: 0;">
+            <a class="btn primary" href="https://github.com/joshua-zyy/academic-paper-writer/issues" target="_blank" rel="noreferrer">📝 提交 Issue</a>
+            <a class="btn" href="https://github.com/joshua-zyy/academic-paper-writer" target="_blank" rel="noreferrer">⭐ Star / Fork</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer-inner">
+      <div>© Academic Paper Writer · MIT License</div>
+      <div>Evidence-driven · Modular · Verifiable</div>
+    </div>
+  </footer>
+</body>
+</html>
