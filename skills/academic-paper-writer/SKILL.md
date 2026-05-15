@@ -7,10 +7,6 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 将此 skill 视为"证据闭环型、分节推进的论文编排代理"。它协调证据审计、文献检索、实验复核、prose 润色、审修和图表生成六个专项环节，按 section unit 串行推进，每节经历 Draft → Quality Gate → Expansion → Self-Review → Revision → Verification 闭环。
 
-## 触发条件
-
-写论文, paper draft, 初稿, write introduction, draft method, 论文起草, full paper outline, section-by-section drafting, 证据闭环, 分节起草
-
 ## 何时使用本 Skill vs. 子 Skill
 
 | 场景 | 使用 |
@@ -26,11 +22,7 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 `Step 0(判定mode) → Step 1(确认venue/language+本地文献库) → Step 1b(可选:PDF→MD准备) → Step 2(证据审计) → Step 3(文献检索:3a本地优先+3b联网+3c聚合) → Step 4(实验复核) → Step 5(Section Blueprint) → Step 6(Draft v1) → Step 7(占位符审计+图表生成) → Step 8(证据合规审查) → Step 9(Prose质量门,内化) → Step 10(扩写检查) → Step 11(综合验证) → Step 12(section loop) → Step 12e(引用清单生成)`
 
-每节经历：`Draft v1 → Quality Gate → Expansion → Self-Review → Revision → Verification`。未通过则回到 Step 8 重修。
-
 ## Red Lines（绝对禁止）
-
-以下行为绝对禁止，违反即为 Skill 执行失败：
 
 1. **主 Agent 只撰写论文文本，绝对不得修改项目源代码、配置文件或数据文件**。探查时只读，图表代码生成时创建新文件而非覆盖现有文件。
 2. 编造文献、作者、年份、venue、DOI、arXiv 编号
@@ -68,13 +60,10 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 1. **输出目录**：`./docs/paper-drafts/`
 2. **论文文件**：`paper_draft.md` — 论文正文 + 参考文献 + 待补项清单，逐步追加更新
-3. **图片目录**：`figures/` — 生图提示词与绘图代码
-   - `figures/figure_prompts.md` — 所有架构图生图提示词汇总（按图编号分节）
-   - `figures/plot_*.py` — 数据结果图的 Python 绘图代码（按图编号命名，不自动执行）
-   - `figures/` 下的图片文件（如用户手动执行绘图代码后生成）
-4. **对话输出限制**：禁止在对话中输出完整论文正文，仅显示简短进度摘要（当前节、verdict、下一节）
-5. **写入时机**：每节 Draft 生成后、每节 Verification 完成后，均须使用 Write/Edit 工具更新 `paper_draft.md`
-6. **中间状态**：Evidence Inventory、Verified References、Revision Queue 等在 agent 上下文中维护，不单独输出为文件
+3. **图片目录**：`figures/` — `figure_prompts.md`（架构图提示词）+ `plot_*.py`（数据图代码）
+4. **对话输出限制**：禁止在对话中输出完整论文正文，仅显示简短进度摘要
+5. **写入时机**：每节 Draft 生成后、Verification 完成后，均须使用 Write/Edit 工具更新 `paper_draft.md`
+6. **中间状态**：Evidence Inventory、Verified References、Revision Queue 等在 agent 上下文中维护
 
 ## 图表生成规范
 
@@ -211,9 +200,7 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 | 12 | 整合 & 依赖感知 section loop | — | 自动 |
 | 12e | **引用清单生成**（强制，论文完成时必执行） | — | 自动 |
 
-**核心约束**：Draft v1 → Evidence Review → Prose Review → Expansion → Verification → Advance（或 Revise）。
-
-**执行细则**：每个委托步骤的 Task dispatch 模板、输入输出格式、子步骤顺序与失败处理统一定义在 `references/` 下的 `workflow-step-*.md` 文件中。执行时以导航索引 `references/orchestration-workflow.md` 为入口，按步骤加载对应文件。
+各步骤的详细 dispatch 模板、输入输出格式、子步骤顺序与失败处理见 `references/orchestration-workflow.md` 和 `references/workflow-step-*.md`。
 
 ### Step 6 必附：待补项清单
 
@@ -239,18 +226,18 @@ Draft v1 生成后，**必须**在正文末尾追加待补项清单。模板见 
 
 ## Agent 资源与执行架构
 
-主 Agent 直接撰写论文正文，确保叙事风格一致。子 Agent 仅提供工具型输出。
+Agent 定义与 dispatch 模板见各子 skill 的 `agents/` 目录。
 
 ### 可 dispatch 的子 Agent
 
-| 步骤 | 子 Skill | Agent 文件 | 职责 |
-|------|---------|-----------|------|
-| Step 2 | `academic-paper-writer` | `agents/probe-agent.md` | 只读探查 |
-| Step 3 | `academic-citation` | `agents/citation_agent.md` | 检索与核验 |
-| Step 3a/3b | `academic-citation` | `agents/literature-reader-agent.md` | 阅读并输出报告 |
-| Step 4 | `academic-experiments` | `agents/experiment_agent.md` | 实验复核 |
-| Step 7 | `academic-figure` | `agents/figure_agent.md` | 图表生成 |
-| Step 8/11 | `academic-reviser` | `agents/reviser_agent.md` | 审查与验证 |
+| 步骤 | 子 Skill | Agent 文件 | 定义位置 | 职责 |
+|------|---------|-----------|---------|------|
+| Step 2 | `academic-paper-writer` | `probe-agent.md` | `skills/academic-paper-writer/agents/` | 只读探查 |
+| Step 3 | `academic-citation` | `citation_agent.md` | `skills/academic-citation/agents/` | 检索与核验 |
+| Step 3a/3b | `academic-citation` | `literature-reader-agent.md` | `skills/academic-citation/agents/` | 阅读并输出报告 |
+| Step 4 | `academic-experiments` | `experiment_agent.md` | `skills/academic-experiments/agents/` | 实验复核 |
+| Step 7 | `academic-figure` | `figure_agent.md` | `skills/academic-figure/agents/` | 图表生成 |
+| Step 8/11 | `academic-reviser` | `reviser_agent.md` | `skills/academic-reviser/agents/` | 审查与验证 |
 
 ### 内化调用
 
@@ -283,7 +270,6 @@ Draft v1 生成后，**必须**在正文末尾追加待补项清单。模板见 
 
 ## 不适用场景
 
-本 Skill 不适用于：
 - 非 CS/AI/ML 领域的论文（如纯实验生物学、临床医学、人文社科）
 - 已有完整 LaTeX 稿只需排版调整的场景
 - 用户明确要求单次生成整篇论文且拒绝分节推进的场景（此时仍不能跳过证据检查）
@@ -308,70 +294,4 @@ Draft v1 生成后，**必须**在正文末尾追加待补项清单。模板见 
 
 ## Example Usage
 
-### 场景 1: full-paper-planning — 从研究概要启动完整论文
-
-**用户输入**：
-> 我有一个基于双分支 Transformer 的 EEG 情绪识别项目，代码在 `./eeg-emotion/`，想用这个仓库写一篇完整论文投到 IEEE T-AFFC。
-
-**执行流程摘要**：
-```
-Step 0: mode=full-paper-planning, scope=empirical CS/AI paper
-Step 1: Venue Brief → IEEE T-AFFC, 英文, 双栏, 12页
-Step 2: 并行 dispatch probe agents 探查代码/数据/配置
-Step 3: 并行 dispatch citation agent + literature reader → Verified References (12篇本地+8篇外部)
-Step 4: dispatch experiment agent → Evidence Inventory (3个newly_run结果, 2个preexisting_artifact)
-Step 5: Section Blueprint → 8节结构 + 每节要点
-Step 6: Draft v1 (Introduction) → 5段完整prose + 待补项清单
-Step 7: arch-prompt 生成架构图提示词
-Step 8: evidence compliance review → evidence_debt: closed
-Step 9: prose quality gate → prose_debt: closed
-Step 10: expansion pass → thin_draft: no
-Step 11: verification → Verdict: passed, Score: 8/10
-Step 12: 推进到 Related Work...
-```
-
-**对话输出**（auto 模式）：
-> ✅ Introduction 完成 | Verdict: passed | Score: 8/10 | 下一节: Related Work
-
----
-
-### 场景 2: section-drafting — 聚焦单节起草
-
-**用户输入**：
-> 帮我写 Method 节，代码在 `./model/`，重点讲清楚双分支架构和注意力机制。
-
-**执行流程摘要**：
-```
-Step 0: mode=section-drafting, section=Method
-Step 2: probe agent 探查代码 → 识别核心模块 (TemporalBranch, SpatialBranch, FusionModule)
-Step 3: 文献检索 → 相关 attention 机制文献 (6篇VERIFIED)
-Step 5: Blueprint → 整体框架 → 模块拆解 → 训练目标
-Step 6: Draft v1 → 完整prose + [FIGURE_NEEDED: overall architecture] + 待补项清单
-Step 7: arch-prompt 生成分支架构图提示词
-Step 8-11: 审查闭环 → Verdict: passed
-```
-
-**输出片段**（Draft v1 Method 开头）：
-> The proposed dual-branch Transformer architecture processes EEG signals through
-> parallel temporal and spatial pathways... [后续展开模块细节]
-
----
-
-### 场景 3: section-revision — 修订已有草稿
-
-**用户输入**：
-> 这是我的 Related Work 草稿，帮我审查修订：[粘贴草稿文本]
-
-**执行流程摘要**：
-```
-Step 0: mode=section-revision, section=Related Work
-Step 8: evidence compliance review → 发现3处裸claim无citation
-Step 9: prose quality gate → prose_debt: open (罗列式段落)
-Step 10: expansion pass → 补充work cluster综合比较
-Step 11: verification → Verdict: passed, Score: 7/10
-```
-
-**输出**（Section Critique 摘要）：
-> - Issues fixed: 补充3处inline citation, 将罗列式段落重组为2个work clusters
-> - Claims weakened: "outperforms all existing methods" → "achieves competitive results"
-> - Evidence still missing: [REF_NEEDED: recent GNN-based EEG methods]
+三个端到端使用场景（full-paper-planning、section-drafting、section-revision）详见 `references/examples/example-usage.md`。首次使用时建议读取。
