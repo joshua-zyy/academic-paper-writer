@@ -20,7 +20,15 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 ## 编排流程
 
-`Step 0(判定mode) → Step 1(Checklist:venue/language/min_citations+本地文献库) → Step 1b(可选:PDF→MD) → Step 2(证据审计) → Step 3(文献检索) → Step 4(实验复核) → Step 5(Blueprint) → Step 6(Section Complete Loop:探查+Draft+审查+润色+验证) → Step 12(section loop) → Step 12e(引用清单)`
+**Step 0** → **Step 1（Blocking Gate，必须完成以下6项）**：
+1. 确认venue
+2. 确认language  
+3. 确认min_citations
+4. 询问本地文献库
+5. 若有本地文献库 → 检查markitdown + 输出转换提示
+6. 以上全部完成 → 进入Step 2
+
+→ Step 1b(可选:PDF→MD) → Step 2(证据审计) → Step 3(文献检索) → Step 4(实验复核) → Step 5(Blueprint) → Step 6(Section Complete Loop:探查+Draft+审查+润色+验证) → Step 12(section loop) → Step 12e(引用清单)
 
 **核心概念：Section Complete Loop（Step 6）**
 
