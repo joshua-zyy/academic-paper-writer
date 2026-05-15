@@ -19,7 +19,7 @@ Step 8: evidence compliance review → evidence_debt: closed
 Step 9: prose quality gate → prose_debt: closed
 Step 10: expansion pass → thin_draft: no
 Step 11: verification → Verdict: passed, Score: 8/10
-Step 12: 推进到 Related Work...
+Step 7: 推进到 Related Work...
 ```
 
 **对话输出**（auto 模式）：

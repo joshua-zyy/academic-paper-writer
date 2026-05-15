@@ -46,7 +46,7 @@
 | 10 | Expansion Pass（内容密度检查） | — | 自动 | — |
 | 11 | Self-Review & Verification | `academic-reviser`（dispatch 子 Agent） | 自动 | DP-4 |
 | 12 | 整合 & 依赖感知 section loop | — | 自动 | — |
-| 12e | **引用清单生成**（强制） | — | 自动 | — |
+| 8 | **引用清单生成**（强制） | — | 自动 | — |
 
 ---
 

@@ -40,7 +40,7 @@ Draft v1 → Placeholder Audit → Evidence Compliance Review → Prose Quality 
 
 参见 `references/section-dependency-matrix.md` 中的矩阵定义。
 
-每完成一个 section 后，按矩阵执行依赖检查（编排器 Step 12b）：
+每完成一个 section 后，按矩阵执行依赖检查（编排器 Step 7b）：
 - 当前 section 的 `depended_by` 列表中有哪些已完成 section
 - 这些 section 是否因 `shared_claims` 变更而需要回修
 - 若需回修，将对应 section 标记 `pending` 并询问使用者

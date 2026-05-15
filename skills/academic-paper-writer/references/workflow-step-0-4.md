@@ -39,7 +39,7 @@ Blocking confirmations — must stop and ask if missing:
    - 询问方式："您预期这篇论文的参考文献数量大约是多少篇？（默认 35 篇，short paper 建议 20 篇，workshop 建议 15 篇）"
    - 用户指定时记录为 `min_citations`
    - 用户未指定或说"默认"时使用默认值 35
-   - **一次性确认**：确认后全程不再重复询问，Step 12e 生成引用清单时自动核验。
+   - **一次性确认**：确认后全程不再重复询问，Step 8 生成引用清单时自动核验。
 
 If venue is known and relevant, read `references/writing-guidelines.md` and form a brief Venue / Language Brief.
 
@@ -472,9 +472,9 @@ For Introduction / Related Work: if retries still produce zero VERIFIED referenc
 | 2 | Author et al., "Title2" | CVPR | 2023 | 10.1109/CVPR.2023.00123 | https://openaccess.thecvf.com/... | Method |
 ```
 
-**与 Step 12e 的区别**：
+**与 Step 8 的区别**：
 - Step 3d = 过程记录，逐节追加，方便用户随时下载
-- Step 12e = 终版核验清单，论文完成后一次性生成，用于确认引用合理性
+- Step 8 = 终版核验清单，论文完成后一次性生成，用于确认引用合理性
 
 - Create a todo list for experiment evidence items.
 - Delegate to `academic-experiments` via the dispatch template below (only when empirical paper and current section needs experiment facts).

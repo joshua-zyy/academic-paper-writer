@@ -28,7 +28,7 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 5. 若有本地文献库 → 检查markitdown + 输出转换提示
 6. 以上全部完成 → 进入Step 2
 
-→ Step 1b(可选:PDF→MD) → Step 2(证据审计) → Step 3(文献检索) → Step 4(实验复核) → Step 5(Blueprint) → Step 6(Section Complete Loop:探查+Draft+审查+润色+验证) → Step 12(section loop) → Step 12e(引用清单)
+→ Step 1b(可选:PDF→MD) → Step 2(证据审计) → Step 3(文献检索) → Step 4(实验复核) → Step 5(Blueprint) → Step 6(Section Complete Loop:探查+Draft+审查+润色+验证) → Step 7(section loop) → Step 8(引用清单)
 
 **核心概念：Section Complete Loop（Step 6）**
 
@@ -134,7 +134,7 @@ Step 6: Section Complete Loop
 12. **失败不伪装**：Verification 未通过且非外部阻塞时，必须继续下一轮修订，不得直接结束或假装通过。
 13. **完整流程执行**：执行 full-paper-planning 时，必须按 Step 0→1→1b(若适用)→2→3(3a→3b→3c)→4→5→6→12 的顺序逐一执行，不得跳步。用户催促时也不得跳过证据审计（Step 2）、文献检索（Step 3）、实验复核（Step 4）、Hard Gates（A/B/C）中的任何一个。
 14. **引用产物必输出**：Step 3 完成后，必须在上下文中维护 Verified References 列表和 Citation-to-Claim Map。缺少任一 → 不得进入 Step 6。
-15. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 `min_citations`（默认 35，short paper 建议 20，workshop 建议 15）。**Step 1 必须询问用户预期引用数量**，用户指定时记录为 `min_citations`，未指定时使用默认值。论文完成后 Step 12e 生成引用清单时自动核验。
+15. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 `min_citations`（默认 35，short paper 建议 20，workshop 建议 15）。**Step 1 必须询问用户预期引用数量**，用户指定时记录为 `min_citations`，未指定时使用默认值。论文完成后 Step 8 生成引用清单时自动核验。
 16. **两阶段写作**：Step 5 Blueprint 可使用 bullet points 和提纲式结构，但 Step 6 Draft v1 必须是完整 prose 段落。bullet points 仅用于规划阶段，不得出现在最终论文正文中。
 17. **最大迭代次数**：修订循环（Step 6.7→6.8→12）最多执行 3 轮。3 轮后仍有未闭合 debt 时，标记为 `unresolvable`，输出修订报告并终止循环，不得继续重试。
 
@@ -200,8 +200,8 @@ Step 6: Section Complete Loop
 |------|---------|---------|---------|
 | A: 证据完备 | Step 2 → Step 6 | 至少一条可引用证据（`newly_run`/`preexisting_artifact`） | 降级路径或阻塞 |
 | B: 引用就绪 | Step 3 → Step 6 | 至少一条 `VERIFIED` 引用或明确"无需文献" | 按 section 分流，Intro/RW 阻塞，Method 可占位 |
-| C: Verification | Step 6.8 → Step 12 | 所有 debt 闭合 + `thin_draft = no` | passed/blocked/failed，详细见 workflow |
-| D: 引用数量 | Step 12e → 输出 | 全文去重后引用总数 >= `min_citations`（默认 35） | 未达标时提醒用户，可继续补充后重检 |
+| C: Verification | Step 6.8 → Step 7 | 所有 debt 闭合 + `thin_draft = no` | passed/blocked/failed，详细见 workflow |
+| D: 引用数量 | Step 8 → 输出 | 全文去重后引用总数 >= `min_citations`（默认 35） | 未达标时提醒用户，可继续补充后重检 |
 
 ## 默认交付物
 
@@ -278,9 +278,11 @@ Phase 3: 6.9 整合 → 推进到下一节
 | 3 | 文献检索与核验（3a 本地优先 + 3b 联网 + 3c 聚合） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 |
 | 4 | 实验事实复核 | `academic-experiments`（dispatch 子 Agent） | 自动 |
 | 5 | 生成 Section / Method Blueprint | — | 自动 |
-| **6** | **Section Complete Loop**（见下方详细说明） | — | 自动 |
-| 12 | 整合 & 依赖感知 section loop | — | 自动 |
-| 12e | **引用清单生成**（强制，论文完成时必执行） | — | 自动 |
+| **6** | **Section Complete Loop**（包含原Step 7-11，见下方详细说明） | — | 自动 |
+| 7 | 整合 & 依赖感知 section loop | — | 自动 |
+| 8 | **引用清单生成**（强制，论文完成时必执行） | — | 自动 |
+
+**注**：原Step 7（占位符审计）、Step 8（证据合规）、Step 9（Prose质量门）、Step 10（扩写检查）、Step 11（综合验证）已合并为Step 6的子步骤（6.4-6.8）。
 
 ### Step 6: Section Complete Loop（详细说明）
 
