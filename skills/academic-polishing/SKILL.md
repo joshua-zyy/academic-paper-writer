@@ -129,10 +129,17 @@ Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 
 
 ### 调用方式
 
-本 Skill 支持两种调用方式：
+本 Skill 由 `academic-paper-writer` 编排器在 Step 6.6 内化调用。主 Agent 读取本 SKILL.md 及 references/ 下的规则文件后自行执行润色与 claim 强度审计，不 dispatch 独立子 Agent。这确保叙事风格与全文一致，避免上下文传递损失。
 
-1. **内化调用**（由 `academic-paper-writer` 在 Step 6.6 使用）：主 Agent 读取本 SKILL.md 及 references/ 下的规则文件后自行执行润色与 claim 强度审计，不 dispatch 独立子 Agent。这确保叙事风格与全文一致，避免上下文传递损失。
-2. **独立使用**：用户直接要求润色、去AI化、claim 强度审计时，本 Skill 独立执行。
+## 独立使用
+
+当本 Skill 被独立加载（不通过 `academic-paper-writer` 编排器）时：
+
+### 典型请求
+- "润色一下这段 Method"
+- "去掉 AI 味，不要像 ChatGPT 写的"
+- "检查一下 claim 有没有过度断言"
+- "帮我把结果部分改得更学术"
 
 ### 入口分流
 
@@ -144,10 +151,18 @@ Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 
 | "改写 Method"、"Method 写得太潦草" | method-prose-rewrite | 2（模糊匹配） | Method 专项叙事：问题→设计→机制→收益/边界 |
 | 指定具体模式名称 | 按指定 | 1（用户显式指定） | 忽略自动推断，按指定模式执行 |
 
-### 独立使用时的约束
-
+### 执行约束
 - **此 Skill 只修改论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件**
 - **不得独立撰写整节论文**
+- 最多 2 轮改写轮次，第 2 轮后无论结果如何均交付
+- 输出格式与编排器调度一致：Prose Quality Gate Result + Rewritten Text + Claim Strength Changes
+
+### 组合使用指引
+| 场景 | 推荐方式 |
+|------|---------|
+| 只需润色/去 AI 化 | 本 Skill（独立） |
+| 起草过程中自动润色 | academic-paper-writer 编排器（Step 6.6 内化调用） |
+| 审修后需润色 | academic-reviser → 本 Skill |
 
 ## 何时读取 references/
 

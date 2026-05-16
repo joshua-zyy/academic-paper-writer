@@ -137,6 +137,8 @@ qa_items:
   - path_B: 不受影响（提示词路径不依赖运行时）
 ```
 
+不阻塞整体流程（safe_to_continue: yes），所有降级路径均能交付可用的输出（代码、blueprint 或提示词）。
+
 ### 路径选择优先级
 1. 优先尝试 `generate_code_only`（交付代码 + 数据）
 2. 用户明确不需要代码 → `generate_figure_blueprint`
