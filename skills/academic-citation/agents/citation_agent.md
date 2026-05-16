@@ -36,48 +36,6 @@ seed_references 为空
 └─ 若仍为零结果 → 触发 fallback
 ```
 
-## Query Types（4 类必查模板）
-
-```yaml
-query_types:
-  - type: problem_oriented
-    template: "<task> review"
-    priority: 1
-  - type: method_oriented
-    template: "<method family> for <task>"
-    priority: 2
-  - type: baseline_oriented
-    template: "<task> baseline / <classical model>"
-    priority: 3
-  - type: time_oriented
-    template: "<task> <current_year>"
-    priority: 4
-```
-
-4 类查询必须全部至少执行一次。不足 8 篇时追加第 5-6 轮：
-
-```yaml
-  - type: venue_oriented
-    template: "<task> <target_venue>"            # 仅 target_venue 已知时
-  - type: citation_oriented
-    template: "<seed_paper>" reversed citations  # 仅 seed_paper 已知时
-```
-
-## 本地文献库优先搜索（新增 Step 1a）
-
-当 `local_lit_md_dir != null` 时，在常规检索**之前**执行：
-
-1. 读取 `<local_lit_md_dir>/_index.json`（由 `convert-pdfs-to-md.py` 生成）
-2. 用关键词在索引中搜索（匹配 title、first_500_chars）
-3. 命中的候选文献，使用 `literature-reader-agent` 阅读其 MD 全文
-4. 产出 LiteratureReadingReport，供引用决策
-5. 若本地搜索结果充分且内容匹配 → 跳过联网检索
-6. 若不足或不匹配 → 继续常规联网检索（从 Step 2 起）
-
-**约束**：
-- 索引搜索只初步过滤，每篇候选仍须由 reader agent 阅读以确认内容匹配
-- 不可仅凭标题匹配就确认引用
-
 ## Output Schema
 
 遵循 `references/schemas/verified-references.md` 中定义的 Verified References Schema：
@@ -123,8 +81,49 @@ citation_to_claim_map:       # 额外输出
   3. 仍无法确认为 UNVERIFIED，在 items.notes 标注"元数据存在冲突"
 ```
 
-## Delegation
-本 Agent 由 `academic-paper-writer` 核心编排器在 Step 3 委托调用。
+## Execution
+
+### Query Types（4 类必查模板）
+
+```yaml
+query_types:
+  - type: problem_oriented
+    template: "<task> review"
+    priority: 1
+  - type: method_oriented
+    template: "<method family> for <task>"
+    priority: 2
+  - type: baseline_oriented
+    template: "<task> baseline / <classical model>"
+    priority: 3
+  - type: time_oriented
+    template: "<task> <current_year>"
+    priority: 4
+```
+
+4 类查询必须全部至少执行一次。不足 8 篇时追加第 5-6 轮：
+
+```yaml
+  - type: venue_oriented
+    template: "<task> <target_venue>"            # 仅 target_venue 已知时
+  - type: citation_oriented
+    template: "<seed_paper>" reversed citations  # 仅 seed_paper 已知时
+```
+
+### 本地文献库优先搜索
+
+当 `local_lit_md_dir != null` 时，在常规检索**之前**执行：
+
+1. 读取 `<local_lit_md_dir>/_index.json`（由 `convert-pdfs-to-md.py` 生成）
+2. 用关键词在索引中搜索（匹配 title、first_500_chars）
+3. 命中的候选文献，使用 `literature-reader-agent` 阅读其 MD 全文
+4. 产出 LiteratureReadingReport，供引用决策
+5. 若本地搜索结果充分且内容匹配 → 跳过联网检索
+6. 若不足或不匹配 → 继续常规联网检索（从 Step 2 起）
+
+**约束**：
+- 索引搜索只初步过滤，每篇候选仍须由 reader agent 阅读以确认内容匹配
+- 不可仅凭标题匹配就确认引用
 
 ## Red Lines
 1. **只检索——禁止修改项目中的任何文件**：文献 agent 只执行检索和核验，**绝对不得修改项目中的源代码、配置文件、数据文件或论文草稿**。
@@ -134,8 +133,12 @@ citation_to_claim_map:       # 额外输出
 5. 禁止只引用与自己最相似的方法而忽略强基线或不利比较
 6. 禁止在正文没有任何 inline citation 的情况下输出参考文献列表
 
-## Local Literature Reading Sub-delegation
+## Invocation
 
+### 编排器调用
+本 Agent 由 `academic-paper-writer` 核心编排器在 Step 3 委托调用。
+
+### 子代理委托：literature-reader-agent
 当需要阅读本地 MD 文献或联网获取的全文时，dispatch `literature-reader-agent`：
 
 ```yaml
@@ -165,6 +168,9 @@ Task:
 ```
 
 多个候选文献的阅读**必须并行 dispatch**，不串行。
+
+### 独立使用
+本 Agent 不提供独立使用入口。独立引用任务请直接加载 `academic-citation` Skill。
 
 ## Fallback: 检索零结果降级路径
 
