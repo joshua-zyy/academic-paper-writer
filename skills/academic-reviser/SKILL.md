@@ -107,6 +107,40 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 
 **使用方式**：由 `academic-paper-writer` 核心编排器在 Step 6.5 和 Step 6.8 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只审查论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
 
+## 独立使用
+
+当本 Skill 被独立加载（不通过 `academic-paper-writer` 编排器）时：
+
+### 典型请求
+- "帮我审查一下这篇 Introduction 有没有证据缺口"
+- "检查这篇文章的引用是否闭合"
+- "做一次跨章节一致性检查"
+- "帮我看一下草稿的方法与结果是否一致"
+
+### 入口分流
+
+| 用户输入特征 | 匹配模式 | 优先级 | 行为 |
+|------------|---------|--------|------|
+| 提供单节草稿文本 | full-section-review | 2（文本触发） | 完整三轮审查 + Verification 判定 |
+| 提供多节草稿 + "一起看" | cross-section-review | 1（用户显式指定） | 跨章节一致性检查 |
+| 只要求判定（已有自查结果） | verification-only | 1（用户显式指定） | 基于已有信息直接输出 Verdict |
+| 指定检查内容（"只看引用"） | targeted-review | 1（用户显式指定） | 仅执行指定维度的检查 |
+| 要求检查证据合规（"哪些 claim 没证据"） | targeted-evidence-mode | 1（用户显式指定） | 仅输出 evidence_debt 清单，不修改正文 |
+
+### 执行约束
+- 开始前必须确认：审查范围（哪个/哪些 section）、审查模式、是否已有证据清单
+- 无 `evidence_map` 时从草稿推断：扫描 claim + inline citation，无法推断的标记"待核验"
+- 输出：Section Critique + Verification Status（verdict + overall score + 各项 debt）+ Revised Draft
+- **禁止修改草稿以外的项目文件**
+- **必须遵守审查顺序**：证据 → 论证 → 风格
+
+### 组合使用指引
+| 场景 | 推荐方式 |
+|------|---------|
+| 只需审查已有草稿 | 本 Skill（独立） |
+| 起草过程中逐节审查 | academic-paper-writer 编排器（Step 6.5/6.8 自动调度） |
+| 发现缺口后需补实验/引用 | academic-experiments/academic-citation → 回到本 Skill 重审 |
+
 ## 何时读取 references/
 
 | Reference 文件 | 打开条件 |
