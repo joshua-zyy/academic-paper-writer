@@ -134,6 +134,16 @@ Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 
 1. **内化调用**（由 `academic-paper-writer` 在 Step 6.6 使用）：主 Agent 读取本 SKILL.md 及 references/ 下的规则文件后自行执行润色与 claim 强度审计，不 dispatch 独立子 Agent。这确保叙事风格与全文一致，避免上下文传递损失。
 2. **独立使用**：用户直接要求润色、去AI化、claim 强度审计时，本 Skill 独立执行。
 
+### 入口分流
+
+| 用户请求特征 | 匹配模式 | 优先级 | 行为 |
+|------------|---------|--------|------|
+| "润色一下"、"改改语言" | prose-quality-gate | 2（模糊匹配） | 通用 Prose Quality Gate 检查 + 改写，最多 2 轮 |
+| "去掉 AI 味"、"不像人类写的" | de-ai-pass | 2（模糊匹配） | 仅去 AI 化改写（AI 连接词、句式调整） |
+| "claim 太强了"、"降级结论" | claim-strength-audit | 2（模糊匹配） | 审计所有 claim 强度，零容忍词检查 |
+| "改写 Method"、"Method 写得太潦草" | method-prose-rewrite | 2（模糊匹配） | Method 专项叙事：问题→设计→机制→收益/边界 |
+| 指定具体模式名称 | 按指定 | 1（用户显式指定） | 忽略自动推断，按指定模式执行 |
+
 ### 独立使用时的约束
 
 - **此 Skill 只修改论文草稿文本，绝对不得修改项目源代码、配置文件或数据文件**
