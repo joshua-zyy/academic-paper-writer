@@ -140,6 +140,38 @@ description: "Audit, run, or verify experimental evidence for CS/AI/ML papers. P
 
 **使用方式**：由 `academic-paper-writer` 核心编排器在 Step 4 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 可运行实验但绝对不得修改项目源代码或数据文件，也不得独立撰写论文正文**。
 
+## 独立使用
+
+当本 Skill 被独立加载（不通过 `academic-paper-writer` 编排器）时：
+
+### 典型请求
+- "帮我看看这个仓库的实验靠不靠谱"
+- "盘点一下已有的实验结果和 checkpoint"
+- "跑一下最小可复核实验来验证结果"
+- "检查一下实验设计有没有协议风险"
+
+### 入口分流
+
+| 用户输入特征 | 匹配模式 | 优先级 | 行为 |
+|------------|---------|--------|------|
+| 指定 `repo_path` + 未指定运行模式 | experiment-evidence-pass | 2（路径触发） | 完整审计：盘点 → 环境验证 → 最小运行 → 协议风险 |
+| 指定 `repo_path` + "只看不动" | evidence-inventory-only | 1（用户显式指定） | 仅盘点，不执行任何命令 |
+| 指定 `repo_path` + 具体运行命令 | minimal-reproducible-run | 1（用户显式指定） | 验证环境 → 执行命令 → 记录结果 |
+| 未提供 `repo_path` | — | 3（无输入） | 询问路径，或在当前目录自动检测入口文件 |
+
+### 执行约束
+- 开始前必须确认：repo_path（默认检测当前目录）、运行模式（minimal/full/skip_run）、超时限制（默认 30min）
+- **禁止在无用户明确许可下**：修改项目文件、安装依赖包、执行 full training
+- 输出格式与编排器调度一致：Evidence Inventory + Protocol Risks + Remaining Blockers
+- 运行受阻时如实报告，不得伪装结果。降级路径见"失败处理"节
+
+### 组合使用指引
+| 场景 | 推荐方式 |
+|------|---------|
+| 只需盘点/复核实验证据 | 本 Skill（独立） |
+| 需将实验结果写入正文并起草 | academic-paper-writer 编排器 |
+| 已有草稿中的结果需验证 | 本 Skill 复核 → academic-reviser 审查 |
+
 ## 何时读取 references/
 
 | Reference 文件 | 打开条件 |
