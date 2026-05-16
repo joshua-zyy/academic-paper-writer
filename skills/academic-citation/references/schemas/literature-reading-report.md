@@ -1,8 +1,8 @@
 # Literature Reading Report Schema — 跨技能数据契约
 
 **用途**: 文献阅读子代理（LiteratureReaderAgent）到论文编排器之间的论文阅读数据交换格式。
-**生产者**: `literature-reader-agent` (由 `academic-paper-writer` Step 3 委托)
-**消费者**: `academic-paper-writer` (Step 3 主 agent, 决定是否引用)
+**生产者**: `literature-reader-agent` (由 `academic-citation` Step 1a 委托)
+**消费者**: `academic-citation` (Step 1a 主 agent, 决定是否引用)
 
 ## 结构
 
