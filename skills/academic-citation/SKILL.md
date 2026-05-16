@@ -65,6 +65,41 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
 
 `literature-reader-agent` 由 `citation_agent` 或 `academic-paper-writer` 在 Step 3a/3b 中并行 dispatch，用于阅读本地 MD 文献或联网获取的全文。
 
+## 独立使用
+
+当本 Skill 被独立加载（不通过 `academic-paper-writer` 编排器）时：
+
+### 典型请求
+- "帮我找 5 篇关于 Graph Transformer 的引用"
+- "核验一下我列的这些引用是否真实存在"
+- "为我的 Introduction 找 Exemplar Set 参考结构"
+- "查一下这篇论文的引用来源是否可靠"
+
+### 入口分流
+
+| 用户输入特征 | 匹配模式 | 优先级 | 行为 |
+|------------|---------|--------|------|
+| 提供 `section` + `keywords` | full-citation-pass | 1（用户显式指定） | 执行完整 6 步流程（同工作流节） |
+| 提供引用列表/种子文献 | citation-verification | 1（用户显式指定） | 仅核验元数据，不追加检索 |
+| 提供 `local_lit_md_dir` | local-citation-pass | 2（路径特征触发） | 本地 MD 优先搜索，批量并行 dispatch reader agent |
+| 只提供 `section` | targeted-citation-search | 3（单特征匹配） | 自动生成关键词，执行 4 类查询 |
+| 明确只需 Exemplar Set | exemplar-set-only | 1（用户显式指定） | 仅构建 Exemplar Set，不强制输出引用列表 |
+
+**多条件匹配时**：取优先级数字最小的匹配模式。
+
+### 执行约束
+- 独立使用时，开始前必须确认：目标 section（默认 Introduction）、检索关键词（未提供时自动生成）、是否需要 Exemplar Set
+- 若用户未指定 `local_lit_md_dir`，跳过本地优先搜索，直接联网检索
+- 输出格式与编排器调度时一致：Verified References + Exemplar Set + Citation-to-Claim Map
+- 若用户要求将引用写入正文，提示："本 Skill 只负责检索核验。如需整合到论文正文，请使用 academic-paper-writer 编排器。"
+
+### 组合使用指引
+| 场景 | 推荐方式 |
+|------|---------|
+| 只需检索/核验引用 | 本 Skill（独立） |
+| 需将引用整合到论文正文并起草 | academic-paper-writer 编排器 |
+| 已有草稿，需补引用并审查 | 本 Skill 检索 → academic-reviser 审查 |
+
 ## 何时读取 references/
 
 | Reference 文件 | 打开条件 |
