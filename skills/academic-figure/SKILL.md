@@ -126,6 +126,41 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Two
 
 **使用方式**：由 `academic-paper-writer` 核心编排器在 Step 6.4 委托时，按 `academic-paper-writer/references/workflow-step-5-8.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只生成图表，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
 
+## 独立使用
+
+当本 Skill 被独立加载（不通过 `academic-paper-writer` 编排器）时：
+
+### 典型请求
+- "帮我根据这个 CSV 画一个性能对比柱状图"
+- "生成一个双分支 Transformer 的架构图提示词"
+- "看看我这张图能不能直接投稿"
+- "建议一下我 Method 部分需要什么图"
+
+### 入口分流
+
+| 用户输入特征 | 匹配模式 | 优先级 | 行为 |
+|------------|---------|--------|------|
+| 提供数据文件（CSV/TSV） | chart-from-data | 2（文件特征触发） | A 路径：类型选择 → Contract → 代码 → QA → SVG |
+| 描述模型结构（无数据） | arch-prompt | 3（内容特征） | B 路径：分析架构 → 生成提示词（工具无关） |
+| 提供论文章节描述 | figure-blueprint | 4（需询问） | 分析可图示化内容 → 输出建议 + 数据需求 |
+| 提供现有图文件 | figure-audit | 1（用户显式指定） | QA 检查 → 审查报告 |
+| 提供现有图 + 修改要求 | figure-revision | 1（用户显式指定） | 判断可执行路径 → 修改 → QA |
+| 指定路径字段 `path: "A"` 或 `path: "B"` | 按指定 | 0（最高） | 忽略自动推断，按指定路径执行 |
+
+### 执行约束
+- 开始前必须确认：图表用途（支撑哪个 claim）、数据来源（如有）、目标 venue 图表规范
+- A 路径必须经过 QA Contract（8 项）方可交付，最多 2 轮
+- B 路径提示词不得包含特定工具参数（`--ar`、`--style` 等）
+- Python 运行时不可用时按 Fallback 降级（见 figure_agent.md）
+- 优先输出 SVG/PDF 矢量格式
+
+### 组合使用指引
+| 场景 | 推荐方式 |
+|------|---------|
+| 只需生成单张图 | 本 Skill（独立） |
+| 起草论文时自动补全 [FIGURE_NEEDED] | academic-paper-writer 编排器（Step 6.4） |
+| 需在不同 section 保持风格统一 | 先独立生成所有图，再由编排器整合 |
+
 ## 何时读取 references/
 
 | Reference 文件 | 打开条件 |
