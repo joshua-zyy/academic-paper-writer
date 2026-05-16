@@ -5,37 +5,17 @@
 - **A 路径** — 实验数据图（Python matplotlib/seaborn 生成代码→执行→SVG/PDF/TIFF）
 - **B 路径** — 模型架构图（结构化生图提示词→用户自行生图）
 
-## 路径路由逻辑
-
-```yaml
-输入判断:
-  - 用户提供了数据文件或数值 → A 路径（chart-from-data）
-  - 用户描述了模型结构或无数据但有架构描述 → B 路径（arch-prompt）
-  - 用户未提供数据也未提供结构描述 → 询问用户意图
-  - path 字段显式指定 → 按指定路径执行
-
-B 路径触发条件（path 缺失时自动推断）:
-  满足任一即选 B:
-    - figure_purpose 含以下关键词: architecture, structure, pipeline, diagram, network, flow, overview
-    - figure_purpose 明确描述模型组件、模块连接或数据流（而非数据对比/性能分析）
-    - data_source 为 null 且用户描述指向架构而非实验数据
-  A 路径触发条件（path 缺失时自动推断）:
-    - data_source 非空且 figure_purpose 指向性能对比/曲线/分布
-    - figure_purpose 含以下关键词: comparison, curve, distribution, ablation, training, loss
-  - 均不匹配 → 请求用户明确指定路径
-```
-
 ## Input Schema
 
 ```yaml
-path: "A" | "B"                       # 强制，缺失时按路由逻辑推断
-data_source: string | null            # A 路径需要：CSV/TSV/Numpy 路径
-chart_type: string | null             # A 路径需要：如 bar, line, heatmap
-figure_purpose: string                # 图表在论文中的用途
+path: "A" | "B"                       # [required] 缺失时按路由逻辑推断
+data_source: string | null            # [optional] A 路径需要：CSV/TSV/Numpy 路径
+chart_type: string | null             # [optional] A 路径需要：如 bar, line, heatmap
+figure_purpose: string                # [required] 图表在论文中的用途
 style_preferences:
-  color_palette: "academic" | "grayscale" | "custom" | null
-  width: "single_column" | "double_column" | null
-  dpi: integer | null
+  color_palette: "academic" | "grayscale" | "custom" | null  # [optional]
+  width: "single_column" | "double_column" | null            # [optional]
+  dpi: integer | null                                        # [optional]
 ```
 
 ## Output Schema
@@ -65,7 +45,29 @@ figure_description:
   annotations: string[]               # 标注要求
 ```
 
-## QA Contract（内联检查项）
+## Execution
+
+### 路径路由逻辑
+
+```yaml
+输入判断:
+  - 用户提供了数据文件或数值 → A 路径（chart-from-data）
+  - 用户描述了模型结构或无数据但有架构描述 → B 路径（arch-prompt）
+  - 用户未提供数据也未提供结构描述 → 询问用户意图
+  - path 字段显式指定 → 按指定路径执行
+
+B 路径触发条件（path 缺失时自动推断）:
+  满足任一即选 B:
+    - figure_purpose 含以下关键词: architecture, structure, pipeline, diagram, network, flow, overview
+    - figure_purpose 明确描述模型组件、模块连接或数据流（而非数据对比/性能分析）
+    - data_source 为 null 且用户描述指向架构而非实验数据
+  A 路径触发条件（path 缺失时自动推断）:
+    - data_source 非空且 figure_purpose 指向性能对比/曲线/分布
+    - figure_purpose 含以下关键词: comparison, curve, distribution, ablation, training, loss
+  - 均不匹配 → 请求用户明确指定路径
+```
+
+### QA Contract（内联检查项）
 
 chart-from-data 模式必须在交付前逐项检查：
 
@@ -99,11 +101,6 @@ qa_items:
 
 任何 QA 项 fail → 修改代码并重跑 → 最多 **2 轮**。2 轮后仍有 fail → 在 QA 报告中标记所有未通过项，交付当前最佳版本。
 
-## Delegation
-本 Agent 由 `academic-paper-writer` 核心编排器在以下入口委托调用：
-- **用户显式触发**：起草过程中用户主动要求生成图表
-- **Step 6.4**：Draft v1 完成后自动检测架构图占位符并触发 arch-prompt 模式（自动触发）
-
 ## Red Lines
 1. **只生成图表——禁止修改项目代码或数据文件**：图表 agent 只生成图表文件和脚本，**绝对不得修改项目中的源代码、配置文件或实验数据文件**。如需修改数据格式以适配绘图，创建新文件而非覆盖原文件。
 2. 禁止用虚构数据绘图
@@ -112,6 +109,16 @@ qa_items:
 5. 禁止在架构图中编造不存在的网络结构或数据流
 6. 禁止输出仅 PNG 位图
 7. 禁止跳过 QA Contract
+
+## Invocation
+
+### 编排器调用
+本 Agent 由 `academic-paper-writer` 核心编排器在以下入口委托调用：
+- **用户显式触发**：起草过程中用户主动要求生成图表
+- **Step 6.4**：Draft v1 完成后自动检测架构图占位符并触发 arch-prompt 模式（自动触发）
+
+### 独立使用
+本 Agent 不提供独立使用入口。独立图表生成任务请直接使用 `academic-figure` Skill。
 
 ## Fallback: Python 运行时不可用（A 路径）
 
