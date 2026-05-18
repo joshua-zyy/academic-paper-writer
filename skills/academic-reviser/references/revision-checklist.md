@@ -23,6 +23,7 @@
 11. [ ] 若当前为 Introduction 或 Related Work：是否先做过同领域 exemplar 调研，而非直接套用通用模板
 12. [ ] 若当前为 Experimental Setup 或 Data：是否把领域常见默认协议误写成当前项目已确认事实
 13. [ ] 若当前为 Discussion 或解释性段落：是否清楚区分"观察结果"和"领域解释"
+14. [ ] 是否存在 Section Contract，并且当前 section 的 required moves、reader-state 转换与 evidence hooks 已落实或显式标为 debt
 
 若任一项失败，先修事实，再谈语言。
 
@@ -43,6 +44,7 @@
 - [ ] 实验设置里的具体协议是否真的有 artifact 支撑，还是按领域习惯补出来的？
 - [ ] 讨论里的领域解释是否有已核验文献支撑，还是只是把观察结果包装成更强解释？
 - [ ] 是否把"内部审查备注"错误地写进论文正文，而不是留在 sidecar critique？
+- [ ] 当前 section 是否完成 `skills/academic-paper-writer/references/section-writing-contracts.md` 中对应类型的论证功能，而不是只达到表面流畅？
 
 对这些问题，要么补证据，要么弱化表述，要么把风险显式写出。
 
@@ -60,6 +62,7 @@
 - [ ] 正文引用样式是否统一
 - [ ] 正文中是否残留 AI 典型机械痕迹：连续多句以相同句式开头、段落首句均为空泛铺垫、高频连接词"此外/然而/因此"扎堆出现
 - [ ] 句子之间是否只靠连接词维持表面连贯，而缺少因果、转折或递进的深层逻辑衔接
+- [ ] 若 `section_contract_debt = open`，是否阻止将 Verification 判为 passed
 
 注意：不要把语言润色放在事实检查之前。
 

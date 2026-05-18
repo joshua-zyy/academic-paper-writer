@@ -15,6 +15,7 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 4. 禁止删除占位符而不补真实内容
 5. 禁止因草稿篇幅长就假设它足够可信
 6. 禁止用更华丽的写法掩盖内容不足（如 related work 薄用漂亮 prose 包装）
+7. 禁止在 `section_contract_debt` 未闭合时判为 passed；结构性论证缺口不能用 prose_debt closed 替代。
 
 ## 非协商规则
 
@@ -83,6 +84,7 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 - 判定：`passed` / `failed` / `blocked`
 - **Overall Score**: X/10（9-10: 所有 debt 闭合，内容充实; 7-8: 硬 debt 闭合，少量可改进; 5-6: 主要 debt 闭合，中等改进空间; 3-4: 部分 debt 未闭合; 1-2: 多个 debt 未闭合）
 - `prose_debt`: open / closed
+- `section_contract_debt`: open / closed
 - `citation_debt`: open / closed
 - `evidence_debt`: open / closed
 - `figure_debt`: open / closed
@@ -167,7 +169,7 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 - 结果、表格、摘要相互一致
 - style brief 与正文不冲突（若适用）
 - 核心章节不再只是骨架式短稿
-- 无未闭合的 citation debt、protocol debt、result debt、prose debt、rationale debt、evidence debt、figure debt
+- 无未闭合的 citation debt、protocol debt、result debt、section_contract_debt、prose debt、rationale debt、evidence debt、figure debt
 
 否则，输出"当前最佳版本 + 未闭合问题清单"。
 

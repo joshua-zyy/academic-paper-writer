@@ -10,7 +10,9 @@
 
 - Create a todo list for plan core modules.
 - Read `references/paper-structure.md` and select structure by paper type and venue.
+- Read `references/section-writing-contracts.md` and create a Section Contract for each planned section: reader state before/after, required moves, evidence hooks, and section-specific failure checks.
 - Generate Evidence Map: section goal, key claims, evidence sources, gaps.
+- The Section Blueprint must map each paragraph/subsection to a required move in the contract. If a move lacks evidence, record the proper placeholder instead of silently omitting it.
 
 **Introduction / Related Work must generate a Section Blueprint**:
 - Exemplar Set observed structures
@@ -68,6 +70,7 @@ unresolved. To bridge this gap, we propose a dual-branch Transformer that...
 ## Step 6: Draft v1
 
 - Create a todo list for subtopics to cover.
+- **Section Contract Gate**: before writing prose, check the current Section Contract from Step 5. Draft v1 must satisfy the section's required moves or preserve explicit debt placeholders. If the contract is missing, return to Step 5 instead of drafting.
 - **前置检查：是否需要深层探查** — 在起草前检查当前 section 类型，按以下规则决定是否需要 dispatch 深层探查：
   | 当前 section | 需 dispatch 的探查 | 并行策略 |
   |-------------|-------------------|---------|
@@ -115,6 +118,7 @@ Task B:
 Body constraints:
 - Paper Body = draft text only; critique/audit notes go to sidecar.
 - Only use verified references and confirmed experiment facts for definitive claims.
+- Draft paragraphs must follow the current Section Contract rather than generic templates. Fluent prose is not sufficient if reader state, required moves, evidence hooks, or failure checks remain unresolved.
 - **Evidence type annotation**: Every numerical result in body must be annotated with its evidence type:
   - `newly_run` results: append "(newly_run, YYYY-MM-DD)" or similar timestamp
   - `preexisting_artifact` results: append "(preexisting_artifact, source: path/to/file)"

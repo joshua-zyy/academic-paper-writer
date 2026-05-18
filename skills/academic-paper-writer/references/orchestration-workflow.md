@@ -38,7 +38,7 @@
 | 2 | 证据审计（并行 dispatch probe agents） | — | 自动，涉及多 probe 时**必须并行** | — |
 | 3 | 文献检索与核验（3a 本地优先 + 3b 联网 + 3c 聚合） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 | — |
 | 4 | 实验事实复核 | `academic-experiments`（dispatch 子 Agent） | 自动 | — |
-| 5 | 生成 Section / Method Blueprint | — | 自动 | DP-2 |
+| 5 | 生成 Section Contract + Section / Method Blueprint | — | 自动 | DP-2 |
 | 6 | 起草 Draft v1（含占位符系统 + **待补项清单**） | — | 自动 | DP-3 |
 | 7 | 占位符审计 + 图表生成 | `academic-figure`（dispatch 子 Agent，arch-prompt） | 自动 | — |
 | 8 | 证据合规审查（Phase 1） | `academic-reviser`（dispatch 子 Agent） | 自动 | — |

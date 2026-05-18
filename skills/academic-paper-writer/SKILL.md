@@ -164,6 +164,7 @@ Step 6 (Method): 6.1 → 6.2 → ... → 6.9
 15. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 `min_citations`（默认 35，short paper 建议 20，workshop 建议 15）。**Step 1 必须询问用户预期引用数量**，用户指定时记录为 `min_citations`，未指定时使用默认值。论文完成后 Step 8 生成引用清单时自动核验。
 16. **两阶段写作**：Step 5 Blueprint 可使用 bullet points 和提纲式结构，但 Step 6 Draft v1 必须是完整 prose 段落。bullet points 仅用于规划阶段，不得出现在最终论文正文中。
 17. **最大迭代次数**：修订循环（Step 6.7→6.8→12）最多执行 3 轮。3 轮后仍有未闭合 debt 时，标记为 `unresolvable`，输出修订报告并终止循环，不得继续重试。
+18. **Section Contract 先于 prose**：每节在 Step 5 必须根据 `references/section-writing-contracts.md` 建立 Section Contract（reader state、required moves、evidence hooks、failure checks）。Step 6 Draft v1 不得跳过该 contract 直接写正文；润色只能在 contract debt 基本闭合后执行。
 
 ## 文件输出规范
 
@@ -305,7 +306,7 @@ Phase 3: 6.9 整合 → 推进到下一节
 | 2 | 证据审计（dispatch probe agents） | — | 自动 |
 | 3 | 文献检索与核验（3a 本地优先 + 3b 联网 + 3c 聚合） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 |
 | 4 | 实验事实复核 | `academic-experiments`（dispatch 子 Agent） | 自动 |
-| 5 | 生成 Section / Method Blueprint | — | 自动 |
+| 5 | 生成 Section Contract + Section / Method Blueprint | — | 自动 |
 | **6** | **Section Complete Loop**（包含原Step 7-11，见下方详细说明） | — | 自动 |
 | 7 | 整合 & 依赖感知 section loop | — | 自动 |
 | 8 | **引用清单生成**（强制，论文完成时必执行） | — | 自动 |
@@ -320,6 +321,7 @@ Phase 3: 6.9 整合 → 推进到下一节
 ## Step 6 执行清单
 
 ### Phase 1: 起草
+- [ ] 6.0 读取并核对 Section Contract（`references/section-writing-contracts.md`）
 - [ ] 6.1 前置探查（按section类型dispatch，见下方探查规则表）
 - [ ] 6.2 生成Draft v1（含占位符系统 + 待补项清单）
 - [ ] 6.3 写入paper_draft.md
@@ -409,6 +411,7 @@ Agent 定义与 dispatch 模板见各子 skill 的 `agents/` 目录。
 |---------------|---------|
 | `references/paper-structure.md` | 选章节结构时 |
 | `references/writing-guidelines.md` | venue 风格适配时 |
+| `references/section-writing-contracts.md` | Step 5 生成 Section Contract；Step 6.0/6.8 检查章节论证功能时 |
 | `references/iteration-control.md` | 进入修订循环时 |
 | `references/content-density.md` | Step 6.7 扩写检查 |
 | `references/figure-generation-guide.md` | Step 6.4 生成图表时 |

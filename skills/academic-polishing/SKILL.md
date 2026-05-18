@@ -14,6 +14,7 @@ description: "Polish academic prose, de-AI-ify text, control claim strength, or 
 3. 禁止把未核验的 user_claim 改写成确定性的强结论
 4. 禁止在 Method 中保留元评论、代码讲解或审稿人对话口吻
 5. 禁止用更华丽的措辞掩盖 evidence gap（如用长篇 prose 包装缺失的实验结果）
+6. 禁止把结构性缺口当作语言问题处理。若 section 缺少必要论证功能、reader-state 转换或 evidence hooks，必须标记 `section_contract_debt = open`，退回 `academic-paper-writer` 的 Section Contract / Blueprint，而不是继续润色。
 
 ## AI 介入边界（Traffic Light）
 
@@ -33,6 +34,7 @@ description: "Polish academic prose, de-AI-ify text, control claim strength, or 
 4. Claim 强度必须与证据等级严格匹配：强结论需有本地可复核结果 + 无协议缺陷。
 5. Method 相关 section 必须形成"问题 → 设计 → 机制 → 收益/边界"叙事，不得停留于公式罗列。
 6. 当输入中包含 `evidence_debt = open` 时，对标记为证据不足的句子仅修正语法错误，不得进行风格强化或措辞润色——避免将无证据支撑的主张打磨得更有说服力。
+7. 当输入中包含 `section_contract_debt = open` 或明显缺少 section-level required moves 时，仅输出问题定位和最小语言修正；不得代替 `academic-paper-writer` 重新设计整节结构。
 
 ## 任务模式
 
@@ -62,12 +64,15 @@ description: "Polish academic prose, de-AI-ify text, control claim strength, or 
 
 输出：`prose_debt: open|closed`、`failed_items: [list]`
 
+若发现问题属于 section-level 结构债务（例如 Introduction 未建立 gap cost、Related Work 无 work clusters、Results 无主问题、Discussion 无边界分析），同时输出 `section_contract_debt: open` 并建议回到 `academic-paper-writer/references/section-writing-contracts.md` 重建 Section Contract。
+
 ### Step 3: Prose Rewrite（若 prose_debt 为 open）
 
 - 将提纲式句子改为完整论证段落
 - 将元评论、说明文和代码导览口吻改写为学术 prose
 - 将罗列式段落改为具有论证链和段内逻辑衔接的连贯段落
 - 执行去AI化改写（参考 `references/de-ai-patterns.md`）
+- 若 `section_contract_debt = open`，只做局部可安全改写；不得补写整节缺失的 required moves，避免把结构债务伪装成流畅 prose。
 
 Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 prose_debt: open，允许继续后续步骤但最终 Verification 不得判为 passed。
 
@@ -114,6 +119,7 @@ Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 
 ```md
 ## Prose Quality Gate Result
 - prose_debt: open|closed
+- section_contract_debt: open|closed
 - failed_items: [...]
 - method_prose_debt: open|closed (if applicable)
 
