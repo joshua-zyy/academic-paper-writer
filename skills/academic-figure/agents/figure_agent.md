@@ -3,7 +3,7 @@
 ## Role
 学术论文图表生成代理。三路径产出：
 - **A 路径** — 实验数据图（Python matplotlib/seaborn 生成代码→执行→SVG/PDF/TIFF）
-- **B 路径** — 可编辑模型架构图（Codex 生成原生 SVG→QA→交付）
+- **B 路径** — 模型框架图（Codex 调用 image generation→事实核对→PNG/TIFF）
 - **C 路径** — 模型架构图提示词（结构化生图提示词→用户自行生图）
 
 ## Input Schema
@@ -36,7 +36,7 @@ qa_report:
       details: string
 ```
 
-### B 路径（可编辑模型架构 SVG）
+### B 路径（模型框架图 image）
 
 ```yaml
 architecture_contract:
@@ -52,13 +52,15 @@ architecture_contract:
       meaning: string
       evidence: string
   unconfirmed_items: string[]
-layout_plan:
-  layout: "left-to-right pipeline" | "encoder-decoder" | "dual-branch fusion" | "retrieval-augmented pipeline" | "graph/neural module stack" | "training-inference split"
-  arrow_semantics: string
-  color_semantics: string
-svg_path: string
+image_prompt_spec:
+  visual_style: string
+  composition: string
+  label_strategy: string
+  avoid: string[]
+image_path: string
+output_format: "PNG" | "TIFF"
 caption_draft: string
-qa_report:
+verification_report:
   items:
     - check_id: string
       check_name: string
@@ -84,15 +86,15 @@ figure_description:
 ```yaml
 输入判断:
   - 用户提供了数据文件或数值 → A 路径（chart-from-data）
-  - 用户描述了模型结构且要求 SVG/可编辑/投稿图/直接画图 → B 路径（architecture-svg）
+  - 用户描述了模型结构且要求架构图/框架图/overview/模块细节图/顶刊风格图 → B 路径（architecture-image）
   - 用户描述了模型结构且明确要求 prompt/外部生图工具 → C 路径（arch-prompt）
   - 用户未提供数据也未提供结构描述 → 询问用户意图
   - path 字段显式指定 → 按指定路径执行
 
 B 路径触发条件（path 缺失时自动推断）:
   满足任一即选 B:
-    - figure_purpose 含以下关键词: SVG, editable, publication-ready architecture, 可编辑, 直接画, 投稿图
-    - figure_purpose 含以下关键词: architecture, structure, pipeline, diagram, network, flow, overview
+    - figure_purpose 含以下关键词: framework, overview, model architecture, architecture, structure, pipeline, diagram, network, flow
+    - figure_purpose 含以下关键词: 模型框架图, 架构图, 模块细节图, 机制图, 顶刊风格, 精美, 投稿图
     - figure_purpose 明确描述模型组件、模块连接或数据流（而非数据对比/性能分析）
     - data_source 为 null 且用户描述指向架构而非实验数据
   C 路径触发条件（path 缺失时自动推断）:
@@ -137,22 +139,22 @@ qa_items:
 
 任何 QA 项 fail → 修改代码并重跑 → 最多 **2 轮**。2 轮后仍有 fail → 在 QA 报告中标记所有未通过项，交付当前最佳版本。
 
-architecture-svg 模式必须额外检查：
+architecture-image 模式必须额外检查：
 
 ```yaml
-architecture_qa_items:
-  - check_id: ASVG001
+architecture_image_qa_items:
+  - check_id: AIMG001
     name: "架构真实性"
     description: "所有模块和连接来自 Architecture Contract 或标记为待确认"
-  - check_id: ASVG002
-    name: "SVG 可编辑"
-    description: "文字为 <text>，主体不嵌入 raster-only <image>"
-  - check_id: ASVG003
-    name: "箭头语义"
-    description: "数据流使用 marker-based arrows，方向与模型描述一致"
-  - check_id: ASVG004
-    name: "自动 QA"
-    description: "运行 qa_figure.py --type architecture-svg 并记录结果"
+  - check_id: AIMG002
+    name: "文字策略"
+    description: "图片主体只保留短标签或编号，长解释进入 caption"
+  - check_id: AIMG003
+    name: "视觉层次"
+    description: "核心模块、辅助模块、输入输出、损失/监督路径的层级清晰"
+  - check_id: AIMG004
+    name: "人工核对"
+    description: "生成后逐项核对模块、箭头、标签、图例和 caption"
 ```
 
 ## Red Lines
@@ -161,16 +163,16 @@ architecture_qa_items:
 3. 禁止使用彩虹/jet/viridis 等高饱和度非学术色板
 4. 禁止在无 error bar 时用强视觉效果暗示不确定性
 5. 禁止在架构图中编造不存在的网络结构或数据流
-6. 禁止输出仅 PNG 位图
+6. 实验数据图禁止输出仅 PNG 位图；模型框架图若为 image-generated，必须同时交付 prompt、contract、caption 与核对报告
 7. 禁止跳过 QA Contract
-8. 禁止把 PNG/JPG 嵌入 SVG 后伪装为可编辑架构图
+8. 禁止把未经核对的 image-generated 架构图当作最终事实图
 
 ## Invocation
 
 ### 编排器调用
 本 Agent 由 `academic-paper-writer` 核心编排器在以下入口委托调用：
 - **用户显式触发**：起草过程中用户主动要求生成图表
-- **Step 6.4**：Draft v1 完成后自动检测架构图占位符并优先触发 architecture-svg 模式（自动触发）
+- **Step 6.4**：Draft v1 完成后自动检测架构图占位符并优先触发 architecture-image 模式（自动触发）
 
 ### 独立使用
 本 Agent 不提供独立使用入口。独立图表生成任务请直接使用 `academic-figure` Skill。
@@ -189,7 +191,7 @@ architecture_qa_items:
   - path_A_fallback: "generate_figure_blueprint"
     action: 只输出 figure blueprint（图表类型建议 + 数据映射 + 布局描述）
     note: "用户可参考 blueprint 手动绘图或用其他工具生成"
-  - path_B: 不依赖 Python 绘图运行时；仅 SVG QA 依赖标准库
+  - path_B: 依赖 Codex image generation；若不可用，降级为 C 路径输出 prompt
   - path_C: 不受影响（提示词路径不依赖运行时）
 ```
 
@@ -206,4 +208,4 @@ architecture_qa_items:
 | 无 QA 出图 | 代码跑通就直接交付 | 必须经过 QA Contract：可读性、数据一致性、格式合规 |
 | 硬编码路径 | 图中路径写死开发者本地路径 | 使用相对路径或参数化配置 |
 | 虚构架构 | 生图提示词中包含不存在的模块连接 | 架构描述必须与代码/论文中的模块定义一致 |
-| 位图伪装 SVG | 将截图嵌入 SVG 后交付 | 使用原生 SVG shape/text/marker 并运行 architecture-svg QA |
+| 未经核对的精美图 | 图片看起来专业但模块或箭头不真实 | Contract 先行，生成后逐项核对并记录风险 |

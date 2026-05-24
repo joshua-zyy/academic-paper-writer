@@ -1,6 +1,6 @@
 ---
 name: academic-figure
-description: "Create, revise, or audit academic figures for CS/AI/ML papers. Supports data figure code generation, editable SVG model architecture diagrams, and tool-agnostic architecture prompts. Use when: generating publication-ready model architecture SVGs, generating architecture diagram prompts, creating data plots from experiment results, auditing existing figures, suggesting figure types for paper sections, revising figure colors/layouts/labels. Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, SVG架构图, model architecture, plot, publication figure, 数据可视化, generate plot, architecture diagram."
+description: "Create, revise, or audit academic figures for CS/AI/ML papers. Supports publication-ready data plots, high-quality image-generated model architecture figures, and tool-agnostic architecture prompts. Use when: generating model framework images, overview figures, module detail figures, data plots from experiment results, auditing existing figures, suggesting figure types for paper sections, revising figure colors/layouts/labels. Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, 模型框架图, overview figure, model architecture, plot, publication figure, 数据可视化, generate plot, architecture diagram."
 ---
 
 # Academic Figure
@@ -10,7 +10,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 | 路径 | 类型 | 产出方式 |
 |------|------|---------|
 | **A** | 实验数据图（训练曲线、消融实验、性能对比、混淆矩阵等） | Python (matplotlib/seaborn) 生成代码→执行→SVG/PDF/TIFF |
-| **B** | 可编辑模型架构图（网络结构、流程图、系统管线） | Codex 直接生成 SVG→QA→交付 |
+| **B** | 模型框架图（复杂架构、overview、模块细节图） | Codex 调用 image generation→人工核对→交付 PNG/TIFF |
 | **C** | 架构图提示词（外部生图工具） | 生成结构化生图提示词→用户自行生图 |
 
 ## Red Lines（绝对禁止）
@@ -19,10 +19,10 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 2. 禁止使用彩虹/jet/viridis 等高饱和度非学术色板
 3. 禁止在无 error bar 或统计信息时用强视觉效果暗示不确定性
 4. 禁止在架构图中编造不存在的网络结构、模块连接或数据流
-5. 禁止输出仅 PNG 位图——必须提供可编辑矢量格式（SVG/PDF）
+5. 实验数据图禁止输出仅 PNG 位图——必须提供可编辑矢量格式（SVG/PDF）；模型框架图若为 image-generated，必须同时交付 prompt、contract、caption 与核对报告
 6. 禁止在生图提示词中包含无法实现的渲染细节（如"完美 3D 透视"）
 7. 禁止跳过 QA Contract
-8. 禁止在架构 SVG 中把文字转成 path 或嵌入 raster-only 截图
+8. 禁止把 image-generated 架构图当作未经核对的最终事实图；必须列出人工核对项
 
 ## AI 介入边界（Traffic Light）
 
@@ -41,17 +41,17 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 3. 坐标轴从非零起点时必须标注截断标记，不得静默缩放。
 4. 误差棒 / 置信区间必须标注含义（std / SEM / 95% CI），不得只画不解释。
 5. 配色不得依赖纯色相作为唯一区分方式——必须结合亮度差、纹理或标注。
-6. 向量输出（SVG/PDF）必须是文字可编辑格式，不得将所有文字渲染为 path。
+6. 实验数据图的向量输出（SVG/PDF）必须是文字可编辑格式，不得将所有文字渲染为 path。
 7. 源数据（CSV/TSV）必须与图表同时交付，不得只给图片。
 8. 架构图提示词必须是工具无关的描述式语言，不得内嵌特定工具参数（--ar、--style 等）。
-9. 架构 SVG 必须严格来自用户提供的模型结构、论文草稿或代码证据；缺失连接必须标为待确认，不得补画。
+9. 模型框架图必须严格来自用户提供的模型结构、论文草稿或代码证据；缺失连接必须标为待确认，不得补画。
 
 ## 任务模式
 
 | Mode | 用途 |
 |------|------|
 | `chart-from-data` | 给定实验数据和图表类型，出实验数据图（Python 代码生成 + 执行） |
-| `architecture-svg` | 给定模型结构描述，直接生成可编辑 SVG 架构图 |
+| `architecture-image` | 给定模型结构描述，生成顶刊风格模型框架图片 |
 | `arch-prompt` | 给定模型结构描述，出外部生图工具可用的架构图提示词 |
 | `figure-blueprint` | 给定论文章节，建议需要哪些图和对应图表类型 |
 | `figure-audit` | 审查现有 figure 是否符合发表标准 |
@@ -66,20 +66,20 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 ```
 用户请求 → 判断图类型
   ├─ 实验数据图 → chart-from-data 模式
-  ├─ 模型架构图 + 需要可投稿/可编辑/可复现 → architecture-svg 模式
+  ├─ 模型架构图 / framework / overview / 模块细节图 → architecture-image 模式
   └─ 模型架构图 + 用户明确要外部生图工具提示词 → arch-prompt 模式
 
 自动触发：academic-paper-writer 的 Step 6.4 在 Draft v1 完成后，会自动扫描正文中的 [FIGURE_NEEDED] 占位符，
-对架构图类占位符默认以 architecture-svg 模式调用本 Skill；若模型结构证据不足，则输出待确认清单并降级为 arch-prompt 或 `[FIGURE_NEEDED]`。
+对架构图类占位符默认以 architecture-image 模式调用本 Skill；若模型结构证据不足，则输出待确认清单并降级为 arch-prompt 或 `[FIGURE_NEEDED]`。
 ```
 
 ### 路径 A — chart-from-data（实验数据图）
 
 详见 `references/workflow-chart-from-data.md`。核心步骤：确认用途 → 选择图表类型 → Figure Contract → 检查运行时 → 生成代码 → 执行导出 → QA Contract → 交付。
 
-### 路径 B — architecture-svg（可编辑模型架构图）
+### 路径 B — architecture-image（模型框架图）
 
-详见 `references/workflow-architecture-svg.md`。核心步骤：Architecture Contract → Layout Plan → SVG 生成 → SVG QA → 交付。
+详见 `references/workflow-architecture-image.md`。核心步骤：Architecture Contract → Prompt Spec → image generation → 视觉/事实核对 → 交付。
 
 ### 路径 C — arch-prompt（模型架构图提示词）
 
@@ -117,12 +117,12 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 2. 生图提示词（通用格式）
 3. 使用说明
 
-### architecture-svg
+### architecture-image
 1. Architecture Contract
-2. Layout Plan
-3. 可编辑 SVG 文件
+2. Image Prompt Spec
+3. PNG / TIFF 图片
 4. 图注草稿
-5. SVG QA 报告
+5. 事实核对清单与风险提示
 
 ### figure-blueprint
 1. 针对当前章节的图类型建议列表
@@ -148,7 +148,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 
 ### 典型请求
 - "帮我根据这个 CSV 画一个性能对比柱状图"
-- "帮我直接画一个可编辑的模型架构 SVG"
+- "帮我画一个顶刊风格的模型框架图"
 - "生成一个双分支 Transformer 的架构图提示词"
 - "看看我这张图能不能直接投稿"
 - "建议一下我 Method 部分需要什么图"
@@ -158,7 +158,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 | 用户输入特征 | 匹配模式 | 优先级 | 行为 |
 |------------|---------|--------|------|
 | 提供数据文件（CSV/TSV） | chart-from-data | 2（文件特征触发） | A 路径：类型选择 → Contract → 代码 → QA → SVG |
-| 描述模型结构并要求画图/SVG/可编辑/投稿图 | architecture-svg | 2（内容特征） | B 路径：Contract → Layout → SVG → QA |
+| 描述模型结构并要求画图/框架图/overview/模块细节图/顶刊风格图 | architecture-image | 2（内容特征） | B 路径：Contract → Prompt Spec → image generation → 核对 |
 | 描述模型结构并明确要提示词/prompt/外部生图 | arch-prompt | 3（内容特征） | C 路径：分析架构 → 生成提示词（工具无关） |
 | 提供论文章节描述 | figure-blueprint | 4（需询问） | 分析可图示化内容 → 输出建议 + 数据需求 |
 | 提供现有图文件 | figure-audit | 1（用户显式指定） | QA 检查 → 审查报告 |
@@ -168,11 +168,12 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 ### 执行约束
 - 开始前必须确认：图表用途（支撑哪个 claim）、数据来源（如有）、目标 venue 图表规范
 - A 路径必须经过 QA Contract（8 项）方可交付，最多 2 轮
-- B 路径必须输出可编辑 SVG；所有文字必须为 `<text>`；数据流必须用 marker-based arrows
+- B 路径必须先建立 Architecture Contract，再调用 image generation；不得直接凭审美生成
 - B 路径不得编造模块、连接、损失函数、输入输出或训练流程；不确定项保留 `[VERIFY_ARCH: ...]`
+- B 路径中复杂文字应转为编号、短标签或图例；详细解释放入 caption，避免 image model 生成长文本
 - C 路径提示词不得包含特定工具参数（`--ar`、`--style` 等）
 - Python 运行时不可用时按 Fallback 降级（见 figure_agent.md）
-- 优先输出 SVG/PDF 矢量格式
+- 实验数据图优先输出 SVG/PDF 矢量格式；模型框架图输出 PNG/TIFF 并保存 prompt 与核对清单
 
 ### 组合使用指引
 | 场景 | 推荐方式 |
@@ -189,9 +190,9 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 | `references/chart-types.md` | chart-from-data 模式的 Step 2（类型选择） |
 | `references/design-theory.md` | 所有涉及配图输出的场景（全局规范） |
 | `references/architecture-prompting.md` | arch-prompt 模式（架构图提示词生成） |
-| `references/workflow-architecture-svg.md` | architecture-svg 模式（直接生成可编辑 SVG 架构图） |
+| `references/workflow-architecture-image.md` | architecture-image 模式（调用 image generation 生成模型框架图） |
 | `references/figure-contract.md` | chart-from-data 模式的 Step 3 |
-| `references/qa-contract.md` | chart-from-data 的 Step 7 / architecture-svg 的 SVG QA / figure-audit 的 Step 2 |
+| `references/qa-contract.md` | chart-from-data 的 Step 7 / architecture-image 的事实核对 / figure-audit 的 Step 2 |
 | `references/tutorials.md` | 用户需要端到端参考示例时 |
 
 ## 终止条件
@@ -209,11 +210,11 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 - 无特定生图工具的硬编码参数
 - 提示词中无虚构的模块或连接
 
-### architecture-svg
-- SVG 通过 `python skills/academic-figure/scripts/qa_figure.py --input <svg> --type architecture-svg`
-- 所有模块名称均来自 Architecture Contract 或明确标记为待确认
-- 数据流箭头方向与模型描述一致
-- 无 `<image>` raster-only 嵌入，文字保持为 `<text>`
+### architecture-image
+- 图片生成前已完成 Architecture Contract
+- 所有模块、连接、输入输出均来自 Contract 或明确标记为待确认
+- 复杂文字未直接压入图片主体，正文解释转入 caption 或图例
+- 输出含生成 prompt、图片文件、图注草稿与人工核对清单
 
 ### figure-audit
 - 所有审查项已完成判定
@@ -238,4 +239,4 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 | 无 QA 出图 | 代码跑通就直接交付用户 | 必须经过 QA Contract：可读性、数据一致性、格式合规 |
 | 硬编码路径 | 图中路径写死开发者本地路径 | 使用相对路径或参数化配置 |
 | 虚构架构 | 生图提示词中包含不存在的模块连接 | 架构描述必须与代码/论文中的模块定义一致 |
-| 位图伪装 SVG | 把 PNG/JPG 嵌入 SVG 后交付 | 使用原生 SVG shape、text、marker，运行 architecture-svg QA |
+| 未经核对的 image 架构图 | 图片看起来精美但模块或箭头可能不真实 | Contract 先行，生成后逐项核对模块、连接与文字 |
