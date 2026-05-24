@@ -10,7 +10,7 @@ Checks:
 2. Color palette is grayscale-safe (no pure hues as sole discriminator)
 3. No rainbow / jet / viridis colormaps
 4. Figure size within venue limits
-5. Axis truncation markers (if y-min > 0)
+5. Architecture SVG structure when --type architecture-svg is used
 """
 
 import argparse
@@ -31,6 +31,7 @@ VENUE_LIMITS = {
 }
 
 BANNED_COLORMAPS = {"jet", "rainbow", "turbo", "nipy_spectral", "gist_rainbow", "hsv"}
+FIGURE_TYPES = {"chart", "architecture-svg"}
 
 
 def check_svg_text_editable(svg_path: str):
@@ -123,16 +124,45 @@ def check_venue_size(svg_path: str, venue: str = None):
     return True, f"Size: {width_attr} x {height_attr} (approx {width_in:.2f}in wide)."
 
 
-def run_qa(svg_path: str, venue: str = None):
+def check_architecture_svg_structure(svg_path: str):
+    """Check SVG architecture diagrams for editable, vector-native structure."""
+    tree = ET.parse(svg_path)
+    root = tree.getroot()
+    ns = {"svg": "http://www.w3.org/2000/svg"}
+
+    texts = root.findall(".//svg:text", ns)
+    images = root.findall(".//svg:image", ns)
+    markers = root.findall(".//svg:marker", ns)
+
+    arrow_elements = []
+    for elem in root.iter():
+        if elem.get("marker-end") or elem.get("marker-start") or elem.get("marker-mid"):
+            arrow_elements.append(elem)
+
+    if images:
+        return False, "Architecture SVG embeds raster <image> elements; use vector shapes and editable text."
+    if len(texts) < 2:
+        return False, f"Architecture SVG needs editable module labels; found {len(texts)} text elements."
+    if not markers or not arrow_elements:
+        return False, "Architecture SVG needs arrow marker definitions and marker-based data-flow arrows."
+    return True, f"Architecture SVG has {len(texts)} text labels and {len(arrow_elements)} marker-based arrows."
+
+
+def run_qa(svg_path: str, venue: str = None, figure_type: str = "chart"):
     """Run all QA checks and return report."""
+    if figure_type not in FIGURE_TYPES:
+        raise ValueError(f"Unsupported figure_type: {figure_type}")
+
     checks = [
         ("Editable Text", check_svg_text_editable),
         ("No Banned Colormaps", check_no_banned_colormaps),
         ("Grayscale Safety", check_grayscale_safety),
         ("Venue Size", lambda p: check_venue_size(p, venue)),
     ]
+    if figure_type == "architecture-svg":
+        checks.append(("Architecture SVG Structure", check_architecture_svg_structure))
 
-    report = {"file": svg_path, "venue": venue, "checks": [], "verdict": "pass"}
+    report = {"file": svg_path, "venue": venue, "figure_type": figure_type, "checks": [], "verdict": "pass"}
     for name, fn in checks:
         ok, msg = fn(svg_path)
         report["checks"].append({"name": name, "status": "pass" if ok else "fail", "message": msg})
@@ -145,6 +175,7 @@ def run_qa(svg_path: str, venue: str = None):
 def print_report(report):
     print(f"\nFigure QA Report: {report['file']}")
     print(f"Venue: {report['venue'] or 'unspecified'}")
+    print(f"Type: {report.get('figure_type', 'chart')}")
     print(f"Verdict: {report['verdict'].upper()}")
     print("-" * 40)
     for c in report["checks"]:
@@ -157,13 +188,14 @@ def main():
     parser = argparse.ArgumentParser(description="QA check academic figures.")
     parser.add_argument("--input", required=True, help="Path to SVG figure")
     parser.add_argument("--venue", choices=list(VENUE_LIMITS.keys()), help="Target venue for size check")
+    parser.add_argument("--type", choices=sorted(FIGURE_TYPES), default="chart", help="Figure type")
     args = parser.parse_args()
 
     if not Path(args.input).exists():
         print(f"Error: File not found: {args.input}", file=sys.stderr)
         sys.exit(1)
 
-    report = run_qa(args.input, venue=args.venue)
+    report = run_qa(args.input, venue=args.venue, figure_type=args.type)
     print_report(report)
     sys.exit(0 if report["verdict"] == "pass" else 1)
 
