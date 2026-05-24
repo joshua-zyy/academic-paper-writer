@@ -57,20 +57,21 @@ description: "Polish academic prose, de-AI-ify text, control claim strength, or 
 - 是否符合去AI化规范（详见 `references/de-ai-patterns.md`）
 
 **章节专项检查项：**
-- Introduction / Related Work：是否只有列举，缺少论证链、综合比较或 work-cluster 叙事
+- Introduction / Related Work：是否只有列举，缺少论证链、综合比较或 work-cluster 叙事；每个 work cluster 是否同时说明 `what it enables` 与 `what it leaves unresolved`
 - Method：是否仍停留在公式罗列或模块说明，缺少"问题 → 设计 → 机制 → 收益/边界"叙事
 - Experimental Setup / Data：是否只有参数或流程罗列，缺少协议、约束与风险说明
 - Discussion / Limitations / Conclusion：是否只有泛泛结论，缺少边界分析、失败模式或限制讨论
 
 输出：`prose_debt: open|closed`、`failed_items: [list]`
 
-若发现问题属于 section-level 结构债务（例如 Introduction 未建立 gap cost、Related Work 无 work clusters、Results 无主问题、Discussion 无边界分析），同时输出 `section_contract_debt: open` 并建议回到 `academic-paper-writer/references/section-writing-contracts.md` 重建 Section Contract。
+若发现问题属于 section-level 结构债务（例如 Introduction 未建立 gap cost、Related Work 无 work clusters、相关工作段无法自然引出下一段 gap、Results 无主问题、Discussion 无边界分析），同时输出 `section_contract_debt: open` 并建议回到 `academic-paper-writer/references/section-writing-contracts.md` 重建 Section Contract。
 
 ### Step 3: Prose Rewrite（若 prose_debt 为 open）
 
 - 将提纲式句子改为完整论证段落
 - 将元评论、说明文和代码导览口吻改写为学术 prose
-- 将罗列式段落改为具有论证链和段内逻辑衔接的连贯段落
+- 将罗列式相关工作段改为类别化综合段：按 work cluster 组织代表文献，逐类写出已支持的能力、残余限制及其如何导向本文 gap；不得新增未核验引用，也不得夸大已有工作的缺陷
+- 将其他罗列式段落改为具有论证链和段内逻辑衔接的连贯段落
 - 执行去AI化改写（参考 `references/de-ai-patterns.md`）
 - 若 `section_contract_debt = open`，只做局部可安全改写；不得补写整节缺失的 required moves，避免把结构债务伪装成流畅 prose。
 

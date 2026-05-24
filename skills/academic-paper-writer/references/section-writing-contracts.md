@@ -41,16 +41,22 @@ Required moves:
 
 1. Establish the important phenomenon or task with field-specific context.
 2. Narrow from broad context to the concrete modeling or evaluation problem.
-3. Synthesize what prior work usually does, grouped by approach rather than by paper list.
+3. Synthesize prior work by approach clusters rather than by paper list. For each cluster, state representative works, what the cluster enables, what residual limitation remains, and how that limitation maps to the paper's concrete gap.
 4. Identify the remaining gap and explain the cost of leaving it unsolved.
 5. Present the proposed bridge: what is modeled, how it differs, and why it addresses the gap.
 6. Summarize verified contributions and, when available, key results within their true scope.
+
+Mini-template for the prior-work move:
+
+`Work cluster -> capability boundary -> residual limitation -> mapped gap/problem in this paper`
 
 Failure checks:
 
 - Opens with generic "deep learning has achieved success" background.
 - States a gap but not why the gap matters.
 - Lists modalities, modules, or techniques before establishing the research problem.
+- Uses "method A did X, method B did Y" paper parade without cluster-level capability and limitation synthesis.
+- Adds only a vague final sentence such as "however, limitations remain" after listing papers, instead of mapping each cluster's limitation to the next gap paragraph.
 - Claims novelty through adjectives rather than contrast with verified prior work.
 - Uses contribution bullets to compensate for a missing narrative chain.
 
