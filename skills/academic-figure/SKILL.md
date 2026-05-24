@@ -189,6 +189,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 | `references/api.md` | chart-from-data 模式的 Step 5（代码生成） |
 | `references/chart-types.md` | chart-from-data 模式的 Step 2（类型选择） |
 | `references/design-theory.md` | 所有涉及配图输出的场景（全局规范） |
+| `references/nature-style-chart-patterns.md` | chart-from-data 模式中需要顶刊式布局、hero panel、legend panel、消融 ladder 或密集多面板图时 |
 | `references/architecture-prompting.md` | arch-prompt 模式（架构图提示词生成） |
 | `references/workflow-architecture-image.md` | architecture-image 模式（调用 image generation 生成模型框架图） |
 | `references/figure-contract.md` | chart-from-data 模式的 Step 3 |

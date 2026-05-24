@@ -8,7 +8,8 @@ Usage:
 This script is intended to be copied and adapted per figure. It enforces:
 - Academic color palette (grayscale-safe)
 - Editable SVG text (svg.fonttype='none')
-- Figure size matching double-column venue standards
+- PDF Type-42 fonts and 600dpi TIFF export
+- Figure size matching journal single/double-column standards
 """
 
 import argparse
@@ -25,6 +26,10 @@ import numpy as np
 # ---------------------------------------------------------------------------
 PALETTE = {
     "blue_main": "#0F4D92",
+    "blue_secondary": "#3775BA",
+    "neutral_light": "#CFCECE",
+    "neutral_mid": "#767676",
+    "neutral_dark": "#4D4D4D",
     "green_3": "#8BCF8B",
     "red_strong": "#B64342",
     "teal": "#42949E",
@@ -33,7 +38,39 @@ PALETTE = {
     "gray_neutral": "#A0A0A0",
 }
 
-PALETTE_LIST = list(PALETTE.values())
+PALETTE_NMI_PASTEL = {
+    "baseline_dark": "#484878",
+    "baseline_mid": "#7884B4",
+    "baseline_soft": "#B4C0E4",
+    "ours_tiny": "#E4E4F0",
+    "ours_base": "#E4CCD8",
+    "ours_large": "#F0C0CC",
+    "neutral_light": "#D8D8D8",
+    "neutral_mid": "#A8A8A8",
+    "neutral_dark": "#606060",
+    "delta_up": "#2E9E44",
+    "delta_down": "#E53935",
+}
+
+DEFAULT_COLORS = [
+    PALETTE["blue_main"],
+    PALETTE["green_3"],
+    PALETTE["red_strong"],
+    PALETTE["teal"],
+    PALETTE["violet"],
+    PALETTE["neutral_light"],
+]
+
+DEFAULT_COLORS_NMI_PASTEL = [
+    PALETTE_NMI_PASTEL["baseline_dark"],
+    PALETTE_NMI_PASTEL["baseline_mid"],
+    PALETTE_NMI_PASTEL["baseline_soft"],
+    PALETTE_NMI_PASTEL["ours_tiny"],
+    PALETTE_NMI_PASTEL["ours_base"],
+    PALETTE_NMI_PASTEL["ours_large"],
+]
+
+PALETTE_LIST = DEFAULT_COLORS_NMI_PASTEL
 
 # Approximate NeurIPS/ICML double-column width in inches
 DOUBLE_COL_WIDTH = 5.5  # inches
@@ -41,22 +78,24 @@ SINGLE_COL_WIDTH = 3.375  # inches
 DEFAULT_HEIGHT = 3.5  # inches
 
 
-def apply_pub_style():
+def apply_pub_style(font_size=7, axes_linewidth=0.8):
     """Apply publication-ready matplotlib style."""
     plt.rcParams.update({
         "font.family": "sans-serif",
-        "font.sans-serif": ["DejaVu Sans", "Arial", "Helvetica"],
-        "font.size": 8,
-        "axes.titlesize": 9,
-        "axes.labelsize": 8,
+        "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans", "Liberation Sans"],
+        "font.size": font_size,
+        "axes.titlesize": font_size,
+        "axes.labelsize": font_size,
         "legend.fontsize": 7,
         "xtick.labelsize": 7,
         "ytick.labelsize": 7,
         "figure.dpi": 300,
-        "savefig.dpi": 300,
+        "savefig.dpi": 600,
         "svg.fonttype": "none",  # editable text in SVG
         "pdf.fonttype": 42,       # editable text in PDF
-        "axes.linewidth": 0.6,
+        "axes.spines.right": False,
+        "axes.spines.top": False,
+        "axes.linewidth": axes_linewidth,
         "xtick.major.width": 0.6,
         "ytick.major.width": 0.6,
         "lines.linewidth": 1.2,
@@ -65,6 +104,26 @@ def apply_pub_style():
         "legend.borderpad": 0.2,
         "legend.handletextpad": 0.3,
     })
+
+
+def add_panel_label(ax, label, x=-0.08, y=1.04, fontsize=9, color="black"):
+    """Place a compact journal-style panel label near the top-left edge."""
+    ax.text(
+        x, y, label,
+        transform=ax.transAxes,
+        fontsize=fontsize,
+        fontweight="bold",
+        color=color,
+        ha="left",
+        va="bottom",
+    )
+
+
+def is_dark(hex_color, threshold=128):
+    """Return True if a hex color is dark enough to need white text."""
+    c = hex_color.lstrip("#")
+    r, g, b = int(c[0:2], 16), int(c[2:4], 16), int(c[4:6], 16)
+    return (0.299 * r + 0.587 * g + 0.114 * b) < threshold
 
 
 def check_dependencies():
@@ -154,19 +213,26 @@ def plot_bar(data, labels=None, groups=None, title="", xlabel="", ylabel="", wid
 
 
 def save_figure(fig, output_path: str):
-    """Save figure to SVG (primary), PDF (secondary), and PNG (preview)."""
+    """Save figure to SVG (primary), PDF (secondary), TIFF, and PNG preview."""
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
 
     svg_path = out.with_suffix(".svg")
     pdf_path = out.with_suffix(".pdf")
+    tiff_path = out.with_suffix(".tiff")
     png_path = out.with_suffix(".png")
 
     fig.savefig(svg_path, format="svg", bbox_inches="tight")
     fig.savefig(pdf_path, format="pdf", bbox_inches="tight")
-    fig.savefig(png_path, format="png", bbox_inches="tight")
+    fig.savefig(tiff_path, format="tiff", dpi=600, bbox_inches="tight")
+    fig.savefig(png_path, format="png", dpi=300, bbox_inches="tight")
     plt.close(fig)
-    print(f"Saved: {svg_path}, {pdf_path}, {png_path}")
+    print(f"Saved: {svg_path}, {pdf_path}, {tiff_path}, {png_path}")
+
+
+def save_pub_py(fig, filename, dpi=600):
+    """Nature-style convenience wrapper for publication export bundles."""
+    save_figure(fig, filename)
 
 
 def main():

@@ -24,7 +24,7 @@
 ### 色板选择
 | 场景 | 推荐 |
 |------|------|
-| 多方法对比 | 独立色相（蓝、橙、绿、红、紫） |
+| 多方法对比 | 低饱和同族色板，优先统一方法 family |
 | 消融实验 | 同色系渐变（深→浅） |
 | 热力图 | 白→蓝渐变（负值用 RdBu_r） |
 | 中性参考线 | 灰色 (#A0A0A0) 或黑色虚线 |
@@ -41,6 +41,26 @@
 | gray_neutral | #A0A0A0 | 中性参考线 / baseline |
 
 同一方法在不同面板中必须保持颜色一致。
+
+### NMI Pastel 低饱和色板
+
+用于多方法、多尺度模型或同族 baseline 对比。相比高饱和蓝/绿/红轮换，它更适合顶刊风格的密集多面板图。
+
+| 名称 | 色值 | 用途 |
+|------|------|------|
+| baseline_dark | #484878 | 强 baseline / reference method |
+| baseline_mid | #7884B4 | baseline family |
+| baseline_soft | #B4C0E4 | weaker baseline / small variant |
+| ours_tiny | #E4E4F0 | 本文小模型 / light variant |
+| ours_base | #E4CCD8 | 本文主模型 |
+| ours_large | #F0C0CC | 本文大模型 |
+| neutral_light | #D8D8D8 | 背景 band / disabled |
+| neutral_mid | #A8A8A8 | secondary label |
+| neutral_dark | #606060 | axis / annotation |
+| delta_up | #2E9E44 | improvement marker |
+| delta_down | #E53935 | degradation marker |
+
+绿色/红色主要保留给方向性标注（gain/drop），不要作为普通方法类别的默认颜色。
 
 ### 禁止使用的色板
 - rainbow / jet / gist_ncar
@@ -77,6 +97,8 @@
 - 视觉对齐（所有 panel 的 x/y 轴标签对齐）
 - Panel 间距 2-4 pt
 - 不同 panel 的坐标轴使用同尺度（除非有理由）
+- 大 legend 应放入独立 legend panel，避免压缩数据区域
+- 多指标比较可使用 ultra-wide panel，让读者从左到右扫描证据链
 
 ### 图例
 - 优先直接标注（在图上标文字）而非图例
@@ -93,7 +115,8 @@
 ### 格式优先顺序
 1. SVG（主格式，文字保留为 `<text>` 节点）
 2. PDF（副格式，Type-42 字体内嵌）
-3. TIFF（位图预览，300-600 dpi）
+3. TIFF（投稿位图，600 dpi）
+4. PNG（快速预览，300 dpi）
 
 ### 尺寸
 | 场景 | 宽度 |

@@ -16,7 +16,8 @@
 - Context: [baseline / reference 数据]
 
 ### Chart Archetype
-- Type: [training-curve | grouped-bar | heatmap | scatter | boxplot | radar | forest | ablation]
+- Type: [quantitative grid | hero metric + supports | ablation ladder | trend with uncertainty | distribution comparison]
+- Chart type: [training-curve | grouped-bar | heatmap | scatter | boxplot | radar | forest | ablation]
 - Panel count: [1 / 2 / 3+]
 
 ### Panel Mapping
@@ -39,6 +40,12 @@
 ### Risk Assessment
 - Potential reviewer challenge: [描述]
 - Mitigation: [方案]
+
+### Export Bundle
+- Script: [plot_<figure>.py]
+- Source data: [CSV/TSV path]
+- Vector: [SVG/PDF]
+- Raster: [TIFF 600dpi / PNG preview]
 ```
 
 ## Architecture Image Contract
