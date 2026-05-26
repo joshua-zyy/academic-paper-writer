@@ -322,7 +322,7 @@ Task:
     {完整的 prompt 文本}
 
     执行步骤:
-    1. 读取 skills/academic-figure/SKILL.md，按 B 路径（architecture-image）执行
+    1. 读取 skills/academic-figure/SKILL.md，按 architecture-image 模式执行
     2. 读取 skills/academic-figure/references/workflow-architecture-image.md
     3. 使用提示词调用 image generation 生成图片
     4. 保存图片为 ./docs/paper-drafts/figures/fig{N}_arch.png

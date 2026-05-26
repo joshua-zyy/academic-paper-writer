@@ -20,8 +20,8 @@
 | academic-experiments | `experiment-evidence-pass` | 忠实度 | 重 | 盘点→运行→记录流程固定 |
 | academic-experiments | `evidence-inventory-only` | 平衡 | 中 | 仅盘点，无运行约束 |
 | academic-experiments | `minimal-reproducible-run` | 忠实度 | 重 | 最小可复核流程固定 |
-| academic-figure | `figure-generation` (A 路径) | 平衡 | 中 | 代码生成有模板但适应数据 |
-| academic-figure | `figure-generation` (B 路径) | 原创性 | 轻 | 架构图提示词依赖对模型结构的创造性理解 |
+| academic-figure | `chart-from-data` | 平衡 | 中 | 代码生成有模板但适应数据 |
+| academic-figure | `arch-prompt` / `architecture-image` | 原创性 | 轻 | 架构图提示词和图像生成依赖对模型结构的创造性理解 |
 | academic-figure | `figure-revision` | 忠实度 | 重 | 按 QA Contract 逐项检查 |
 | academic-figure | `figure-audit` | 忠实度 | 重 | 审查清单固定 |
 | academic-polishing | `prose-quality-gate` | 忠实度 | 重 | 质量检查清单固定 |

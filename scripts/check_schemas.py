@@ -10,6 +10,7 @@ Checks:
 2. SKILL.md debt fields match verification-report schema debt fields
 3. Probe types referenced in orchestration workflow exist in probe-agent.md
 4. Reference files mentioned in SKILL.md "何时读取" tables exist
+5. Figure dispatch templates use academic-figure mode names, not stale path labels
 """
 
 import argparse
@@ -34,13 +35,14 @@ def check_schema_sync(skills_root: Path) -> list:
             continue
         for sf in schema_dir.glob("*.md"):
             if sf.name not in shared_files:
-                issues.append(("WARN", f"{skill}/references/schemas/{sf.name} has no shared/ copy"))
+                issues.append(("FAIL", f"{skill}/references/schemas/{sf.name} has no shared/ copy"))
             else:
                 sub_content = sf.read_text(encoding="utf-8")
-                if "权威版本维护在" in sub_content or "authoritative version" in sub_content:
-                    issues.append(("PASS", f"{skill}/references/schemas/{sf.name} -> points to shared/"))
+                shared_content = (shared_schemas / sf.name).read_text(encoding="utf-8")
+                if sub_content == shared_content:
+                    issues.append(("PASS", f"{skill}/references/schemas/{sf.name} matches shared/ copy"))
                 else:
-                    issues.append(("WARN", f"{skill}/references/schemas/{sf.name} may diverge from shared/ copy"))
+                    issues.append(("FAIL", f"{skill}/references/schemas/{sf.name} diverges from shared/ copy"))
 
     return issues
 
@@ -93,6 +95,28 @@ def check_reference_files_exist(skills_root: Path) -> list:
     return issues
 
 
+def check_figure_dispatch_modes(skills_root: Path) -> list:
+    issues = []
+    references_dir = skills_root / "academic-paper-writer" / "references"
+    if not references_dir.exists():
+        issues.append(("FAIL", "academic-paper-writer references directory not found"))
+        return issues
+
+    content = "\n".join(p.read_text(encoding="utf-8") for p in references_dir.rglob("*.md"))
+    stale_paths = re.findall(r'\bpath:\s*[ABC]\b|路径\s*[ABC]|[ABC]\s*路径', content)
+    if stale_paths:
+        issues.append(("FAIL", f"Stale academic-figure path labels found: {sorted(set(stale_paths))}"))
+
+    required_modes = ["arch-prompt", "chart-from-data"]
+    missing_modes = [mode for mode in required_modes if mode not in content]
+    if missing_modes:
+        issues.append(("FAIL", f"Missing academic-figure mode names in dispatch templates: {missing_modes}"))
+
+    if not stale_paths and not missing_modes:
+        issues.append(("PASS", "Figure dispatch templates use academic-figure mode names"))
+    return issues
+
+
 def main():
     parser = argparse.ArgumentParser(description="Check cross-skill schema consistency.")
     parser.add_argument("--skills-root", required=True, help="Path to skills/ directory")
@@ -121,6 +145,12 @@ def main():
 
     print("\n3. Reference file existence:")
     issues = check_reference_files_exist(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n4. Figure dispatch mode consistency:")
+    issues = check_figure_dispatch_modes(root)
     all_issues.extend(issues)
     for level, msg in issues:
         print(f"  [{level}] {msg}")
