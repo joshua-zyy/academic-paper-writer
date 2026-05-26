@@ -1,12 +1,12 @@
-# Orchestration Workflow — Part 3: Review & Integration (Step 6.6–7)
+# Orchestration Workflow — Part 3: Review, Integration & Batch Generation (Step 6.6–9)
 
-本文件包含编排器 Step 6.6–7 的详细执行流程。按需加载，避免一次性加载全部步骤。
+本文件包含编排器 Step 6.6–9 的详细执行流程。按需加载，避免一次性加载全部步骤。
 
 完整步骤索引见 `orchestration-workflow.md`。
 
 ---
 
-## Step 6.6: Prose Quality Gate (Phase 2 of Two-Phase Review) — 内化调用
+## Step 6.6: Prose Quality Gate (Review Phase 2: Prose Gate) — 内化调用
 
 - Create a todo list for prose checks.
 - Confirm Step 6.5 `evidence_debt = closed` before executing.
@@ -124,6 +124,14 @@ Revised Draft 生成后，**必须**将更新后的正文写入 `./docs/paper-dr
 
 **禁止在对话中输出完整 Revised Draft 正文。** 对话中仅输出进度摘要。
 
+### Step 6.9: Update Cumulative Draft and Advance
+
+- 将当前 section 的 Revised Draft 追加或替换到 `./docs/paper-drafts/paper_draft.md` 中。
+- 更新 Section Queue：将当前 section 标记为 `completed`。
+- 推进到下一 section（按 Section Queue 顺序），回到 Step 6.0。
+
+---
+
 ## Step 7: Integration & Section Loop (Dependency-Aware)
 
 For `full-paper-planning`, do not end after one section revision.
@@ -167,7 +175,7 @@ Continue until:
 - Blocking evidence gaps would significantly increase hallucination risk
 - User explicitly requests pause
 
-### 12d. Abstract Generation (Hard Gate D)
+### 7d. Abstract Generation (Hard Gate D)
 
 Abstract is **not** in the initial Section Queue. It can only be generated after **all** of the following conditions are met:
 
@@ -183,7 +191,22 @@ When generating Abstract:
 - Do not introduce new claims, methods, or terminology not present in the body
 - Place Abstract at the beginning of the final Cumulative Draft output
 
-### 8. External Citation Checklist Generation（**强制**，全文完成后执行）
+### 7e. Progress Report（auto 模式下每节完成后输出）
+
+每节 Verification 完成后，在对话中输出简短进度摘要：
+
+> **{Section}**: {verdict} → Next: {next_section}
+> {如有关键问题，最多 1-2 条；否则省略}
+
+此摘要**替代**完整正文的对话输出。完整内容仅在 `./docs/paper-drafts/paper_draft.md` 中可查阅。
+
+### 7f. File Update（强制）
+
+每节 Verification 完成后，**必须**使用 Edit 工具更新 `./docs/paper-drafts/paper_draft.md`，将当前节的最新版本追加或替换到论文文件中。
+
+---
+
+## Step 8: External Citation Checklist Generation（**强制**，全文完成后执行）
 
 Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**生成引用文献清单。未生成清单不得输出最终稿。
 
@@ -230,27 +253,108 @@ Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**生成引�
 （逐步更新，每确认一篇更新一行）
 ```
 
-**执行顺序约束**：8 完成后，才可执行 7g (Progress Report) 和 7h (File Update)。
-
-### 7g. Progress Report（auto 模式下每节完成后输出）
-
-每节 Verification 完成后，在对话中输出简短进度摘要：
-
-> **{Section}**: {verdict} → Next: {next_section}
-> {如有关键问题，最多 1-2 条；否则省略}
-
-此摘要**替代**完整正文的对话输出。完整内容仅在 `./docs/paper-drafts/paper_draft.md` 中可查阅。
-
-### 7h. File Update（强制）
-
-每节 Verification 完成后，**必须**使用 Edit 工具更新 `./docs/paper-drafts/paper_draft.md`，将当前节的最新版本追加或替换到论文文件中。
+**执行顺序约束**：Step 8 完成后，进入 Step 9（图片批量生成）。
 
 ---
 
-## Shared Inputs and References
+## Step 9: 图片批量生成（**强制**，全文完成后执行）
 
-Cross-skill data contracts, shared concept references, and reference-loading guidance are maintained in `skills/academic-paper-writer/SKILL.md` as the high-level orchestrator index.
+Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**执行图片批量生成。未执行不得输出最终稿。
 
-When executing a concrete step in this file:
-- read the referenced schema under the relevant sub-skill's `references/schemas/` if the step consumes or produces structured cross-skill data
-- read the referenced file under `references/` when that step explicitly calls for it
+### 触发条件
+
+- Abstract 已生成（隐含所有 core sections Verification = passed）
+- `./docs/paper-drafts/figures/figure_prompts.md` 或 `./docs/paper-drafts/figures/plot_*.py` 存在
+
+### 9a. 扫描图片产出物
+
+1. 检查 `./docs/paper-drafts/figures/figure_prompts.md` 是否存在且包含未生成的架构图提示词
+2. 检查 `./docs/paper-drafts/figures/` 目录下是否存在 `plot_fig*.py` 且对应图片尚未生成
+3. 统计：已生成图片数 / 提示词待生成数 / 代码待执行数
+
+### 9b. 数据图批量执行
+
+对每个 `./docs/paper-drafts/figures/plot_fig{N}.py`：
+
+1. **环境检查**：确认 matplotlib、seaborn 等依赖可用
+2. **执行脚本**：使用 PowerShell 运行 `python ./docs/paper-drafts/figures/plot_fig{N}.py`
+3. **验证产出**：确认生成了对应的 SVG 和 PNG 文件
+4. **QA 检查**（快速）：配色正确、坐标轴可读、无乱码
+5. 若执行失败：记录错误原因，标记为「待手动修复」，不阻塞后续图片执行
+
+**执行模板**：
+```powershell
+$scriptPath = "./docs/paper-drafts/figures/plot_fig{N}.py"
+if (Test-Path $scriptPath) {
+    python $scriptPath 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Output "plot_fig{N}.py 执行成功"
+    } else {
+        Write-Output "plot_fig{N}.py 执行失败，请手动检查"
+    }
+}
+```
+
+### 9c. 架构图批量生成
+
+对 `./docs/paper-drafts/figures/figure_prompts.md` 中每个架构图提示词：
+
+1. 提取各图的 prompt 文本
+2. 对每个 prompt，**按以下优先级尝试生成**：
+   - 若当前环境支持直接调用 image generation（如 DALL-E / Stable Diffusion / Codex image），则 dispatch `academic-figure`（architecture-image 模式）生成实际图片
+   - 否则，在对话中输出提示："以下架构图提示词待手动在外部工具中生成：`<prompt>`"
+3. 生成后的图片保存到 `./docs/paper-drafts/figures/fig{N}_arch.png`
+4. 正文中的图编号引用保持不变
+
+**Dispatch 模板（architecture-image 模式）**：
+```yaml
+Task:
+  description: "生成架构图 - Figure {N}"
+  subagent_type: "general"
+  prompt: |
+    你已加载 academic-figure 子 Skill（skills/academic-figure/SKILL.md）。
+
+    任务: 以 architecture-image 模式生成架构图
+    图编号: Figure {N}
+    图用途: {从 figure_prompts.md 中提取的描述}
+
+    架构图提示词（来自 figure_prompts.md）:
+    {完整的 prompt 文本}
+
+    执行步骤:
+    1. 读取 skills/academic-figure/SKILL.md，按 B 路径（architecture-image）执行
+    2. 读取 skills/academic-figure/references/workflow-architecture-image.md
+    3. 使用提示词调用 image generation 生成图片
+    4. 保存图片为 ./docs/paper-drafts/figures/fig{N}_arch.png
+    5. 输出事实核对清单（模块/连接/文字是否与原文一致）
+
+    约束:
+    - 遵循 academic-figure SKILL.md 中的 Red Lines
+    - 不得编造不存在的模块或连接
+    - 若 image generation 不可用，明确报告"不可用"并返回 prompt 文本
+
+    返回: 生成结果（成功/失败 + 图片路径 或 错误说明）
+```
+
+### 9d. 输出图片生成报告
+
+在对话中输出简短报告：
+
+```
+## 图片批量生成报告
+
+| 图片 | 类型 | 状态 | 路径/说明 |
+|------|------|------|----------|
+| Figure 1 | 架构图 | ✅ 已生成 | figures/fig1_arch.png |
+| Figure 2 | 数据图 | ❌ 待生成 | figures/plot_fig2.py 执行失败 |
+| Figure 3 | 架构图 | ⚠️ 待手动 | 需用户自行使用 prompt 生成 |
+| Figure 4 | 数据图 | ✅ 已生成 | figures/fig4.svg |
+```
+
+### 9e. 更新 Cumulative Draft
+
+将图片生成报告追加到 `./docs/paper-drafts/paper_draft.md` 末尾（作为内部记录，非正式正文）。
+
+**执行顺序约束**：
+- Step 8（引用清单）→ Step 9（图片批量生成）→ 输出最终稿
+- Step 9 不可跳过，即使没有图片待生成也必须执行扫描并输出"无需生成图片"的确认

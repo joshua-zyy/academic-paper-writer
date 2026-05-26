@@ -41,18 +41,19 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 5. 若有本地文献库 → 检查markitdown + 输出转换提示
 6. 以上全部完成 → 进入Step 2
 
-→ Step 1b(可选:PDF→MD) → Step 2(证据审计) → Step 3(文献检索) → Step 4(实验复核) → Step 5(Blueprint) → Step 6(Section Complete Loop:探查+Draft+审查+润色+验证) → Step 7(section loop) → Step 8(引用清单)
+→ Step 1b(可选:PDF→MD) → Step 2(证据审计) → Step 3(文献检索) → Step 4(实验复核) → Step 5(Blueprint) → Step 6(Section Complete Loop:探查+Draft+审查+润色+验证) → Step 7(section loop) → Step 8(引用清单) → Step 9(图片批量生成)
 
 **核心概念：Section Complete Loop（Step 6）**
 
 **重要**：Step 6不是单个section，而是**每个section都要经历的完整流程**。
 
 对于Section Queue中的每个section（Introduction、Related Work、Method...），
-都必须执行以下6.1-6.9的完整流程，**不可跳过任何阶段**：
+都必须执行以下6.0-6.9的完整流程，**不可跳过任何阶段**：
 
 ```
 Step 6: Section Complete Loop（每个section的完整流程）
 ├── Phase 1: 起草
+│   ├── 6.0 核对 Section Contract
 │   ├── 6.1 前置探查（按section类型dispatch）
 │   ├── 6.2 Draft v1（含占位符+待补项清单）
 │   └── 6.3 写入paper_draft.md
@@ -69,11 +70,11 @@ Step 6: Section Complete Loop（每个section的完整流程）
 **示例执行顺序**：
 ```
 Step 0-5: 准备阶段
-Step 6 (Introduction): 6.1 → 6.2 → ... → 6.9
+Step 6 (Introduction): 6.0 → 6.1 → ... → 6.9
 Step 7: 推进到 Related Work
-Step 6 (Related Work): 6.1 → 6.2 → ... → 6.9
+Step 6 (Related Work): 6.0 → 6.1 → ... → 6.9
 Step 7: 推进到 Method
-Step 6 (Method): 6.1 → 6.2 → ... → 6.9
+Step 6 (Method): 6.0 → 6.1 → ... → 6.9
 ...
 ```
 
@@ -159,12 +160,13 @@ Step 6 (Method): 6.1 → 6.2 → ... → 6.9
 10. **引用闭合**：需要文献支撑的段落必须有 inline citation 或 `[REF_NEEDED: ...]`。参考文献列表只能包含正文中被引用或已声明的条目。
 11. **Section Complete Loop**：每节必须完成 Step 6 的完整闭环（Phase 1 起草 → Phase 2 审查润色 → Phase 3 整合）。**Draft v1 ≠ 初稿完成**，只有完成 Step 6.8（综合验证）的section才算初稿完成。
 12. **失败不伪装**：Verification 未通过且非外部阻塞时，必须继续下一轮修订，不得直接结束或假装通过。
-13. **完整流程执行**：执行 full-paper-planning 时，必须按 Step 0→1→1b(若适用)→2→3(3a→3b→3c)→4→5→6→12 的顺序逐一执行，不得跳步。用户催促时也不得跳过证据审计（Step 2）、文献检索（Step 3）、实验复核（Step 4）、Hard Gates（A/B/C）中的任何一个。
+13. **完整流程执行**：执行 full-paper-planning 时，必须按 Step 0→1→1b(若适用)→2→3(3a→3b→3c→3d)→4→5→6(6.0→6.9)→7→8→9 的顺序逐一执行，不得跳步。用户催促时也不得跳过证据审计（Step 2）、文献检索（Step 3）、实验复核（Step 4）、Hard Gates（A/B/C）中的任何一个。
 14. **引用产物必输出**：Step 3 完成后，必须在上下文中维护 Verified References 列表和 Citation-to-Claim Map。缺少任一 → 不得进入 Step 6。
 15. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 `min_citations`（默认 35，short paper 建议 20，workshop 建议 15）。**Step 1 必须询问用户预期引用数量**，用户指定时记录为 `min_citations`，未指定时使用默认值。论文完成后 Step 8 生成引用清单时自动核验。
 16. **两阶段写作**：Step 5 Blueprint 可使用 bullet points 和提纲式结构，但 Step 6 Draft v1 必须是完整 prose 段落。bullet points 仅用于规划阶段，不得出现在最终论文正文中。
-17. **最大迭代次数**：修订循环（Step 6.7→6.8→12）最多执行 3 轮。3 轮后仍有未闭合 debt 时，标记为 `unresolvable`，输出修订报告并终止循环，不得继续重试。
+17. **最大迭代次数**：修订循环（Step 6.7→6.8→7）最多执行 3 轮。3 轮后仍有未闭合 debt 时，标记为 `unresolvable`，输出修订报告并终止循环，不得继续重试。
 18. **Section Contract 先于 prose**：每节在 Step 5 必须根据 `references/section-writing-contracts.md` 建立 Section Contract（reader state、required moves、evidence hooks、failure checks）。Step 6 Draft v1 不得跳过该 contract 直接写正文；润色只能在 contract debt 基本闭合后执行。
+19. **数字引用格式**：正文中所有 inline citation 必须使用数字格式 `[1]`, `[2]`, `[1,3,5]`, `[2-4]`。禁止使用作者-年份格式（如 "Vaswani et al. (2017)"）。参考文献列表的编号与正文中的数字引用一一对应。
 
 ## 文件输出规范
 
@@ -217,7 +219,7 @@ Step 6 (Method): 6.1 → 6.2 → ... → 6.9
 
 若用户请求含糊，优先选择最小满足需求的 mode。
 
-除纯 pass-through 模式（如 `related-work-or-citation-pass`、`experiment-evidence-pass`）外，所有起草/修订模式都必须执行同一组 Hard Gates 与 Step 0 → 12 闭环；`section-drafting` 只是缩小证据范围，不缩短流程。
+除纯 pass-through 模式（如 `related-work-or-citation-pass`、`experiment-evidence-pass`）外，所有起草/修订模式都必须执行同一组 Hard Gates 与 Step 0 → 9 闭环；`section-drafting` 只是缩小证据范围，不缩短流程。
 
 推进模式详见上方"推进模式"节。默认 auto 模式，用户可切换。
 
@@ -280,7 +282,7 @@ Step 6 (Method): 6.1 → 6.2 → ... → 6.9
 
 节级最小闭环（Step 6 Section Complete Loop）：
 ```
-Phase 1: 6.1 前置探查 → 6.2 Draft v1 → 6.3 写入文件
+Phase 1: 6.0 核对Section Contract → 6.1 前置探查 → 6.2 Draft v1 → 6.3 写入文件
 Phase 2: 6.4 占位符审计+图表 → 6.5 证据合规 → 6.6 Prose质量门 → 6.7 扩写检查 → 6.8 综合验证
 Phase 3: 6.9 整合 → 推进到下一节
 ```
@@ -304,14 +306,15 @@ Phase 3: 6.9 整合 → 推进到下一节
 | 1 | **Checklist**：确认 venue/language/min_citations + 本地文献库（Blocking Gate） | — | 自动 |
 | 1b | 可选：PDF→MD 转换（提示用户运行，不阻塞） | — | 自动（条件执行） |
 | 2 | 证据审计（dispatch probe agents） | — | 自动 |
-| 3 | 文献检索与核验（3a 本地优先 + 3b 联网 + 3c 聚合） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 |
+| 3 | 文献检索与核验（3a 本地优先 + 3b 联网 + 3c 聚合 + 3d 过程记录） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 |
 | 4 | 实验事实复核 | `academic-experiments`（dispatch 子 Agent） | 自动 |
 | 5 | 生成 Section Contract + Section / Method Blueprint | — | 自动 |
-| **6** | **Section Complete Loop**（包含原Step 7-11，见下方详细说明） | — | 自动 |
+| **6** | **Section Complete Loop**（包含 6.0–6.9 子步骤，见下方详细说明） | — | 自动 |
 | 7 | 整合 & 依赖感知 section loop | — | 自动 |
 | 8 | **引用清单生成**（强制，论文完成时必执行） | — | 自动 |
+| 9 | **图片批量生成**（强制，论文完成时必执行） | `academic-figure`（dispatch，chart-from-data / architecture-image） | 自动 |
 
-**注**：原Step 7（占位符审计）、Step 8（证据合规）、Step 9（Prose质量门）、Step 10（扩写检查）、Step 11（综合验证）已合并为Step 6的子步骤（6.4-6.8）。
+**注**：原独立步骤 占位符审计/证据合规/Prose质量门/扩写检查/综合验证（旧编号 Step 7–11）已合并为 Step 6 的子步骤（6.4–6.8）。
 
 ### Step 6: Section Complete Loop（详细说明）
 
@@ -327,11 +330,27 @@ Phase 3: 6.9 整合 → 推进到下一节
 - [ ] 6.3 写入paper_draft.md
 
 ### Phase 2: 审查与润色（自动执行，不暂停）
-- [ ] 6.4 占位符审计 + 图表生成（academic-figure）
-- [ ] 6.5 证据合规审查（academic-reviser）
+
+**⚠️ Phase 2 为强制执行阶段，不得跳过任何子步骤。**
+以下所有子步骤必须在 Phase 1 全部完成**之后**、进入 Phase 3 或下一节**之前**依次执行：
+
+- [ ] 6.4 **占位符审计 + 图表生成**（**强制执行，不可跳过**）
+  - **即使 Draft v1 中没有 `[FIGURE_NEEDED]` 占位符，也必须执行此步骤**：
+  - 扫描全文占位符统计
+  - 对 Method 节主动补入缺失的架构图占位符
+  - 对每个 `[FIGURE_NEEDED]` 建立 Figure Contract，然后 dispatch `academic-figure` 子代理生成：
+    - 架构图类 → 架构图提示词写入 `./docs/paper-drafts/figures/figure_prompts.md`
+    - 数据图类 → Python 绘图代码写入 `./docs/paper-drafts/figures/plot_fig{N}.py`
+  - 追加待补项清单到 Draft v1 末尾
+  - 正文中的占位符替换为图编号引用（如 `Figure 1`）
+  - 详细 dispatch 模板和子步骤见 `references/workflow-step-5-6.5.md` Step 6.4
+- [ ] 6.5 证据合规审查（academic-reviser，dispatch，targeted-evidence-mode）
 - [ ] 6.6 Prose质量门（academic-polishing，内化调用）
 - [ ] 6.7 扩写检查（内容密度）
-- [ ] 6.8 综合验证（academic-reviser）
+- [ ] 6.8 综合验证（academic-reviser，dispatch，full-section-review）
+
+**🚫 Phase 2 未完成前，禁止进入 Phase 3 或推进到下一节。**
+完成 Phase 2 的验证：6.8 返回 `verdict = passed` 或 `blocked + safe_to_continue = yes` 后方可继续。
 
 ### Phase 3: 整合
 - [ ] 6.9 更新Cumulative Draft → 推进到下一节
@@ -339,27 +358,30 @@ Phase 3: 6.9 整合 → 推进到下一节
 
 ### 6.1 前置探查规则表
 
-在起草前，**必须**按以下规则决定是否dispatch探查：
+在起草前，**必须**按以下规则决定是否 dispatch 探查：
 
 | Section | 探查任务 | 并行策略 |
 |---------|---------|---------|
+| **Introduction** | `existing_material` + 本地文献深度探索 + 外部文献定向搜索 | **必须并行**（项目探查+文献探索同时进行） |
+| **Related Work** | `existing_material` + 本地文献深度探索 + 外部文献定向搜索 | **必须并行**（项目探查+文献探索同时进行） |
 | **Method** | `code_structure` + `preprocessing` | **必须并行**（同时发出两个Task） |
 | **Experimental Setup** | `experiment_setup` | 单探查 |
 | **Main Results / Ablation** | `experiment_results` | 单探查 |
 | **Discussion** | `interpretability` | 单探查 |
-| **Introduction / Related Work** | 无需深层探查（Step 2 已完成） | — |
 
-**dispatch模板**见 `references/workflow-step-0-4.md` 的 `### 单探查 dispatch 模板` 和 `### 并行 dispatch 模板`。
+**dispatch模板**：
+- 项目探查模板见 `references/workflow-step-0-4.md` 的 `### 单探查 dispatch 模板` 和 `### 并行 dispatch 模板`
+- Introduction/Related Work 的文献深度探索模板见 `references/workflow-step-5-6.5.md` Step 6.1 中的"Section 文献深度探索 dispatch 模板"
 
 ### 各步骤详细参考
 
 | 子步骤 | 详细说明 | 委托方式 |
 |--------|---------|---------|
-| 6.4 占位符审计 + 图表生成 | `references/workflow-step-5-8.md` Step 7 | `academic-figure`（dispatch） |
-| 6.5 证据合规审查 | `references/workflow-step-5-8.md` Step 8 | `academic-reviser`（dispatch） |
-| 6.6 Prose质量门 | `references/workflow-step-9-12.md` Step 9 | `academic-polishing`（内化） |
-| 6.7 扩写检查 | `references/workflow-step-9-12.md` Step 10 | 主Agent自行执行 |
-| 6.8 综合验证 | `references/workflow-step-9-12.md` Step 11 | `academic-reviser`（dispatch） |
+| 6.4 占位符审计 + 图表生成 | `references/workflow-step-5-6.5.md` Step 6.4 | `academic-figure`（dispatch） |
+| 6.5 证据合规审查 | `references/workflow-step-5-6.5.md` Step 6.5 | `academic-reviser`（dispatch） |
+| 6.6 Prose质量门 | `references/workflow-step-6.6-9.md` Step 6.6 | `academic-polishing`（内化） |
+| 6.7 扩写检查 | `references/workflow-step-6.6-9.md` Step 6.7 | 主Agent自行执行 |
+| 6.8 综合验证 | `references/workflow-step-6.6-9.md` Step 6.8 | `academic-reviser`（dispatch） |
 
 ## 跨技能数据契约（Schemas）
 

@@ -4,7 +4,9 @@
 
 ## 压力场景
 
-| 场景 | 文件 | 核心验证点 |
+> **状态**：以下场景文件尚未创建，为计划的测试方案。可通过 `tests/pressure-scenarios/` 目录存放具体测试用例。
+
+| 场景 | 计划文件 | 核心验证点 |
 |------|------|-----------|
 | 虚构引用检测 | `test/pressure-scenarios/scenario-1-phantom-citation.md` | 是否阻塞虚构文献、正确标记 UNVERIFIED |
 | 证据缺口处理 | `test/pressure-scenarios/scenario-2-evidence-gap.md` | 缺证据时是否降级或阻塞，而非硬写 |
@@ -14,7 +16,7 @@
 ## 使用方式
 
 1. 准备对应场景的输入材料
-2. 执行完整的 section 起草流程（Step 0→12）
+2. 执行完整的 section 起草流程（Step 0→9）
 3. 检查以下行为：
    - 是否正确阻塞或降级
    - 是否保留必要 placeholder

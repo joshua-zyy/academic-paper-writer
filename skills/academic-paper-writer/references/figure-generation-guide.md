@@ -30,3 +30,39 @@
 3. **导出格式**：SVG（主要）+ PNG 300dpi（次要预览），文本保持可编辑
 4. **多面板架构**：遵循 overview → deviation → relationship 三层递进，反冗余检查（无两个面板回答同一科学问题）
 5. **简洁风格**：仅保留左+下 spine，frameless legend，tight_layout
+
+## 双路径处理（Step 6.4）
+
+| 图类型 | 遇到占位符时 | 输出 |
+|--------|:---:|------|
+| 架构图/框架图 | 自动生成提示词 | 写入 `figures/figure_prompts.md`，正文占位符替换为图编号引用 |
+| 数据结果图 | 自动生成 Python 绘图代码 | 代码写入 `figures/plot_{figure_id}.py`，正文保留占位符，**不自动执行** |
+
+> 注：数据图代码在 Step 6.4 阶段不自动执行，留待 Step 9 全文完成后统一批量执行。
+
+## 图片批量生成（Step 9）
+
+全文所有核心章节 Verification 通过后，在 Step 9 统一执行图片批量生成。
+
+### 数据图批量执行
+
+1. 扫描 `./docs/paper-drafts/figures/` 下所有 `plot_fig*.py`
+2. 对每个脚本：检查 Python 环境 → 执行脚本 → 验证 SVG/PNG 输出 → 快速 QA
+3. 执行失败不阻塞整体流程，记录为「待手动修复」
+
+### 架构图批量生成
+
+1. 读取 `./docs/paper-drafts/figures/figure_prompts.md` 中所有未生成图片的提示词
+2. 若环境支持 image generation：按 architecture-image 模式逐张生成 → 保存为 `fig{N}_arch.png`
+3. 若环境不支持：在对话中列出所有待手动生成的提示词
+
+### 生成后验证清单
+
+| 检查项 | 数据图 | 架构图 |
+|--------|:---:|:---:|
+| 文件存在且可打开 | ✅ | ✅ |
+| 配色为学术色板（非 rainbow/jet） | ✅ | ✅ |
+| 坐标轴标签可读、无乱码 | ✅ | — |
+| 模块/连接与代码/论文描述一致 | — | ✅ |
+| 输出矢量格式（SVG） | ✅ | — |
+| 灰度打印可辨识 | ✅ | ✅ |

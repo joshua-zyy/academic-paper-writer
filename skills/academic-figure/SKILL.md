@@ -140,7 +140,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 |------|------|
 | `agents/figure_agent.md` | 图表类型选择与生成规范 |
 
-**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 6.4 委托时，按 `academic-paper-writer/references/workflow-step-5-8.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只生成图表，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 6.4 委托时，按 `academic-paper-writer/references/workflow-step-5-6.5.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只生成图表，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
 
 ## 独立使用
 

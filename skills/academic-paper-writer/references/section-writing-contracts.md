@@ -14,6 +14,8 @@ For the current section, create a brief contract before writing prose:
 
 If a required move lacks evidence, keep an explicit placeholder such as `[REF_NEEDED: ...]`, `[RESULT_NEEDED: ...]`, `[TABLE_NEEDED: ...]`, or `[METHOD_DETAIL_NEEDED: ...]`. Do not hide missing evidence through smoother prose.
 
+**Citation format**: All inline citations must use numeric style `[1]`, `[2]`, `[3]` (e.g., `[1]`, `[2-4]`, `[1,3,5]`). Author-year format (e.g., "Vaswani et al. (2017)") is prohibited.
+
 ## Abstract
 
 **Job**: Give a self-contained, evidence-calibrated version of the paper after the main claims are stable.
@@ -199,3 +201,4 @@ Before a section can enter prose polishing, confirm:
 - Each strong claim has a citation, artifact, result, figure/table, or placeholder.
 - The section's first and last paragraphs change the reader state in the intended direction.
 - The section does not rely on fluent prose to conceal open evidence, rationale, result, or protocol debt.
+- All inline citations use numeric `[1]` format consistently; no author-year citations exist in the prose.

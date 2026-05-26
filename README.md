@@ -265,7 +265,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 │    ↓                                                                    │
 │   ┌──────────────────────────────────────────────────────────────────┐   │
 │   │              调研阶段                                              │   │
-│   │  📚 Step 3  文献检索与核验（三步流程）                              │   │
+│   │  📚 Step 3  文献检索与核验（四步流程）                              │   │
 │   │     ├─ 3a  本地文献库优先搜索（MD/PDF 直读）                        │   │
 │   │     ├─ 3b  联网检索 + 全文获取 + subagent 阅读                     │   │
 │   │     └─ 3c  聚合 + Citation-to-Claim Map + 3d 引用清单文件          │   │
@@ -280,8 +280,8 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 │    ↓                                                                    │
 │   ┌──────────────────────────────────────────────────────────────────┐   │
 │   │              质量门（双阶段审查）                                    │   │
-│   │  ⚖️ Step 6.5  证据合规审查（Phase 1）                                 │   │
-│   │  ✨ Step 6.6  Prose Quality Gate（Phase 2，内化调用）                  │   │
+│   │  ⚖️ Step 6.5  证据合规审查（Review Phase 1）                                 │   │
+│   │  ✨ Step 6.6  Prose Quality Gate（Review Phase 2，内化调用）                  │   │
 │   │  📏 Step 6.7 Expansion Pass（内容密度检查）                           │   │
 │   └──────────────────────────────────────────────────────────────────┘   │
 │    ↓                                                                    │
@@ -292,10 +292,13 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 │                                                                          │
 │   📌 Abstract 后置 — 所有核心章节全部 passed 后才允许生成                  │
 │   📋 Step 8  引用清单生成（**强制**，核验 >= `min_citations` 篇引用，默认 35）                │
+│    ↓                                                                    │
+│   🖼️ Step 9  图片批量生成（**强制**，执行绘图代码 + 架构图 image generation）                 │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
 > - 🔒 Step 1 是硬阻塞，缺少 venue/language + 本地文献库确认时不能继续
+> - Step 8→Step 9→输出最终稿，两者均为强制步骤，不可跳过
 > - 📐 `section-drafting` 也要走完整闭环，只是缩小证据范围
 > - 🚧 Introduction / Related Work 在零 VERIFIED 引用时必须阻塞
 > - ⚡ Step 2 涉及多个 probe 时**必须并行** dispatch，不得串行
@@ -379,7 +382,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 |------|------|------|
 | **战略层** | `SKILL.md` | 高层规则、触发条件、Hard Gates 摘要、数据契约、reference 导航 |
 | **战术导航** | `orchestration-workflow.md` | 导航索引，指引到按阶段拆分的执行文件 |
-| **战术执行** | `workflow-step-0-4.md`<br/>`workflow-step-5-8.md`<br/>`workflow-step-9-12.md` | 拆分为 3 个文件的详细执行手册，每个包含独立 dispatch 模板、step-by-step 流程、fallback 路径。**按阶段加载以节省上下文窗口** |
+| **战术执行** | `workflow-step-0-4.md`<br/>`workflow-step-5-6.5.md`<br/>`workflow-step-6.6-9.md` | 拆分为 3 个文件的详细执行手册，每个包含独立 dispatch 模板、step-by-step 流程、fallback 路径。**按阶段加载以节省上下文窗口** |
 
 > 💡 **阅读建议**：改规则摘要、使用边界、导航 → 看 `SKILL.md`。改具体执行步骤、模板、失败路径 → 按 Step 阶段加载对应的 `workflow-step-*.md`。
 
@@ -465,7 +468,9 @@ python scripts/check_schemas.py --skills-root ./skills
 
 ### 压力场景验证
 
-| 场景 | 文件 | 核心验证点 |
+> **状态**：以下为计划的验证场景，具体用例文件尚未创建。
+
+| 场景 | 计划文件 | 核心验证点 |
 |------|------|-----------|
 | 📄 Introduction 文献不足 | `test/pressure-scenarios/scenario-1-phantom-citation.md` | 是否阻塞虚构文献 |
 | 🧠 Method 设计动机缺失 | `test/pressure-scenarios/scenario-2-evidence-gap.md` | 缺证据时是否降级 |

@@ -19,6 +19,7 @@ Step 6.5: evidence compliance review → evidence_debt: closed
 Step 6.6: prose quality gate → prose_debt: closed
 Step 6.7: expansion pass → thin_draft: no
 Step 6.8: verification → Verdict: passed, Score: 8/10
+Step 6.9: 更新Cumulative Draft → 推进到 Related Work
 Step 7: 推进到 Related Work...
 ```
 
@@ -41,6 +42,7 @@ Step 5: Blueprint → 整体框架 → 模块拆解 → 训练目标
 Step 6: Draft v1 → 完整prose + [FIGURE_NEEDED: overall architecture] + 待补项清单
 Step 6.4: arch-prompt 生成分支架构图提示词
 Step 6.5-6.8: 审查闭环 → Verdict: passed
+Step 6.9: 更新Cumulative Draft → 推进
 ```
 
 **输出片段**（Draft v1 Method 开头）：
@@ -61,6 +63,7 @@ Step 6.5: evidence compliance review → 发现3处裸claim无citation
 Step 6.6: prose quality gate → prose_debt: open (罗列式段落)
 Step 6.7: expansion pass → 补充work cluster综合比较
 Step 6.8: verification → Verdict: passed, Score: 7/10
+Step 6.9: 更新Revised Draft到Cumulative Draft
 ```
 
 **输出**（Section Critique 摘要）：

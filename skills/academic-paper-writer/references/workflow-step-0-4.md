@@ -316,17 +316,18 @@ Task C:
 
 3 个探查全部返回后，汇总为 **Project Overview**，作为 Evidence Map 的索引层。
 
-**深层探查不在此处执行**。各 section 起草前的深度探查规则已移至 `references/workflow-step-5-8.md` Step 6 的"前置检查：是否需要深层探查"表中。起草对应 section 前须按该表 dispatch。
+**深层探查不在此处执行**。各 section 起草前的深度探查规则已移至 `references/workflow-step-5-6.5.md` Step 6 的"前置检查：是否需要深层探查"表中。起草对应 section 前须按该表 dispatch。
 
 For Introduction / Related Work, also audit exemplar paper candidates.
 For Method, also audit model data flow, module boundaries, tensor shapes, recoverable formulas.
 
-## Step 3: Literature Search and Verification（三步流程）
+## Step 3: Literature Search and Verification（四步流程）
 
-本步骤分为三个子步骤：
+本步骤分为四个子步骤：
 - **Step 3a**：本地文献库优先搜索（条件执行）
 - **Step 3b**：联网文献检索 + 全文获取与阅读
 - **Step 3c**：Subagent 阅读结果聚合 + Citation-to-Claim 映射
+- **Step 3d**：生成引用文献清单文件（过程记录）
 
 ---
 
