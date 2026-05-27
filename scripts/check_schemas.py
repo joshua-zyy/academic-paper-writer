@@ -97,23 +97,55 @@ def check_reference_files_exist(skills_root: Path) -> list:
 
 def check_figure_dispatch_modes(skills_root: Path) -> list:
     issues = []
-    references_dir = skills_root / "academic-paper-writer" / "references"
-    if not references_dir.exists():
-        issues.append(("FAIL", "academic-paper-writer references directory not found"))
-        return issues
+    stale_paths = []
+    required_modes = ["arch-prompt", "chart-from-data", "architecture-image"]
 
-    content = "\n".join(p.read_text(encoding="utf-8") for p in references_dir.rglob("*.md"))
-    stale_paths = re.findall(r'\bpath:\s*[ABC]\b|路径\s*[ABC]|[ABC]\s*路径', content)
+    for skill_name in ["academic-paper-writer", "academic-figure"]:
+        references_dir = skills_root / skill_name / "references"
+        if not references_dir.exists():
+            continue
+        content = "\n".join(p.read_text(encoding="utf-8") for p in references_dir.rglob("*.md"))
+        stale_paths.extend(re.findall(r'\bpath:\s*[ABC]\b|路径\s*[ABC]|[ABC]\s*路径', content))
+
     if stale_paths:
         issues.append(("FAIL", f"Stale academic-figure path labels found: {sorted(set(stale_paths))}"))
 
-    required_modes = ["arch-prompt", "chart-from-data"]
-    missing_modes = [mode for mode in required_modes if mode not in content]
+    all_content = ""
+    for skill_name in ["academic-paper-writer", "academic-figure"]:
+        references_dir = skills_root / skill_name / "references"
+        if references_dir.exists():
+            all_content += "\n".join(p.read_text(encoding="utf-8") for p in references_dir.rglob("*.md"))
+
+    missing_modes = [mode for mode in required_modes if mode not in all_content]
     if missing_modes:
         issues.append(("FAIL", f"Missing academic-figure mode names in dispatch templates: {missing_modes}"))
 
     if not stale_paths and not missing_modes:
-        issues.append(("PASS", "Figure dispatch templates use academic-figure mode names"))
+        issues.append(("PASS", "Figure dispatch templates use correct mode names"))
+    return issues
+
+
+def check_probe_types(skills_root: Path) -> list:
+    issues = []
+    probe_agent = skills_root / "academic-paper-writer" / "agents" / "probe-agent.md"
+    workflow_dir = skills_root / "academic-paper-writer" / "references"
+
+    if not probe_agent.exists() or not workflow_dir.exists():
+        issues.append(("FAIL", "Missing probe-agent.md or workflow references"))
+        return issues
+
+    probe_content = probe_agent.read_text(encoding="utf-8")
+    defined_types = set(re.findall(r'####\s+(\w+)\s+—', probe_content))
+
+    workflow_content = "\n".join(p.read_text(encoding="utf-8") for p in workflow_dir.rglob("*.md"))
+    referenced_types = set(re.findall(r'probe_type:\s*(\w+)', workflow_content))
+
+    undefined = referenced_types - defined_types
+    if undefined:
+        issues.append(("FAIL", f"Probe types referenced in workflow but not defined in probe-agent.md: {undefined}"))
+    else:
+        issues.append(("PASS", f"All {len(referenced_types)} probe types defined"))
+
     return issues
 
 
@@ -155,9 +187,17 @@ def main():
     for level, msg in issues:
         print(f"  [{level}] {msg}")
 
+    print("\n5. Probe type consistency:")
+    issues = check_probe_types(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
     fail_count = sum(1 for level, _ in all_issues if level == "FAIL")
+    warn_count = sum(1 for level, _ in all_issues if level == "WARN")
+    pass_count = sum(1 for level, _ in all_issues if level == "PASS")
     print(f"\n{'=' * 50}")
-    print(f"Total issues: {len(all_issues)} | FAIL: {fail_count} | WARN: {sum(1 for l, _ in all_issues if l == 'WARN')}")
+    print(f"Results: {pass_count} PASS | {fail_count} FAIL | {warn_count} WARN")
     sys.exit(1 if fail_count > 0 else 0)
 
 
