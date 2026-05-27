@@ -32,7 +32,7 @@ literature_reading_report:
   citable_claims:
     - claim: string               # 可被引用的 claim
       source: enum                # 原文 / 推断
-     原文佐证: string | null      # 原文的具体语句（source=原文时必填，推断时为 null）
+      source_quote: string | null      # 原文的具体语句（source=原文时必填，推断时为 null）
       confidence: enum            # high / medium / low
       suitable_purpose:           # background / method_comparison / baseline / dataset_source
         - string
@@ -74,7 +74,7 @@ literature_reading_report:
   citable_claims:
     - claim: "Transformer 在 WMT 2014 英德翻译任务上达到 BLEU 28.4"
       source: 原文
-      原文佐证: "Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task"
+      source_quote: "Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task"
       confidence: high
       suitable_purpose:
         - baseline
@@ -82,7 +82,7 @@ literature_reading_report:
 
     - claim: "自注意力机制能捕获长距离依赖"
       source: 推断
-      原文佐证: null
+      source_quote: null
       confidence: medium
       suitable_purpose:
         - background
