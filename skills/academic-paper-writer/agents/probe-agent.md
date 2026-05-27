@@ -9,7 +9,7 @@
 probe_type: string                    # [required] 探查类型
 target_path: string                   # [required] 探查目标路径（项目根目录或子目录）
 section_type: string                  # [required] 当前服务的 section
-task_description: string              # [required] 需要探查的具体内容
+task_description: string              # [optional] 需要探查的具体内容（未提供时从 probe_type + section_type 推断）
 ```
 
 ## Output Schema

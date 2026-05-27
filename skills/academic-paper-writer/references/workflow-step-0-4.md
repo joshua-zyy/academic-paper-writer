@@ -639,6 +639,9 @@ Task:
     任务: 对项目路径 {repo_path} 执行实验证据盘点与复核
     当前 section: {section}
     目标 venue: {venue}
+    experiment_config:
+      mode: minimal_reproducible      # 默认最小可复核模式
+      timeout_minutes: 30
 
     执行步骤:
     1. 读取 skills/academic-experiments/SKILL.md，按 Step 1-5 执行

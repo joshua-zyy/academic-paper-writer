@@ -37,6 +37,7 @@ preceding_status:
 verification_report:
   section: string
   verdict: "passed" | "failed" | "blocked"
+  overall_score: integer              # 1-10, 快速质量指示
   checks_run:
     - check_id: string
       check_name: string
@@ -46,6 +47,7 @@ verification_report:
   citation_debt: "open" | "closed"
   evidence_debt: "open" | "closed"
   figure_debt: "open" | "closed"
+  section_contract_debt: enum         # open / closed
   thin_draft: boolean
   frozen_claims:
     - claim: string
