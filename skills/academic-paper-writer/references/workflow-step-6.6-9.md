@@ -54,6 +54,29 @@ Prose rewrite loop: max 2 rounds. If still open after 2 rounds, carry `prose_deb
 - 无上下文传递损失
 - 润色后的文本与前后节风格一致
 
+### Step 6.6 内化调用模板
+
+主 Agent 读取 `skills/academic-polishing/SKILL.md` 后，按以下参数执行：
+
+```yaml
+Internalized Call:
+  skill: academic-polishing
+  section_type: {当前 section 名称}
+  draft_text: {当前 section 的 Draft v1 文本}
+  preceding_status:
+    prose_debt: {open | closed}
+    evidence_debt: {open | closed}
+    section_contract_debt: {open | closed}
+  mode: prose-quality-gate  # 默认模式，Method section 时追加 method-prose-rewrite
+  constraints:
+    - 不修改项目文件
+    - 不新增引用
+    - evidence_debt = open 的句子仅修正语法，不做风格强化
+    - section_contract_debt = open 时仅做局部安全改写
+```
+
+输出：`prose_debt`（open/closed）+ `failed_items` + 改写后文本 + `claim_strength_changes`
+
 ## Step 6.7: Expansion Pass (Content Density Check)
 
 - Create a todo list for thin-draft checks.
