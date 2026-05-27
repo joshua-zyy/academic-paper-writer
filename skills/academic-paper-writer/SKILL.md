@@ -181,6 +181,34 @@ Agent 定义、dispatch 模板、职责边界见各子 skill 的 `agents/` 目�
 
 详见 `references/orchestration-workflow.md` 的"Shared Inputs and References"节。按步骤加载对应文件，不预加载。
 
+| Reference 文件 | 打开条件 |
+|---------------|---------|
+| `references/orchestration-workflow.md` | 总控流程、dispatch 模板、跨 skill 数据契约 |
+| `references/workflow-step-0-4.md` | Step 0–4 执行（含 Step 1 九项确认清单） |
+| `references/workflow-step-5-6.5.md` | Step 5 Blueprint 与 Step 6.0–6.5 执行 |
+| `references/workflow-step-6.6-9.md` | Step 6.6–6.9 执行（Expansion、Verification、Integration） |
+| `references/section-writing-contracts.md` | Step 5 为每节建立 Section Contract |
+| `references/paper-structure.md` | 理解默认 section queue 与 Abstract 后置规则 |
+| `references/general-writing-guide.md` | 通用学术写作原则与结构指导 |
+| `references/writing-guidelines.md` | Venue 适配与证据分层 |
+| `references/exemplar-introduction.md` | Introduction 写作范例与可迁移模式 |
+| `references/exemplar-related-work.md` | Related Work 写作范例与 work cluster 组织 |
+| `references/exemplar-method.md` | Method 写作范例与模块化组织 |
+| `references/exemplar-experiments.md` | Experiments 写作范例与消融实验典范 |
+| `references/exemplar-abstract.md` | Abstract 写作范例 |
+| `references/evidence-classification.md` | 三类证据（newly_run / preexisting_artifact / user_claim）定义 |
+| `references/content-density.md` | Step 6.7 Expansion Pass 的 thin draft 判定标准 |
+| `references/placeholder-guide.md` | 占位符系统规范（REF_NEEDED、FIGURE_NEEDED 等） |
+| `references/section-dependency-matrix.md` | Step 7 section loop 的跨节依赖与回检规则 |
+| `references/reporting-checklist.md` | Step 6.5 证据合规审查的报告规范 Checklist |
+| `references/mode-spectrum.md` | 任务模式的忠实度 vs 原创性光谱 |
+| `references/paper-types.md` | 论文类型枚举与判断方法 |
+| `references/data-access-levels.md` | 跨技能协作的运行时数据边界约定 |
+| `references/iteration-control.md` | 修订循环控制（最多 3 轮） |
+| `references/test-scenarios.md` | 压力测试场景索引 |
+| `references/figure-generation-guide.md` | 图表生成规范（详见 academic-figure） |
+| `references/examples/example-usage.md` | 三个端到端使用场景示例 |
+
 ## 不适用场景
 
 - 非 CS/AI/ML 领域的论文（如纯实验生物学、临床医学、人文社科）

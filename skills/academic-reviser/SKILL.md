@@ -152,6 +152,7 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 | `references/common-pitfalls.md` | 自查是否存在自欺行为时 |
 | `references/schemas/verification-report.md` | 理解输出数据格式 |
 | `references/templates/section-critique.md` | 组织 Section Critique 输出格式 |
+| `references/verification-checklists.md` | Gate C Verification 的按 section 类型验证检查清单 |
 
 ## 不适用场景
 
