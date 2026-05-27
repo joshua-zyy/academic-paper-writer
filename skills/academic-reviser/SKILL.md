@@ -1,6 +1,6 @@
 ---
 name: academic-reviser
-description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical peer reviewer. Three-round review (evidence→argument→style) with Verification Status and debt tracking. Use when: reviewing a paper draft before submission, checking evidence compliance of claims, simulating peer reviewer feedback, verifying citation closure and evidence debts, performing cross-section consistency checks. Triggers on: 审修, self review, 自查, verification, revise, 修订, check draft, 审稿, evidence compliance, peer review, 论文审查, draft audit, 验证论文, 检查引用, cross-section review."
+description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical peer reviewer. Three-round review (evidence→argument→style) with Verification Status and debt tracking. Use when: reviewing a paper draft before submission, checking evidence compliance of claims, simulating peer reviewer feedback, verifying citation closure and evidence debts, performing cross-section consistency checks. Triggers on: self review, 自查, verification, 审稿, evidence compliance, peer review, 论文审查, draft audit, 验证论文, 检查引用, cross-section review, 审修, draft verification."
 ---
 
 # Academic Reviser
