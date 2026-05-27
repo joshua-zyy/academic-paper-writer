@@ -1,6 +1,6 @@
 ---
 name: academic-citation
-description: "Search, verify, and map citations for CS/AI/ML papers. Produces VERIFIED/UNVERIFIED reference lists with Citation-to-Claim maps and Exemplar Sets. Use when: finding references for a paper section, verifying citation accuracy, building exemplar sets for introduction/related work learning, checking if existing citations are real and accurate, supplementing local literature library. Triggers on: 找引用, 文献检索, citation pass, find references, reference check, 补文献, citation verification, Exemplar Set, search papers, verify citation, 核验文献, 查引用, literature search, reference verification."
+description: "Search, verify, and map citations for CS/AI/ML papers. Produces VERIFIED/UNVERIFIED reference lists with Citation-to-Claim maps and Exemplar Sets. Use when: finding references for a paper section, verifying citation accuracy, building exemplar sets for introduction/related work learning, checking if existing citations are real and accurate, supplementing local literature library. Triggers on: 找引用, 文献检索, citation pass, find references, reference check, 补文献, citation verification, Exemplar Set, search papers, verify citation, 核验文献, 查引用, literature search, reference verification, citation verification with reading, 引用确认, 全文阅读验证."
 ---
 
 # Academic Citation

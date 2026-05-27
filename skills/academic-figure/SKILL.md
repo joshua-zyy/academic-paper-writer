@@ -1,6 +1,6 @@
 ---
 name: academic-figure
-description: "Create, revise, or audit academic figures for CS/AI/ML papers. Supports publication-ready data plots, high-quality image-generated model architecture figures, and tool-agnostic architecture prompts. Use when: generating model framework images, overview figures, module detail figures, data plots from experiment results, auditing existing figures, suggesting figure types for paper sections, revising figure colors/layouts/labels. Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, 模型框架图, overview figure, model architecture, plot, publication figure, 数据可视化, generate plot, architecture diagram."
+description: "Create, revise, or audit academic figures for CS/AI/ML papers. Supports publication-ready data plots, high-quality image-generated model architecture figures, and tool-agnostic architecture prompts. Use when: generating model framework images, overview figures, module detail figures, data plots from experiment results, auditing existing figures, suggesting figure types for paper sections, revising figure colors/layouts/labels. Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, 模型框架图, overview figure, model architecture, plot, publication figure, 数据可视化, generate plot, architecture diagram, figure blueprint, 建议图表类型, figure audit, 审查图表, figure revision, 修改图表."
 ---
 
 # Academic Figure
