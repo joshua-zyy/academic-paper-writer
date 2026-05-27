@@ -33,7 +33,11 @@ Blocking confirmations — must stop and ask if missing:
    - **一次性确认**：venue 确认后全程不再重复询问，后续 section 无需再次确认。
 2. **Draft language**: Required for formal drafting. Default to English if not specified.
    - **一次性确认**：语言确认后全程不再重复询问。
-3. **Continuation mode**: Default to `auto` (automatic section advancement). If user prefers step-by-step confirmation, record `continuation_mode = step-by-step`.
+3. **Continuation mode**: **必须询问**用户选择逐节撰写还是自动全部生成初稿。
+   - 询问方式："选择逐节撰写（每节完成后暂停确认）还是自动全部生成初稿？（默认自动）"
+   - 用户选择"逐节" → 记录 `continuation_mode = step-by-step`
+   - 用户选择"自动"或未指定 → 记录 `continuation_mode = auto`
+   - **一次性确认**：确认后全程不再重复询问，用户可随时切换
 4. **Current section**: Determined by Step 0 if user did not specify.
 5. **预期引用数量（min_citations）**：**必须询问**用户预期的参考文献数量。
    - 询问方式："您预期这篇论文的参考文献数量大约是多少篇？（默认 35 篇，short paper 建议 20 篇，workshop 建议 15 篇）"
@@ -71,35 +75,44 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
 - `section-drafting` / `section-revision`：若 venue-brief.md 已存在（同一项目、同一 venue），可复用，无需重复执行；若不存在，必须执行
 - `related-work-or-citation-pass` / `experiment-evidence-pass`：若 venue 影响执行策略（如引用格式），且 venue-brief.md 不存在，必须执行
 
-### 1.5.1 执行逻辑
+### 1.5.1 执行方式
 
-1. **判断 venue 类型**：
-   - 知名 venue（如 NeurIPS、CVPR、ICLR、AAAI、IEEE T-PAMI、Nature、Science 等）→ 可直接使用已知要求，但仍需用 webfetch 标注信息来源
-   - 其他 venue → 必须用 webfetch 访问官方页面
+**委托方式**：dispatch `academic-venue-research` 子skill
 
-2. **使用 webfetch 获取官方信息**：
-   - 构造搜索目标时**必须包含投稿年份**：`{venue_name} {year} author guidelines` 或 `{venue_name} {year} call for papers`
-   - 若用户未指定投稿年份，使用当前年份
-   - 使用 webfetch 访问最可能的官方页面
-   - 若首次访问未找到，尝试 `submission guidelines` / `paper format` / `camera ready instructions` 等变体
-   - **降级策略**（webfetch 失败时）：
-     - webfetch 返回空内容或无法访问 → 尝试其他可能的官方 URL
-     - 所有 URL 均失败 → 使用 agent 已知的 venue 知识（如有），并在信息完整性表中标注 `source: agent_knowledge (unverified)`
-     - agent 无相关知识 → 标注 Unknown，警告用户"未能获取官方信息，建议手动确认"
-   - 不得编造任何未从官方页面获取的信息
+**Dispatch 模板**：
+```yaml
+Task:
+  description: "Venue Requirements Research - {venue}"
+  subagent_type: "general"
+  prompt: |
+    你已加载 academic-venue-research 子 Skill（skills/academic-venue-research/SKILL.md）。
 
-3. **提取以下信息**（按优先级）：
+    任务: 对目标 venue {venue} 执行完整调研（投稿要求 + 写作风格）
+    venue: {venue}
+    local_style_ref_dir: {local_style_ref_dir | null}
+    research_type: full
+    output_path: ./docs/paper-drafts/venue-brief.md
 
-   | 信息项 | 必需/可选 | 说明 |
-   |--------|----------|------|
-   | Page Limit | 必需 | 正文页数限制（含/不含参考文献、附录） |
-   | Required Structure | 必需 | venue 要求的必需章节（如 Abstract 必须、Keywords 必须等） |
-   | Template | 必需 | LaTeX/Word 模板要求 |
-   | Anonymous Review | 必需 | 是否双盲 |
-   | Citation Format | 必需 | 引用格式（数字/作者-年份） |
-   | Appendix Policy | 可选 | 附录政策 |
-   | File Format | 可选 | PDF/A、文件大小限制等 |
-   | Other Requirements | 可选 | 其他特殊要求（如 data availability statement 等） |
+    执行步骤:
+    1. 读取 skills/academic-venue-research/SKILL.md，按 Step 1-4 执行
+    2. 调研投稿要求（使用 webfetch 访问官方页面）
+    3. 调研写作风格（读取本地风格参考文献库或通过其他方式获取论文）
+    4. 生成 venue-brief.md 文件
+
+    约束: 遵循 academic-venue-research SKILL.md 中的 Red Lines
+
+    返回: venue-brief.md 文件路径 + 调研摘要
+```
+
+**输入**：
+- `venue`：目标 venue 名称
+- `local_style_ref_dir`：本地风格参考文献库路径（可选，来自 Step 1 第5项）
+- `research_type`：调研类型（full / requirements / style）
+- `output_path`：输出路径（默认 `./docs/paper-drafts/venue-brief.md`）
+
+**输出**：
+- `venue-brief.md` 文件
+- 调研摘要（在对话中输出）
 
 ### 1.5.2 生成 Venue Brief 文件
 
@@ -126,8 +139,39 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
 
 ## 写作风格备注
 
-- Preferred Structure Notes: {从二级证据观察到的结构偏好}
-- Writing Tone Notes: {从二级证据观察到的语气偏好}
+### 调研来源
+- 调研论文数量：{数量}
+- 调研论文列表：{论文标题列表}
+- 调研方法：{本地文献库 / 开放获取论文 / 摘要分析}
+
+### 论文结构偏好
+- Introduction 长度：{平均段落数 / 页数}
+- Introduction 组织方式：{常见结构}
+- Related Work 位置：{独立章节 / Method 内 / Introduction 内}
+- Related Work 组织方式：{按技术路线 / 按任务 / 按限制类型}
+- Method 详细程度：{高 / 中 / 低}
+- Experimental Setup 详细程度：{高 / 中 / 低}
+
+### 写作风格偏好
+- 语气：{正式 / 半正式 / 非正式}
+- 用词偏好：{技术术语多 / 少 / 适中}
+- 句式结构：{长句多 / 短句多 / 混合}
+- 段落长度：{长段落 / 短段落 / 混合}
+
+### 引用密度
+- 平均引用数量：{数量}
+- 引用格式：{数字 / 作者-年份}
+
+### 图表使用偏好
+- 平均图表数量：{数量}
+- 图表类型偏好：{架构图 / 数据图 / 混合}
+- 图表说明详细程度：{高 / 中 / 低}
+
+### 各个部分的写法
+- Abstract：{长度 / 结构 / 信息密度}
+- Introduction：{背景介绍方式 / 问题陈述方式 / 贡献总结方式}
+- Method：{详细程度 / 公式使用 / 算法描述}
+- Experiments：{结果展示方式 / 分析深度}
 
 ## 信息完整性
 

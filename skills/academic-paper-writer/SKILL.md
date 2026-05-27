@@ -9,14 +9,15 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 ## ⚠️ Step 1 执行清单（Blocking Gate，必须首先执行）
 
-执行任何其他步骤之前，**必须**先完成以下6项：
+执行任何其他步骤之前，**必须**先完成以下7项：
 
 - [ ] 1. **确认venue**（Blocking）— 询问："目标期刊/会议是？"
 - [ ] 2. **确认language** — 询问："论文用中文还是英文撰写？"
 - [ ] 3. **确认min_citations** — 询问："预期参考文献数量？（默认35篇）"
-- [ ] 4. **询问本地文献库** — 询问："是否有本地文献库（存放PDF的目录）？"
-- [ ] 5. **本地文献库处理**（若有）— 检查markitdown + 输出转换提示
-- [ ] 6. **以上全部完成** → 进入Step 2
+- [ ] 4. **确认推进模式** — 询问："选择逐节撰写（每节完成后暂停确认）还是自动全部生成初稿？（默认自动）"
+- [ ] 5. **询问本地文献库** — 询问："是否有本地文献库（存放PDF的目录）？"
+- [ ] 6. **本地文献库处理**（若有）— 检查markitdown + 输出转换提示
+- [ ] 7. **以上全部完成** → 进入Step 2
 
 详细说明见下方"Step 1 执行清单（Blocking Gate）"章节。
 
@@ -37,10 +38,12 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 1. 确认venue
 2. 确认language
 3. 确认min_citations
-4. 询问本地文献库
-5. 若有本地文献库 → 检查markitdown + 输出转换提示
-6. **进入 Step 1.5**（强制）— 执行 Venue Requirements Research
-7. 以上全部完成（含 Step 1.5） → 进入Step 2
+4. 确认推进模式（逐节撰写 vs 自动全部生成）
+5. 询问本地风格参考文献库（用于分析目标期刊写作风格）
+6. 询问本地文献库
+7. 若有本地文献库 → 检查markitdown + 输出转换提示
+8. **进入 Step 1.5**（强制）— 执行 Venue Requirements Research
+9. 以上全部完成（含 Step 1.5） → 进入Step 2
 
 → Step 1b(可选:PDF→MD) → Step 2(证据审计) → Step 3(文献检索) → Step 4(实验复核) → Step 5(Blueprint) → Step 6(Section Complete Loop:探查+Draft+审查+润色+验证) → Step 7(section loop) → Step 8(引用清单) → Step 9(图片批量生成)
 
@@ -101,23 +104,34 @@ Step 6 (Method): 6.0 → 6.1 → ... → 6.9
       - 询问："预期参考文献数量？（默认35篇，short paper建议20，workshop建议15）"
       - 未指定 → 默认35
       
-- [ ] 4. **询问本地文献库**
-      - 询问："是否有本地文献库（存放PDF的目录）？"
-      - 有 → 记录路径，进入第5项
-      - 没有 → 跳过第5项
+- [ ] 4. **确认推进模式**
+      - 询问："选择逐节撰写（每节完成后暂停确认）还是自动全部生成初稿？（默认自动）"
+      - 用户选择"逐节" → 记录 `continuation_mode = step-by-step`
+      - 用户选择"自动"或未指定 → 记录 `continuation_mode = auto`
+      - **一次性确认**：确认后全程不再重复询问，用户可随时切换
       
-- [ ] 5. **本地文献库处理**（仅当第4项为"有"时）
+- [ ] 5. **询问本地风格参考文献库**
+      - 询问："是否有本地目标期刊风格参考文献库（存放目标期刊近年论文PDF的目录）？"
+      - 有 → 记录路径为 `local_style_ref_dir`，进入第6项
+      - 没有 → 跳过第6项，提示用户可以创建一个用于分析目标期刊写作风格
+      
+- [ ] 6. **询问本地文献库**
+      - 询问："是否有本地文献库（存放PDF的目录）？"
+      - 有 → 记录路径，进入第7项
+      - 没有 → 跳过第7项
+      
+- [ ] 7. **本地文献库处理**（仅当第6项为"有"时）
       - 检查markitdown是否已安装
       - 未安装 → 提供安装命令：`pip install markitdown`
       - 输出PDF→MD转换提示（见下方模板）
       - 确认用户已收到提示
 
-- [ ] 6. **进入 Step 1.5**（强制）— venue 确认后，必须执行 Venue Requirements Research（详见 `references/workflow-step-0-4.md` Step 1.5），不可跳过
+- [ ] 8. **进入 Step 1.5**（强制）— venue 确认后，必须执行 Venue Requirements Research（详见 `references/workflow-step-0-4.md` Step 1.5），不可跳过
 
-- [ ] 7. **以上全部完成**（含 Step 1.5） → 进入Step 2
+- [ ] 9. **以上全部完成**（含 Step 1.5） → 进入Step 2
 ```
 
-### Step 1b 转换提示模板（第5项使用）
+### Step 1b 转换提示模板（第7项使用）
 
 当用户有本地文献库时，**必须**输出以下提示：
 
@@ -414,6 +428,7 @@ Agent 定义与 dispatch 模板见各子 skill 的 `agents/` 目录。
 
 | 步骤 | 子 Skill | Agent 文件 | 定义位置 | 职责 |
 |------|---------|-----------|---------|------|
+| Step 1.5 | `academic-venue-research` | `venue-research-agent.md` | `skills/academic-venue-research/agents/` | 期刊调研（投稿要求 + 写作风格） |
 | Step 2 | `academic-paper-writer` | `probe-agent.md` | `skills/academic-paper-writer/agents/` | 只读探查 |
 | Step 3 | `academic-citation` | `citation_agent.md` | `skills/academic-citation/agents/` | 检索与核验 |
 | Step 3a/3b | `academic-citation` | `literature-reader-agent.md` | `skills/academic-citation/agents/` | 阅读并输出报告 |
