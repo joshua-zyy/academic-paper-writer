@@ -65,7 +65,7 @@ Step 1 九项确认清单见 `references/workflow-step-0-4.md`。
 16. **两阶段写作**：Step 5 Blueprint 可使用 bullet points 和提纲式结构，但 Step 6 Draft v1 必须是完整 prose 段落。bullet points 仅用于规划阶段，不得出现在最终论文正文中。
 17. **最大迭代次数**：修订循环（Step 6.7→6.8→7）最多执行 3 轮。3 轮后仍有未闭合 debt 时，标记为 `unresolvable`，输出修订报告并终止循环，不得继续重试。
 18. **Section Contract 先于 prose**：每节在 Step 5 必须根据 `references/section-writing-contracts.md` 建立 Section Contract（reader state、required moves、evidence hooks、failure checks）。Step 6 Draft v1 不得跳过该 contract 直接写正文；润色只能在 contract debt 基本闭合后执行。
-19. **数字引用格式**：正文中所有 inline citation 必须使用数字格式 `[1]`, `[2]`, `[1,3,5]`, `[2-4]`。禁止使用作者-年份格式（如 "Vaswani et al. (2017)"）。参考文献列表的编号与正文中的数字引用一一对应。
+19. **数字引用格式（默认）**：正文中所有 inline citation 默认使用数字格式 `[1]`, `[2]`, `[1,3,5]`, `[2-4]`。当 `venue-brief.md` 中 `Citation Format` 明确指定为 author-year 格式时，遵循 venue 要求，使用作者-年份格式。参考文献列表的编号/格式与正文引用一一对应。
 
 ## 文件输出规范
 
