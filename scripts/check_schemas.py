@@ -100,11 +100,9 @@ def check_figure_dispatch_modes(skills_root: Path) -> list:
     stale_paths = []
     required_modes = ["arch-prompt", "chart-from-data", "architecture-image"]
 
-    for skill_name in ["academic-paper-writer", "academic-figure"]:
-        references_dir = skills_root / skill_name / "references"
-        if not references_dir.exists():
-            continue
-        content = "\n".join(p.read_text(encoding="utf-8") for p in references_dir.rglob("*.md"))
+    orchestrator_refs = skills_root / "academic-paper-writer" / "references"
+    if orchestrator_refs.exists():
+        content = "\n".join(p.read_text(encoding="utf-8") for p in orchestrator_refs.rglob("*.md"))
         stale_paths.extend(re.findall(r'\bpath:\s*[ABC]\b|路径\s*[ABC]|[ABC]\s*路径', content))
 
     if stale_paths:
