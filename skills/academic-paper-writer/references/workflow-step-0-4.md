@@ -64,6 +64,68 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
 
 **Failure to confirm venue**: Stop and wait. Do not proceed to Step 2. Do not generate Outline or Section Queue until venue is resolved.
 
+### Step 1 完整执行清单（9 项，Blocking Gate）
+
+执行Step 1时，**必须按以下顺序逐项完成**。任一未完成不得进入Step 2。
+
+- [ ] 1. **确认venue**（Blocking）
+      - 询问："目标期刊/会议是？"
+      - 用户未决定 → 提供2-3个建议
+      - 用户说"你决定" → agent自主选择并告知
+
+- [ ] 2. **确认language**
+      - 询问："论文用中文还是英文撰写？"
+      - 未指定 → 默认英文
+
+- [ ] 3. **确认min_citations**
+      - 询问："预期参考文献数量？（默认35篇，short paper建议20，workshop建议15）"
+      - 未指定 → 默认35
+
+- [ ] 4. **确认推进模式**
+      - 询问："选择逐节撰写（每节完成后暂停确认）还是自动全部生成初稿？（默认自动）"
+      - 用户选择"逐节" → 记录 `continuation_mode = step-by-step`
+      - 用户选择"自动"或未指定 → 记录 `continuation_mode = auto`
+      - **一次性确认**：确认后全程不再重复询问，用户可随时切换
+
+- [ ] 5. **询问本地风格参考文献库**
+      - 询问："是否有本地目标期刊风格参考文献库（存放目标期刊近年论文PDF的目录）？"
+      - 有 → 记录路径为 `local_style_ref_dir`，进入第6项
+      - 没有 → 跳过第6项，提示用户可以创建一个用于分析目标期刊写作风格
+
+- [ ] 6. **询问本地文献库**
+      - 询问："是否有本地文献库（存放PDF的目录）？"
+      - 有 → 记录路径，进入第7项
+      - 没有 → 跳过第7项
+
+- [ ] 7. **本地文献库处理**（仅当第6项为"有"时）
+      - 检查markitdown是否已安装
+      - 未安装 → 提供安装命令：`pip install markitdown`
+      - 输出PDF→MD转换提示（见下方模板）
+      - 确认用户已收到提示
+
+- [ ] 8. **进入 Step 1.5**（强制）— venue 确认后，必须执行 Venue Requirements Research（详见下方 Step 1.5），不可跳过
+
+- [ ] 9. **以上全部完成**（含 Step 1.5） → 进入Step 2
+
+### Step 1b 转换提示模板（第7项使用）
+
+当用户有本地文献库时，**必须**输出以下提示：
+
+```
+本地文献库已确认: <local_lit_pdf_dir>
+
+请先确保 markitdown 已安装（如未安装）, 需注意python版本>=3.12：
+  pip install markitdown
+
+然后从项目根目录运行以下命令：
+  python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_lit_pdf_dir> <local_lit_md_dir>
+
+转换完毕后请告知我，我将从本地文献库中搜索可引用的文献。
+（在此期间我将先进行项目证据审计和联网文献检索）
+```
+
+输出提示后，**立即进入Step 2**，不等待转换完成。
+
 ---
 
 ## Step 1.5: Venue Requirements Research（强制）

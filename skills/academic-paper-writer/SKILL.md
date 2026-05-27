@@ -7,19 +7,11 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 将此 skill 视为"证据闭环型、分节推进的论文编排代理"。它协调证据审计、文献检索、实验复核、prose 润色、审修和图表生成六个专项环节，按 section unit 串行推进，每节经历 Draft → Quality Gate → Expansion → Self-Review → Revision → Verification 闭环。
 
-## ⚠️ Step 1 执行清单（Blocking Gate，必须首先执行）
+## Step 1 执行清单（Blocking Gate，9 项）
 
-执行任何其他步骤之前，**必须**先完成以下7项：
+执行 Step 1 时，**必须**按顺序逐项完成。任一未完成不得进入 Step 2。
 
-- [ ] 1. **确认venue**（Blocking）— 询问："目标期刊/会议是？"
-- [ ] 2. **确认language** — 询问："论文用中文还是英文撰写？"
-- [ ] 3. **确认min_citations** — 询问："预期参考文献数量？（默认35篇）"
-- [ ] 4. **确认推进模式** — 询问："选择逐节撰写（每节完成后暂停确认）还是自动全部生成初稿？（默认自动）"
-- [ ] 5. **询问本地文献库** — 询问："是否有本地文献库（存放PDF的目录）？"
-- [ ] 6. **本地文献库处理**（若有）— 检查markitdown + 输出转换提示
-- [ ] 7. **以上全部完成** → 进入Step 2
-
-详细说明见下方"Step 1 执行清单（Blocking Gate）"章节。
+详细 checklist 和模板见 `references/workflow-step-0-4.md` Step 1 节。
 
 ## 何时使用本 Skill vs. 子 Skill
 
@@ -34,121 +26,11 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 ## 编排流程
 
-**Step 0** → **Step 1（Blocking Gate：确认信息，不含 venue 调研）**：
-1. 确认venue
-2. 确认language
-3. 确认min_citations
-4. 确认推进模式（逐节撰写 vs 自动全部生成）
-5. 询问本地风格参考文献库（用于分析目标期刊写作风格）
-6. 询问本地文献库
-7. 若有本地文献库 → 检查markitdown + 输出转换提示
-8. **进入 Step 1.5**（强制）— 执行 Venue Requirements Research
-9. 以上全部完成（含 Step 1.5） → 进入Step 2
+Step 0→1(Blocking Gate)→1.5(Venue Research)→1b(可选)→2(证据审计)→3(文献检索)→4(实验复核)→5(Blueprint)→6(Section Complete Loop)→7(section loop)→8(引用清单)→9(图片批量生成)
 
-→ Step 1b(可选:PDF→MD) → Step 2(证据审计) → Step 3(文献检索) → Step 4(实验复核) → Step 5(Blueprint) → Step 6(Section Complete Loop:探查+Draft+审查+润色+验证) → Step 7(section loop) → Step 8(引用清单) → Step 9(图片批量生成)
+Step 1 九项确认清单见 `references/workflow-step-0-4.md`。
 
-**核心概念：Section Complete Loop（Step 6）**
-
-**重要**：Step 6不是单个section，而是**每个section都要经历的完整流程**。
-
-对于Section Queue中的每个section（Introduction、Related Work、Method...），
-都必须执行以下6.0-6.9的完整流程，**不可跳过任何阶段**：
-
-```
-Step 6: Section Complete Loop（每个section的完整流程）
-├── Phase 1: 起草
-│   ├── 6.0 核对 Section Contract
-│   ├── 6.1 前置探查（按section类型dispatch）
-│   ├── 6.2 Draft v1（含占位符+待补项清单）
-│   └── 6.3 写入paper_draft.md
-├── Phase 2: 审查与润色（自动执行，不暂停）
-│   ├── 6.4 占位符审计 + 图表生成
-│   ├── 6.5 证据合规审查
-│   ├── 6.6 Prose质量门
-│   ├── 6.7 扩写检查
-│   └── 6.8 综合验证
-└── Phase 3: 整合
-    └── 6.9 更新Cumulative Draft → 按Section Queue推进下一节
-```
-
-**示例执行顺序**：
-```
-Step 0-5: 准备阶段
-Step 6 (Introduction): 6.0 → 6.1 → ... → 6.9
-Step 7: 推进到 Related Work
-Step 6 (Related Work): 6.0 → 6.1 → ... → 6.9
-Step 7: 推进到 Method
-Step 6 (Method): 6.0 → 6.1 → ... → 6.9
-...
-```
-
-**Draft v1 ≠ 初稿完成**。只有完成Step 6.8（综合验证）的section才算初稿完成。
-
-## Step 1 执行清单（Blocking Gate）
-
-执行Step 1时，**必须按以下顺序逐项完成**。任一未完成不得进入Step 2。
-
-```markdown
-## Step 1 Checklist
-
-- [ ] 1. **确认venue**（Blocking）
-      - 询问："目标期刊/会议是？"
-      - 用户未决定 → 提供2-3个建议
-      - 用户说"你决定" → agent自主选择并告知
-      
-- [ ] 2. **确认language**
-      - 询问："论文用中文还是英文撰写？"
-      - 未指定 → 默认英文
-      
-- [ ] 3. **确认min_citations**
-      - 询问："预期参考文献数量？（默认35篇，short paper建议20，workshop建议15）"
-      - 未指定 → 默认35
-      
-- [ ] 4. **确认推进模式**
-      - 询问："选择逐节撰写（每节完成后暂停确认）还是自动全部生成初稿？（默认自动）"
-      - 用户选择"逐节" → 记录 `continuation_mode = step-by-step`
-      - 用户选择"自动"或未指定 → 记录 `continuation_mode = auto`
-      - **一次性确认**：确认后全程不再重复询问，用户可随时切换
-      
-- [ ] 5. **询问本地风格参考文献库**
-      - 询问："是否有本地目标期刊风格参考文献库（存放目标期刊近年论文PDF的目录）？"
-      - 有 → 记录路径为 `local_style_ref_dir`，进入第6项
-      - 没有 → 跳过第6项，提示用户可以创建一个用于分析目标期刊写作风格
-      
-- [ ] 6. **询问本地文献库**
-      - 询问："是否有本地文献库（存放PDF的目录）？"
-      - 有 → 记录路径，进入第7项
-      - 没有 → 跳过第7项
-      
-- [ ] 7. **本地文献库处理**（仅当第6项为"有"时）
-      - 检查markitdown是否已安装
-      - 未安装 → 提供安装命令：`pip install markitdown`
-      - 输出PDF→MD转换提示（见下方模板）
-      - 确认用户已收到提示
-
-- [ ] 8. **进入 Step 1.5**（强制）— venue 确认后，必须执行 Venue Requirements Research（详见 `references/workflow-step-0-4.md` Step 1.5），不可跳过
-
-- [ ] 9. **以上全部完成**（含 Step 1.5） → 进入Step 2
-```
-
-### Step 1b 转换提示模板（第7项使用）
-
-当用户有本地文献库时，**必须**输出以下提示：
-
-```
-本地文献库已确认: <local_lit_pdf_dir>
-
-请先确保 markitdown 已安装（如未安装）, 需注意python版本>=3.12：
-  pip install markitdown
-
-然后从项目根目录运行以下命令：
-  python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_lit_pdf_dir> <local_lit_md_dir>
-
-转换完毕后请告知我，我将从本地文献库中搜索可引用的文献。
-（在此期间我将先进行项目证据审计和联网文献检索）
-```
-
-输出提示后，**立即进入Step 2**，不等待转换完成。
+**核心概念：Section Complete Loop（Step 6）** — 每个 section 都经历 6.0→6.9 的完整流程（起草→审查润色→整合），不可跳过。**Draft v1 ≠ 初稿完成**，只有完成 Step 6.8 的 section 才算初稿完成。
 
 ## Red Lines（绝对禁止）
 
@@ -255,217 +137,49 @@ Step 6 (Method): 6.0 → 6.1 → ... → 6.9
 
 ## 默认交付物
 
-唯一输出目录 `./docs/paper-drafts/`，包含：
-
-1. `paper_draft.md` — 论文正文（逐节追加，含 inline 占位符标记）+ 参考文献列表 + 待补项清单
-2. `figures/figure_prompts.md` — 所有架构图生图提示词汇总（按图编号分节）
-3. `figures/plot_*.py` — 数据结果图的 Python 绘图代码（按图编号命名，不自动执行）
-4. `referenced-literature-checklist.md` — 引用文献清单（**强制，论文完成时必生成**）
-5. `referenced-literature-inventory.md` — 引用文献过程记录（Step 3c 后生成，逐节追加）
-
-对话中仅输出简短进度摘要，不输出完整论文正文。
-
-## 可选产物（用户请求时生成）
-
-以下产物不纳入强制流程，在用户明确要求或 venue 需要时生成：
-
-| 产物 | 说明 | 何时需要 |
-|------|------|---------|
-| `abstract.md` | 单独提取的 Abstract | venue 要求独立提交时 |
-| `cover-letter.md` | 投稿信模板 | 期刊投稿时 |
-| `highlights.md` | 3-5 条核心贡献 | venue 要求时（如 Cell Press） |
-| `venue-checklist.md` | venue-specific 提交检查清单 | 始终建议生成 |
+详见 `references/orchestration-workflow.md`。输出目录 `./docs/paper-drafts/`。
 
 ## 默认 section queue
 
-### empirical CS/AI paper
-
-1. Introduction
-2. Related Work
-3. Method / Approach
-4. Experimental Setup
-5. Main Results
-6. Ablation / Analysis
-7. Discussion / Limitations
-8. Conclusion
-
-**Abstract 为后置章节**，不在初始 Section Queue 中。仅在 Section Queue 全部完成且所有核心章节 Verification = passed 后才允许生成。在此之前，在占位符系统中使用 `[ABSTRACT_NEEDED: 待主要证据稳定后撰写]`。
-
-### 其他类型
-
-先根据 `references/paper-structure.md` 选结构。Abstract 仍后置。
+详见 `references/paper-structure.md`。Abstract 为后置章节，不在初始队列中。
 
 ## 迭代控制
 
-详见 `references/iteration-control.md`。
-
-节级最小闭环（Step 6 Section Complete Loop）：
-```
-Phase 1: 6.0 核对Section Contract → 6.1 前置探查 → 6.2 Draft v1 → 6.3 写入文件
-Phase 2: 6.4 占位符审计+图表 → 6.5 证据合规 → 6.6 Prose质量门 → 6.7 扩写检查 → 6.8 综合验证
-Phase 3: 6.9 整合 → 推进到下一节
-```
-
-退出当前 section 的条件：
-- Step 6.8 Verification passed
-- Step 6.8 Verification blocked 且 safe_to_continue = yes
-- 用户明确要求暂停
-
-不退出条件：
-- Verification failed 且非外部阻塞 → 继续下一轮修订
-- Verification blocked 且 safe_to_continue = no → 等待外部证据
+详见 `references/iteration-control.md`。修订循环最多 3 轮，详见 `references/orchestration-workflow.md`。
 
 ## 工作流概要
 
-详见 `references/orchestration-workflow.md` 获取每个步骤的完整执行细节。
-
-| Step | 动作 | 委托方式 | 触发方式 |
-|------|------|---------|---------|
-| 0 | 判定 mode、scope、当前 section | — | 自动 |
-| 1 | **Checklist**：确认 venue/language/min_citations + 本地文献库（Blocking Gate） | — | 自动 |
-| 1b | 可选：PDF→MD 转换（提示用户运行，不阻塞） | — | 自动（条件执行） |
-| 2 | 证据审计（dispatch probe agents） | — | 自动 |
-| 3 | 文献检索与核验（3a 本地优先 + 3b 联网 + 3c 聚合 + 3d 过程记录） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 |
-| 4 | 实验事实复核 | `academic-experiments`（dispatch 子 Agent） | 自动 |
-| 5 | 生成 Section Contract + Section / Method Blueprint | — | 自动 |
-| **6** | **Section Complete Loop**（包含 6.0–6.9 子步骤，见下方详细说明） | — | 自动 |
-| 7 | 整合 & 依赖感知 section loop | — | 自动 |
-| 8 | **引用清单生成**（强制，论文完成时必执行） | — | 自动 |
-| 9 | **图片批量生成**（强制，论文完成时必执行） | `academic-figure`（dispatch，chart-from-data / architecture-image） | 自动 |
-
-**注**：原独立步骤 占位符审计/证据合规/Prose质量门/扩写检查/综合验证（旧编号 Step 7–11）已合并为 Step 6 的子步骤（6.4–6.8）。
+详见 `references/orchestration-workflow.md` 获取步骤索引、完整执行细节和 dispatch 模板。
 
 ### Step 6: Section Complete Loop（详细说明）
 
 每节必须完成以下完整流程，**Draft v1 ≠ 初稿完成**：
 
-```markdown
-## Step 6 执行清单
+- **Phase 1**: 6.0 核对 Section Contract → 6.1 前置探查 → 6.2 Draft v1 → 6.3 写入文件
+- **Phase 2**: 6.4 占位符审计+图表 → 6.5 证据合规 → 6.6 Prose 质量门 → 6.7 扩写检查 → 6.8 综合验证
+- **Phase 3**: 6.9 整合 → 推进到下一节
 
-### Phase 1: 起草
-- [ ] 6.0 读取并核对 Section Contract（`references/section-writing-contracts.md`）
-- [ ] 6.1 前置探查（按section类型dispatch，见下方探查规则表）
-- [ ] 6.2 生成Draft v1（含占位符系统 + 待补项清单）
-- [ ] 6.3 写入paper_draft.md
-
-### Phase 2: 审查与润色（自动执行，不暂停）
-
-**⚠️ Phase 2 为强制执行阶段，不得跳过任何子步骤。**
-以下所有子步骤必须在 Phase 1 全部完成**之后**、进入 Phase 3 或下一节**之前**依次执行：
-
-- [ ] 6.4 **占位符审计 + 图表生成**（**强制执行，不可跳过**）
-  - **即使 Draft v1 中没有 `[FIGURE_NEEDED]` 占位符，也必须执行此步骤**：
-  - 扫描全文占位符统计
-  - 对 Method 节主动补入缺失的架构图占位符
-  - 对每个 `[FIGURE_NEEDED]` 建立 Figure Contract，然后 dispatch `academic-figure` 子代理生成：
-    - 架构图类 → 架构图提示词写入 `./docs/paper-drafts/figures/figure_prompts.md`
-    - 数据图类 → Python 绘图代码写入 `./docs/paper-drafts/figures/plot_fig{N}.py`
-  - 追加待补项清单到 Draft v1 末尾
-  - 正文中的占位符替换为图编号引用（如 `Figure 1`）
-  - 详细 dispatch 模板和子步骤见 `references/workflow-step-5-6.5.md` Step 6.4
-- [ ] 6.5 证据合规审查（academic-reviser，dispatch，targeted-evidence-mode）
-- [ ] 6.6 Prose质量门（academic-polishing，内化调用）
-- [ ] 6.7 扩写检查（内容密度）
-- [ ] 6.8 综合验证（academic-reviser，dispatch，full-section-review）
-
-**🚫 Phase 2 未完成前，禁止进入 Phase 3 或推进到下一节。**
-完成 Phase 2 的验证：6.8 返回 `verdict = passed` 或 `blocked + safe_to_continue = yes` 后方可继续。
-
-### Phase 3: 整合
-- [ ] 6.9 更新Cumulative Draft → 推进到下一节
-```
+详细执行清单见 `references/workflow-step-5-6.5.md` Step 6 节。
 
 ### 6.1 前置探查规则表
 
-在起草前，**必须**按以下规则决定是否 dispatch 探查：
-
-| Section | 探查任务 | 并行策略 |
-|---------|---------|---------|
-| **Introduction** | `existing_material` + 本地文献深度探索 + 外部文献定向搜索 | **必须并行**（项目探查+文献探索同时进行） |
-| **Related Work** | `existing_material` + 本地文献深度探索 + 外部文献定向搜索 | **必须并行**（项目探查+文献探索同时进行） |
-| **Method** | `code_structure` + `preprocessing` | **必须并行**（同时发出两个Task） |
-| **Experimental Setup** | `experiment_setup` | 单探查 |
-| **Main Results / Ablation** | `experiment_results` | 单探查 |
-| **Discussion** | `interpretability` | 单探查 |
-
-**dispatch模板**：
-- 项目探查模板见 `references/workflow-step-0-4.md` 的 `### 单探查 dispatch 模板` 和 `### 并行 dispatch 模板`
-- Introduction/Related Work 的文献深度探索模板见 `references/workflow-step-5-6.5.md` Step 6.1 中的"Section 文献深度探索 dispatch 模板"
+详见 `references/workflow-step-5-6.5.md` Step 6.1 节。
 
 ### 各步骤详细参考
 
-| 子步骤 | 详细说明 | 委托方式 |
-|--------|---------|---------|
-| 6.4 占位符审计 + 图表生成 | `references/workflow-step-5-6.5.md` Step 6.4 | `academic-figure`（dispatch） |
-| 6.5 证据合规审查 | `references/workflow-step-5-6.5.md` Step 6.5 | `academic-reviser`（dispatch） |
-| 6.6 Prose质量门 | `references/workflow-step-6.6-9.md` Step 6.6 | `academic-polishing`（内化） |
-| 6.7 扩写检查 | `references/workflow-step-6.6-9.md` Step 6.7 | 主Agent自行执行 |
-| 6.8 综合验证 | `references/workflow-step-6.6-9.md` Step 6.8 | `academic-reviser`（dispatch） |
+详见 `references/workflow-step-5-6.5.md` Step 6.4–6.5 和 `references/workflow-step-6.6-9.md` Step 6.6–6.8。
 
 ## 跨技能数据契约（Schemas）
 
-| Schema 文件 | 生产者 | 消费者 | 用途 |
-|------------|--------|--------|------|
-| `skills/academic-citation/references/schemas/verified-references.md` | academic-citation | paper-writer, polishing | 引用数据交换 |
-| `skills/academic-experiments/references/schemas/evidence-inventory.md` | academic-experiments | paper-writer | 实验证据交换 |
-| `skills/academic-reviser/references/schemas/verification-report.md` | academic-reviser | paper-writer | 验证报告交换 |
-
-每个 schema 文件为其生产者 skill 的权威版本（source of truth）。
-
-各 Skill 的独立参考文件：
-
-| 文件 | 用途 |
-|------|------|
-| `references/evidence-classification.md` | 三类证据定义 |
-| `references/placeholder-guide.md` | 占位符系统规范 |
-| `references/paper-types.md` | 论文类型定义 |
+详见 `references/orchestration-workflow.md` 的"Shared Inputs and References"节。Schema 文件位于各子 skill 的 `references/schemas/` 目录。
 
 ## Agent 资源与执行架构
 
-Agent 定义与 dispatch 模板见各子 skill 的 `agents/` 目录。
-
-### 可 dispatch 的子 Agent
-
-| 步骤 | 子 Skill | Agent 文件 | 定义位置 | 职责 |
-|------|---------|-----------|---------|------|
-| Step 1.5 | `academic-venue-research` | `venue-research-agent.md` | `skills/academic-venue-research/agents/` | 期刊调研（投稿要求 + 写作风格） |
-| Step 2 | `academic-paper-writer` | `probe-agent.md` | `skills/academic-paper-writer/agents/` | 只读探查 |
-| Step 3 | `academic-citation` | `citation_agent.md` | `skills/academic-citation/agents/` | 检索与核验 |
-| Step 3a/3b | `academic-citation` | `literature-reader-agent.md` | `skills/academic-citation/agents/` | 阅读并输出报告 |
-| Step 4 | `academic-experiments` | `experiment_agent.md` | `skills/academic-experiments/agents/` | 实验复核 |
-| Step 6.4 | `academic-figure` | `figure_agent.md` | `skills/academic-figure/agents/` | 图表生成 |
-| Step 6.5/6.8 | `academic-reviser` | `reviser_agent.md` | `skills/academic-reviser/agents/` | 审查与验证 |
-
-### 内化调用
-
-| 步骤 | Skill | 说明 |
-|------|-------|------|
-| Step 6.6 | `academic-polishing` | 主 Agent 自行执行，确保风格一致 |
-
-### 职责边界
-
-- **主 Agent**：Section Blueprint、Draft v1、Expansion Pass、Cumulative Draft、Abstract、跨节一致性
-- **子 Agent**：提供专项输出，不直接修改 Cumulative Draft
+Agent 定义、dispatch 模板、职责边界见各子 skill 的 `agents/` 目录。主 Agent 负责论文正文和跨节一致性，子 Agent 提供专项输出。
 
 ## 何时读取 references/
 
-| Reference 文件 | 打开条件 |
-|---------------|---------|
-| `references/paper-structure.md` | 选章节结构时 |
-| `references/writing-guidelines.md` | Step 1.5 调研 venue 要求时；venue 风格适配时 |
-| `references/general-writing-guide.md` | 写作时参考通用学术写作原则；需要了解各部分写作规范时；检查论文是否符合学术写作基本要求时 |
-| `references/section-writing-contracts.md` | Step 5 生成 Section Contract；Step 6.0/6.8 检查章节论证功能时 |
-| `references/iteration-control.md` | 进入修订循环时 |
-| `references/content-density.md` | Step 6.7 扩写检查 |
-| `references/figure-generation-guide.md` | Step 6.4 生成图表时 |
-| `references/exemplar-introduction.md` 等 | 写对应章节前（Exemplar < 3 篇时） |
-| `references/evidence-classification.md` | Step 2 证据审计 |
-| `references/placeholder-guide.md` | Step 6.2 生成 Draft |
-| `references/mode-spectrum.md` | Step 0 选择模式 |
-| `references/data-access-levels.md` | 理解数据访问边界 |
-| `references/reporting-checklist.md` | Step 6.5 证据合规审查 / 实验相关 section 检查 |
-| `skills/academic-citation/scripts/convert-pdfs-to-md.py` | Step 1b PDF→MD |
-| `shared/references/concepts.md` | 跨技能共享概念速查 |
+详见 `references/orchestration-workflow.md` 的"Shared Inputs and References"节。按步骤加载对应文件，不预加载。
 
 ## 不适用场景
 
