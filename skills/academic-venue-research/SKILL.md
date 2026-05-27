@@ -13,6 +13,9 @@ description: "Research target venue requirements and writing style for CS/AI/ML 
 2. 禁止将未验证的信息标注为 VERIFIED
 3. 禁止忽略信息来源的透明性
 4. 禁止在无法获取官方信息时假装已获取
+5. 禁止将 webfetch 获取的缓存页面当作最新 CFP（必须标注 fetch 时间戳）
+6. 禁止将非官方博客或第三方总结作为 author guidelines 来源
+7. 禁止将已录用论文的观察结果当作 venue 规范要求（二级证据仅用于风格偏好）
 
 ## 非协商规则
 
