@@ -438,6 +438,7 @@ Agent 定义与 dispatch 模板见各子 skill 的 `agents/` 目录。
 |---------------|---------|
 | `references/paper-structure.md` | 选章节结构时 |
 | `references/writing-guidelines.md` | Step 1.5 调研 venue 要求时；venue 风格适配时 |
+| `references/general-writing-guide.md` | 写作时参考通用学术写作原则；需要了解各部分写作规范时；检查论文是否符合学术写作基本要求时 |
 | `references/section-writing-contracts.md` | Step 5 生成 Section Contract；Step 6.0/6.8 检查章节论证功能时 |
 | `references/iteration-control.md` | 进入修订循环时 |
 | `references/content-density.md` | Step 6.7 扩写检查 |
