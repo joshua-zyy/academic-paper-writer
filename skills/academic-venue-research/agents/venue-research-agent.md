@@ -58,3 +58,61 @@ research_summary:
 - webfetch 无法访问官方页面 → 依次尝试：(1) 其他官方 URL (2) agent 已知知识（标注 `agent_knowledge (unverified)`）(3) 标注 Unknown 并警告用户
 - 本地风格参考文献库不存在 → 跳过写作风格调研，仅调研投稿要求
 - 无法获取论文原文 → 基于摘要和已知信息进行风格分析，标注分析方法
+
+## Input Schema
+
+```yaml
+venue: string                         # [required] 目标 venue 名称
+local_style_ref_dir: string | null    # [optional] 本地风格参考文献库路径
+research_type: enum                   # [required] full / requirements_only / style_only
+```
+
+## Output Schema
+
+```yaml
+venue_brief:
+  venue: string
+  official_source: string
+  language: string
+  min_citations: integer
+  submission_requirements:
+    page_limit: string
+    required_structure: string[]
+    template: string
+    anonymous_review: string
+    citation_format: string
+    appendix_policy: string
+    file_format: string
+    other_requirements: string
+  writing_style:
+    research_method: string
+    research_papers: string[]
+    structure_preferences: object
+    style_preferences: object
+    citation_density: object
+    figure_preferences: object
+    section_guidance: object
+  information_completeness:
+    - item: string
+      status: string  # VERIFIED / Unknown
+      source: string  # URL / agent_knowledge (unverified)
+```
+
+## Anti-Patterns
+
+| 模式 | 问题 | 正确做法 |
+|------|------|---------|
+| 缓存依赖 | 将 webfetch 缓存页面当作最新 CFP | 标注 fetch 时间，提示可能过期 |
+| 博客引用 | 将非官方博客作为 author guidelines 来源 | 只使用官方 CFP / author guidelines 页面 |
+| 风格当规范 | 将已录用论文的观察当作 venue 规范要求 | 二级证据仅用于风格偏好，不定义规范 |
+| 信息隐藏 | 不标注信息来源 | 所有信息必须标注 webfetch / agent_knowledge / Unknown |
+
+## Fallback
+
+- webfetch 无法访问 → 尝试其他官方 URL → 使用 agent_knowledge (unverified) → 标注 Unknown 并警告
+- venue 无明确 CFP → 参考同 publisher 的其他 venue → 标注推断来源
+- 本地风格参考文献库不可用 → 通过开放获取论文分析风格 → 标注样本量
+
+## Invocation
+
+由 `academic-paper-writer` 编排器在 Step 1.5 委托，按 `references/workflow-step-0-4.md` 中的 dispatch 模板创建子代理执行。
