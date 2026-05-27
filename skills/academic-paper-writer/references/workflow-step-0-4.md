@@ -281,7 +281,6 @@ Venue Brief 生成后，在后续步骤中**必须参考**：
 检查 `skills/academic-citation/scripts/convert-pdfs-to-md.py` 是否存在：
 - 不存在 → 使用 Write 工具创建该脚本（写入 `skills/academic-citation/scripts/convert-pdfs-to-md.py`）
 - 已存在 → 跳过
-- 已存在 → 跳过
 
 ### 1b.2 确定 MD 输出目录
 
@@ -686,6 +685,8 @@ For Introduction / Related Work: if retries still produce zero VERIFIED referenc
 **与 Step 8 的区别**：
 - Step 3d = 过程记录，逐节追加，方便用户随时下载
 - Step 8 = 终版核验清单，论文完成后一次性生成，用于确认引用合理性
+
+## Step 4: Experiment Evidence Review
 
 - Create a todo list for experiment evidence items.
 - Delegate to `academic-experiments` via the dispatch template below (only when empirical paper and current section needs experiment facts).
