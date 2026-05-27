@@ -107,6 +107,7 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
 | `references/search-strategy.md` | 设计检索查询时（Step 2） |
 | `references/verification-protocol.md` | 核验候选文献时（Step 3） |
 | `references/citation-mapping.md` | 建立 Citation-to-Claim 映射时（Step 5） |
+| `skills/shared/schemas/citation-to-claim-map.md` | 构建 Citation-to-Claim 映射时（Step 5） |
 | `references/schemas/verified-references.md` | 理解输出数据格式（Step 6） |
 | `references/schemas/literature-reading-report.md` | subagent 阅读输出格式（Step 1a/3a） |
 | `agents/literature-reader-agent.md` | 文献阅读代理模板（Step 1a/3a 并行 dispatch） |
