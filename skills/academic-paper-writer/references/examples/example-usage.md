@@ -8,7 +8,8 @@
 **执行流程摘要**：
 ```
 Step 0: mode=full-paper-planning, scope=empirical CS/AI paper
-Step 1: Venue Brief → IEEE T-AFFC, 英文, 双栏, 12页
+Step 1: 确认 venue=IEEE T-AFFC, 英文, min_citations=35
+Step 1.5: Venue Requirements Research → venue-brief.md (双栏, 12页, 匿名评审, IEEE模板)
 Step 2: 并行 dispatch probe agents 探查代码/数据/配置
 Step 3: 并行 dispatch citation agent + literature reader → Verified References (12篇本地+8篇外部)
 Step 4: dispatch experiment agent → Evidence Inventory (3个newly_run结果, 2个preexisting_artifact)

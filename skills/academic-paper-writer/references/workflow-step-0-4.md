@@ -41,7 +41,7 @@ Blocking confirmations — must stop and ask if missing:
    - 用户未指定或说"默认"时使用默认值 35
    - **一次性确认**：确认后全程不再重复询问，Step 8 生成引用清单时自动核验。
 
-If venue is known and relevant, read `references/writing-guidelines.md` and form a brief Venue / Language Brief.
+If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venue Requirements Research，使用 webfetch 访问官方页面获取投稿要求并生成 `venue-brief.md`。
 
 ### 本地文献库（强制询问，与 venue 同属 Blocking Gate）
 
@@ -59,6 +59,110 @@ If venue is known and relevant, read `references/writing-guidelines.md` and form
 - 若用户明确没有本地文献库或跳过转换：`local_lit_md_dir = null`，跳过 Step 1b
 
 **Failure to confirm venue**: Stop and wait. Do not proceed to Step 2. Do not generate Outline or Section Queue until venue is resolved.
+
+---
+
+## Step 1.5: Venue Requirements Research（强制）
+
+**条件**: venue 已确认且非 `user_declined` 时**必须执行**。不可跳过，不可推迟到起草阶段。
+
+**跨模式适用性**：
+- `full-paper-planning`：必须执行
+- `section-drafting` / `section-revision`：若 venue-brief.md 已存在（同一项目、同一 venue），可复用，无需重复执行；若不存在，必须执行
+- `related-work-or-citation-pass` / `experiment-evidence-pass`：若 venue 影响执行策略（如引用格式），且 venue-brief.md 不存在，必须执行
+
+### 1.5.1 执行逻辑
+
+1. **判断 venue 类型**：
+   - 知名 venue（如 NeurIPS、CVPR、ICLR、AAAI、IEEE T-PAMI、Nature、Science 等）→ 可直接使用已知要求，但仍需用 webfetch 标注信息来源
+   - 其他 venue → 必须用 webfetch 访问官方页面
+
+2. **使用 webfetch 获取官方信息**：
+   - 构造搜索目标时**必须包含投稿年份**：`{venue_name} {year} author guidelines` 或 `{venue_name} {year} call for papers`
+   - 若用户未指定投稿年份，使用当前年份
+   - 使用 webfetch 访问最可能的官方页面
+   - 若首次访问未找到，尝试 `submission guidelines` / `paper format` / `camera ready instructions` 等变体
+   - **降级策略**（webfetch 失败时）：
+     - webfetch 返回空内容或无法访问 → 尝试其他可能的官方 URL
+     - 所有 URL 均失败 → 使用 agent 已知的 venue 知识（如有），并在信息完整性表中标注 `source: agent_knowledge (unverified)`
+     - agent 无相关知识 → 标注 Unknown，警告用户"未能获取官方信息，建议手动确认"
+   - 不得编造任何未从官方页面获取的信息
+
+3. **提取以下信息**（按优先级）：
+
+   | 信息项 | 必需/可选 | 说明 |
+   |--------|----------|------|
+   | Page Limit | 必需 | 正文页数限制（含/不含参考文献、附录） |
+   | Required Structure | 必需 | venue 要求的必需章节（如 Abstract 必须、Keywords 必须等） |
+   | Template | 必需 | LaTeX/Word 模板要求 |
+   | Anonymous Review | 必需 | 是否双盲 |
+   | Citation Format | 必需 | 引用格式（数字/作者-年份） |
+   | Appendix Policy | 可选 | 附录政策 |
+   | File Format | 可选 | PDF/A、文件大小限制等 |
+   | Other Requirements | 可选 | 其他特殊要求（如 data availability statement 等） |
+
+### 1.5.2 生成 Venue Brief 文件
+
+**必须**将调研结果写入 `./docs/paper-drafts/venue-brief.md`，格式如下：
+
+```markdown
+# Venue Brief
+
+- Venue: {venue 名称}
+- Official Source: {官方页面 URL}
+- Language: {语言} [User Config]
+- Min Citations: {预期引用数} [User Config]
+
+## 投稿要求
+
+- Page Limit: {页数限制，含说明}
+- Required Structure: {必需章节列表}
+- Template: {模板要求}
+- Anonymous Review: {是否双盲}
+- Citation Format: {引用格式}
+- Appendix Policy: {附录政策}
+- File Format: {文件格式要求}
+- Other Requirements: {其他特殊要求}
+
+## 写作风格备注
+
+- Preferred Structure Notes: {从二级证据观察到的结构偏好}
+- Writing Tone Notes: {从二级证据观察到的语气偏好}
+
+## 信息完整性
+
+| 信息项 | 状态 | 来源 |
+|--------|------|------|
+| Page Limit | VERIFIED / Unknown | {URL 或 agent_knowledge (unverified)} |
+| Required Structure | VERIFIED / Unknown | {URL 或 agent_knowledge (unverified)} |
+| Template | VERIFIED / Unknown | {URL 或 agent_knowledge (unverified)} |
+| Anonymous Review | VERIFIED / Unknown | {URL 或 agent_knowledge (unverified)} |
+| Citation Format | VERIFIED / Unknown | {URL 或 agent_knowledge (unverified)} |
+| Appendix Policy | VERIFIED / Unknown | {URL 或 agent_knowledge (unverified)} |
+```
+
+### 1.5.3 对后续步骤的影响
+
+Venue Brief 生成后，在后续步骤中**必须参考**：
+
+| 后续步骤 | 如何使用 Venue Brief |
+|----------|---------------------|
+| Step 3 (文献检索) | 根据 Citation Format 确定引用核验策略 |
+| Step 4 (实验复核) | 根据 Page Limit 确定实验结果展示的详略程度 |
+| Step 5 (Blueprint) | 根据 Required Structure 调整 section queue |
+| Step 6 (Draft) | 根据 Page Limit 控制各节篇幅 |
+| Step 6 (Draft) | 根据 Citation Format 使用正确的引用格式 |
+| Step 6 (Draft) | 根据 Anonymous Review 决定是否去除可识别信息 |
+| Step 8 (引用清单) | 根据 Appendix Policy 决定附录内容 |
+| Step 9 (图片生成) | 根据 Template 确定图片尺寸和分辨率要求 |
+
+### 1.5.4 失败处理
+
+- webfetch 无法访问官方页面 → 依次尝试：(1) 其他官方 URL (2) agent 已知知识（标注 `agent_knowledge (unverified)`）(3) 标注 Unknown 并警告用户
+- 用户提供 venue 但明确说"你决定" → agent 自主选择 venue 后仍需执行 1.5
+- venue = user_declined → 跳过 1.5，使用通用结构，警告用户"未指定 venue，通用结构可能不满足投稿要求"
+- 二级证据（已录用论文）仅用于风格偏好，不能定义 venue 规范
+- **信息来源透明**：所有 Venue Brief 中的信息必须标注来源（`webfetch` / `agent_knowledge (unverified)` / `Unknown`），不得隐藏信息来源
 
 ---
 

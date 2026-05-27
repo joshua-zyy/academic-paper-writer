@@ -14,7 +14,7 @@
 
 | 阶段 | Steps | 文件 | 核心任务 |
 |------|-------|------|---------|
-| 准备 | 0–4（含 1b） | `workflow-step-0-4.md` | 判定模式、确认 venue+本地文献库、PDF→MD 转换准备、**并行**证据审计、文献检索、实验复核 |
+| 准备 | 0–4（含 1.5, 1b） | `workflow-step-0-4.md` | 判定模式、确认 venue、**Venue Requirements Research**、本地文献库、PDF→MD 转换准备、**并行**证据审计、文献检索、实验复核 |
 | 起草与初步审查 | 5–6（含 6.0–6.5） | `workflow-step-5-6.5.md` | Section Plan、Draft v1、占位符审计与图表、证据合规审查 |
 | 审查与整合 | 6.6–9 | `workflow-step-6.6-9.md` | Prose Gate、Expansion、Verification、Section Loop、引用清单、图片批量生成 |
 
@@ -33,7 +33,8 @@
 | Step | 动作 | 委托方式 | 触发方式 | DP |
 |------|------|---------|---------|-----|
 | 0 | 判定 mode、scope、当前 section | — | 自动 | — |
-| 1 | 确认 venue / 语言 / min_citations + 本地文献库（Blocking Gate） | — | 自动 | DP-1 |
+| 1 | 确认 venue / 语言 / min_citations + 本地文献库（Blocking Gate，**不含** venue 调研） | — | 自动 | — |
+| 1.5 | **Venue Requirements Research**（强制）— webfetch 访问官方页面，生成 venue-brief.md | — | 自动 | DP-1 |
 | 1b | 可选: PDF→MD 转换准备（生成脚本，提示用户运行，不阻塞） | — | 自动（条件执行） | — |
 | 2 | 证据审计（并行 dispatch probe agents） | — | 自动，涉及多 probe 时**必须并行** | — |
 | 3 | 文献检索与核验（3a 本地优先 + 3b 联网 + 3c 聚合 + 3d 过程记录） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 | — |

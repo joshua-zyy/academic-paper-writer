@@ -5,7 +5,7 @@
 - 使用定位
 - 工具与信息来源
 - 证据分层
-- Venue / Language Brief 的最小内容
+- Venue Brief 模板
 - 没有目标 venue 时的默认写法
 - 风格适配的失败处理
 - 与草稿生成的边界
@@ -13,7 +13,7 @@
 ## 使用定位
 
 本文件用于两件事：
-- 当用户提供目标会议/期刊时，生成简短、可审计的 Venue / Language Brief
+- 当用户提供目标会议/期刊时，生成 Venue Brief（详见 Step 1.5）
 - 在写作与修订阶段辅助 venue 风格适配
 
 注意：
@@ -23,15 +23,24 @@
 
 ---
 
-## 1. 工具与信息来源
+## 1. 工具与信息来源（强制调研）
 
-当需要做目标会议/期刊适配时，使用 web 检索确认少量高价值事实：
+当用户提供目标会议/期刊后，**必须**使用 webfetch 访问官方页面，确认以下信息：
 - 论文章节结构与必需组成部分
 - 投稿规则
 - 模板要求
 - 页数限制
 - 匿名要求
 - 官方语言与格式偏好
+
+**调研时机**：Step 1.5（venue 确认后立即执行，不可推迟到起草阶段）
+
+**调研优先级**：
+1. 官方 CFP / author guidelines 页面（一级证据）
+2. 官方模板说明（一级证据）
+3. 已录用论文观察（二级证据，仅用于风格偏好）
+
+**输出**：生成 `venue-brief.md` 文件，后续所有步骤必须参考。无法确认的信息标注 Unknown，不得编造。
 
 ---
 
@@ -59,28 +68,29 @@
 
 ---
 
-## 3. Venue / Language Brief 的最小内容
+## 3. Venue Brief 模板
 
-```md
-## Venue / Language Brief
+完整模板定义见 `workflow-step-0-4.md` Step 1.5.2。以下为核心字段摘要：
 
-- Venue:
-- Official Source:
-- Required Structure:
-- Page Limit:
-- Appendix Policy:
-- Anonymous Review:
-- Template:
-- Language:
-- Preferred Structure Notes:
-- Writing Tone Notes:
-```
+| 字段 | 说明 |
+|------|------|
+| Venue | venue 名称 |
+| Official Source | 官方页面 URL（必须指向官方来源） |
+| Language | 语言 [User Config] |
+| Min Citations | 预期引用数 [User Config] |
+| Page Limit | 页数限制 |
+| Required Structure | 必需章节列表（写成可执行的章节顺序） |
+| Template | 模板要求 |
+| Anonymous Review | 是否双盲 |
+| Citation Format | 引用格式 |
+| Appendix Policy | 附录政策 |
 
 说明：
 - Official Source 必须指向官方页面或官方模板说明。
 - Required Structure 要写成可执行的章节顺序。
 - Preferred Structure Notes 只写高价值差异。
 - 如果某项未确认，写 Unknown，不要猜。
+- 完整模板和执行流程见 `workflow-step-0-4.md` Step 1.5。
 
 ---
 

@@ -33,13 +33,14 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 ## 编排流程
 
-**Step 0** → **Step 1（Blocking Gate，必须完成以下6项）**：
+**Step 0** → **Step 1（Blocking Gate：确认信息，不含 venue 调研）**：
 1. 确认venue
-2. 确认language  
+2. 确认language
 3. 确认min_citations
 4. 询问本地文献库
 5. 若有本地文献库 → 检查markitdown + 输出转换提示
-6. 以上全部完成 → 进入Step 2
+6. **进入 Step 1.5**（强制）— 执行 Venue Requirements Research
+7. 以上全部完成（含 Step 1.5） → 进入Step 2
 
 → Step 1b(可选:PDF→MD) → Step 2(证据审计) → Step 3(文献检索) → Step 4(实验复核) → Step 5(Blueprint) → Step 6(Section Complete Loop:探查+Draft+审查+润色+验证) → Step 7(section loop) → Step 8(引用清单) → Step 9(图片批量生成)
 
@@ -110,8 +111,10 @@ Step 6 (Method): 6.0 → 6.1 → ... → 6.9
       - 未安装 → 提供安装命令：`pip install markitdown`
       - 输出PDF→MD转换提示（见下方模板）
       - 确认用户已收到提示
-      
-- [ ] 6. **以上全部完成** → 进入Step 2
+
+- [ ] 6. **进入 Step 1.5**（强制）— venue 确认后，必须执行 Venue Requirements Research（详见 `references/workflow-step-0-4.md` Step 1.5），不可跳过
+
+- [ ] 7. **以上全部完成**（含 Step 1.5） → 进入Step 2
 ```
 
 ### Step 1b 转换提示模板（第5项使用）
@@ -151,7 +154,7 @@ Step 6 (Method): 6.0 → 6.1 → ... → 6.9
 1. **证据优先**：先找证据，再写定论。区分三类证据：`newly_run`、`preexisting_artifact`、`user_claim`。只把前两类当作可直接引用的证据。
 2. **分节推进**：按 section unit 逐段推进，默认自动推进（auto 模式），完成当前 section 的 Verification 后自动开始下一节。用户可要求 step-by-step 模式逐节确认。
 3. **上下文确认**：任务进入论文起草或正式章节写作时，必须先询问目标期刊/会议、本轮写作语言和本地文献库，不得直接开写。
-4. **venue 优先**：目标 venue 已知时，章节结构优先遵循官方作者指南或模板，不套用通用结构。
+4. **venue 优先**：目标 venue 已知时，章节结构优先遵循官方作者指南或模板，不套用通用结构。venue 要求必须通过 Step 1.5 实际调研并生成 Venue Brief，仅记录 venue 名称但不调研其要求等同于未确认 venue。
 5. **占位符保留**：缺失模型架构图、实验流程图、表格、方法细节或数据集细节时，必须在正文对应位置留下显式占位标记，不得静默略过。
 6. **方法深度**：Method 不得只写概述。对核心或非显然设计选择，必须交代：解决什么瓶颈、为什么采用这种设计、预期收益、代价/局限性/适用边界。
 7. **Introduction/Related Work**：不得按通用模板直接开写。必须先调研同领域 exemplar papers，抽取常见叙述单元、比较框架与引用密度。
@@ -160,7 +163,7 @@ Step 6 (Method): 6.0 → 6.1 → ... → 6.9
 10. **引用闭合**：需要文献支撑的段落必须有 inline citation 或 `[REF_NEEDED: ...]`。参考文献列表只能包含正文中被引用或已声明的条目。
 11. **Section Complete Loop**：每节必须完成 Step 6 的完整闭环（Phase 1 起草 → Phase 2 审查润色 → Phase 3 整合）。**Draft v1 ≠ 初稿完成**，只有完成 Step 6.8（综合验证）的section才算初稿完成。
 12. **失败不伪装**：Verification 未通过且非外部阻塞时，必须继续下一轮修订，不得直接结束或假装通过。
-13. **完整流程执行**：执行 full-paper-planning 时，必须按 Step 0→1→1b(若适用)→2→3(3a→3b→3c→3d)→4→5→6(6.0→6.9)→7→8→9 的顺序逐一执行，不得跳步。用户催促时也不得跳过证据审计（Step 2）、文献检索（Step 3）、实验复核（Step 4）、Hard Gates（A/B/C）中的任何一个。
+13. **完整流程执行**：执行 full-paper-planning 时，必须按 Step 0→1→1.5(Venue Requirements Research)→1b(若适用)→2→3(3a→3b→3c→3d)→4→5→6(6.0→6.9)→7→8→9 的顺序逐一执行，不得跳步。用户催促时也不得跳过 Step 1.5（Venue Requirements Research）、证据审计（Step 2）、文献检索（Step 3）、实验复核（Step 4）、Hard Gates（A/B/C）中的任何一个。
 14. **引用产物必输出**：Step 3 完成后，必须在上下文中维护 Verified References 列表和 Citation-to-Claim Map。缺少任一 → 不得进入 Step 6。
 15. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 `min_citations`（默认 35，short paper 建议 20，workshop 建议 15）。**Step 1 必须询问用户预期引用数量**，用户指定时记录为 `min_citations`，未指定时使用默认值。论文完成后 Step 8 生成引用清单时自动核验。
 16. **两阶段写作**：Step 5 Blueprint 可使用 bullet points 和提纲式结构，但 Step 6 Draft v1 必须是完整 prose 段落。bullet points 仅用于规划阶段，不得出现在最终论文正文中。
@@ -177,6 +180,7 @@ Step 6 (Method): 6.0 → 6.1 → ... → 6.9
 5. **对话输出限制**：禁止在对话中输出完整论文正文，仅显示简短进度摘要
 6. **写入时机**：每节 Draft 生成后、Verification 完成后，均须使用 Write/Edit 工具更新 `paper_draft.md`
 7. **中间状态**：Evidence Inventory、Verified References、Revision Queue 等在 agent 上下文中维护
+8. **Venue Brief**：`venue-brief.md` — venue 投稿要求摘要（Step 1.5 输出，后续步骤必参考）
 
 ## 图表生成规范
 
@@ -198,7 +202,7 @@ Step 6 (Method): 6.0 → 6.1 → ... → 6.9
 
 | DP | 位置 | Agent 展示 | 用户操作 |
 |----|------|-----------|---------|
-| DP-1 | Step 1 完成后 | Venue Brief 摘要（venue、语言、min_citations、本地文献库状态） | 确认/修正 |
+| DP-1 | Step 1.5 完成后 | Venue Brief 摘要（venue、语言、min_citations、venue 要求、本地文献库状态） | 确认/修正 |
 | DP-2 | Step 5 Blueprint 完成后 | Section Blueprint（章节结构、每节要点、证据来源） | 确认/调整 Blueprint |
 | DP-3 | Step 6.2 Draft v1 完成后 | Draft 摘要（当前节、段落数、待补项清单摘要） | 确认方向/指出问题 |
 | DP-4 | Step 6.8 Verification 完成后 | Verification Status（verdict、overall score、未闭合问题） | 确认通过/要求修订 |
@@ -229,6 +233,7 @@ Step 6 (Method): 6.0 → 6.1 → ... → 6.9
 
 | Gate | 触发位置 | 核心条件 | 失败处理 |
 |------|---------|---------|---------|
+| E: Venue 调研 | Step 1 → Step 2 | venue 确认后必须完成 Step 1.5，生成 venue-brief.md | 阻塞，不得进入 Step 2 |
 | A: 证据完备 | Step 2 → Step 6 | 至少一条可引用证据（`newly_run`/`preexisting_artifact`） | 降级路径或阻塞 |
 | B: 引用就绪 | Step 3 → Step 6 | 至少一条 `VERIFIED` 引用或明确"无需文献" | 按 section 分流，Intro/RW 阻塞，Method 可占位 |
 | C: Verification | Step 6.8 → Step 7 | 所有 debt 闭合 + `thin_draft = no` | passed/blocked/failed，详细见 workflow |
@@ -432,7 +437,7 @@ Agent 定义与 dispatch 模板见各子 skill 的 `agents/` 目录。
 | Reference 文件 | 打开条件 |
 |---------------|---------|
 | `references/paper-structure.md` | 选章节结构时 |
-| `references/writing-guidelines.md` | venue 风格适配时 |
+| `references/writing-guidelines.md` | Step 1.5 调研 venue 要求时；venue 风格适配时 |
 | `references/section-writing-contracts.md` | Step 5 生成 Section Contract；Step 6.0/6.8 检查章节论证功能时 |
 | `references/iteration-control.md` | 进入修订循环时 |
 | `references/content-density.md` | Step 6.7 扩写检查 |
