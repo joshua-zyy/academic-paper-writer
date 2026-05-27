@@ -98,8 +98,11 @@ Task:
     6. 输出 Section Critique + Verification Status
 
     Verification 判定规则（Gate C strict 模式）:
-    - verdict = passed 仅当 prose_debt=closed 且 citation_debt=closed 且 evidence_debt=closed 且 figure_debt=closed 且 thin_draft=no
-    - 任何 debt 未闭合 → verdict = blocked（禁止伪装为 passed）
+    **verdict = passed 条件**：
+    - 所有硬 debt 闭合：`prose_debt = closed`、`section_contract_debt = closed`、`citation_debt = closed`、`evidence_debt = closed`
+    - `thin_draft = no`
+    - `figure_debt` 为软约束：open 时 verdict 不得为 passed，但可设为 `blocked` + `safe_to_continue = yes`
+    - 任何硬 debt 未闭合 → verdict = blocked（禁止伪装为 passed）
     - blocked 时输出 safe_to_continue + frozen_claims
 
     输出的 Section Critique 必须明确:

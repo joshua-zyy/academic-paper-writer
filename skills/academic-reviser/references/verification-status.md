@@ -54,9 +54,9 @@
 - 主要风险已被显式讨论
 - 未核验内容被清楚标记
 - 结果、表格、摘要相互一致
-- 核心章节不再只是骨架式短稿
-- 无未闭合的 citation debt、evidence debt、protocol debt、result debt、section_contract_debt、prose debt、rationale debt、figure debt
-- 无 thin_draft
+- 核心章节不再只是骨架式短稿（thin_draft = no）
+- 无未闭合的硬 debt：citation debt、evidence debt、protocol debt、result debt、section_contract_debt、rationale debt、prose debt
+- figure debt 为软约束：open 时 verdict 不得为 passed，但可 blocked + safe_to_continue = yes
 
 ### failed
 

@@ -45,7 +45,10 @@ verification_report:
 | `figure_debt` | 图表缺口 | 存在未替换的 `[FIGURE_NEEDED]` 或 `[TABLE_NEEDED]` |
 | `thin_draft` | 内容过薄 | Expansion Pass 判定 |
 
-**通过条件**：`verdict = passed` 要求 `section_contract_debt = closed`、`prose_debt = closed`、`citation_debt = closed` 且 `evidence_debt = closed`。`figure_debt` 和 `thin_draft` 为软约束，可标记但允许 `safe_to_continue = yes`。
+**通过条件**：
+- `verdict = passed` 要求所有硬 debt 闭合（`prose_debt = closed`、`section_contract_debt = closed`、`citation_debt = closed`、`evidence_debt = closed`）且 `thin_draft = no`。
+- `figure_debt` 为软约束：`figure_debt = open` 时 verdict 不得为 `passed`，但可设为 `blocked` + `safe_to_continue = yes`。
+- `thin_draft = yes` 时：若可通过扩写解决，verdict = `failed`；若需外部证据，verdict = `blocked`。
 
 ## 示例
 

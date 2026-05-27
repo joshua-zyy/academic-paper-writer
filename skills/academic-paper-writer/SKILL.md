@@ -250,7 +250,7 @@ Step 6 (Method): 6.0 → 6.1 → ... → 6.9
 | E: Venue 调研 | Step 1 → Step 2 | venue 确认后必须完成 Step 1.5，生成 venue-brief.md | 阻塞，不得进入 Step 2 |
 | A: 证据完备 | Step 2 → Step 6 | 至少一条可引用证据（`newly_run`/`preexisting_artifact`） | 降级路径或阻塞 |
 | B: 引用就绪 | Step 3 → Step 6 | 至少一条 `VERIFIED` 引用或明确"无需文献" | 按 section 分流，Intro/RW 阻塞，Method 可占位 |
-| C: Verification | Step 6.8 → Step 7 | 所有 debt 闭合 + `thin_draft = no` | passed/blocked/failed，详细见 workflow |
+| C: Verification | Step 6.8 → Step 7 | 所有硬 debt 闭合 + thin_draft = no（figure_debt 为软约束，open 时可 blocked + safe_to_continue） | passed/blocked/failed，详细见 workflow |
 | D: 引用数量 | Step 8 → 输出 | 全文去重后引用总数 >= `min_citations`（默认 35） | 未达标时提醒用户，可继续补充后重检 |
 
 ## 默认交付物
