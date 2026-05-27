@@ -28,21 +28,21 @@ def check_schema_sync(skills_root: Path) -> list:
 
     shared_files = {f.name for f in shared_schemas.glob("*.md")}
 
-    sub_skills = ["academic-citation", "academic-experiments", "academic-reviser"]
+    sub_skills = [d.name for d in skills_root.iterdir()
+                  if d.is_dir() and d.name != "shared"
+                  and (d / "references" / "schemas").exists()]
     for skill in sub_skills:
         schema_dir = skills_root / skill / "references" / "schemas"
-        if not schema_dir.exists():
-            continue
         for sf in schema_dir.glob("*.md"):
             if sf.name not in shared_files:
                 issues.append(("FAIL", f"{skill}/references/schemas/{sf.name} has no shared/ copy"))
             else:
-                sub_content = sf.read_text(encoding="utf-8")
-                shared_content = (shared_schemas / sf.name).read_text(encoding="utf-8")
-                if sub_content == shared_content:
-                    issues.append(("PASS", f"{skill}/references/schemas/{sf.name} matches shared/ copy"))
+                content = sf.read_text(encoding="utf-8")
+                expected_ref = f"skills/shared/schemas/{sf.name}"
+                if expected_ref in content:
+                    issues.append(("PASS", f"{skill}/references/schemas/{sf.name} correctly points to shared/"))
                 else:
-                    issues.append(("FAIL", f"{skill}/references/schemas/{sf.name} diverges from shared/ copy"))
+                    issues.append(("FAIL", f"{skill}/references/schemas/{sf.name} is not a pointer to {expected_ref}"))
 
     return issues
 
