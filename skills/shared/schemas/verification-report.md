@@ -47,7 +47,7 @@ verification_report:
 
 **通过条件**：
 - `verdict = passed` 要求所有硬 debt 闭合（`prose_debt = closed`、`section_contract_debt = closed`、`citation_debt = closed`、`evidence_debt = closed`）且 `thin_draft = no`。
-- `figure_debt` 为软约束：`figure_debt = open` 时 verdict 不得为 `passed`，但可设为 `blocked` + `safe_to_continue = yes`。
+- `figure_debt` 为软发布债务：`figure_debt = open` 不单独阻止当前 section `passed`，但必须进入 Step 9 或外部阻塞清单；最终稿交付前必须处理或显式标记为外部阻塞。
 - `thin_draft = yes` 时：若可通过扩写解决，verdict = `failed`；若需外部证据，verdict = `blocked`。
 
 ## 示例

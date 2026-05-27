@@ -49,7 +49,7 @@ description: "Research target venue requirements and writing style for CS/AI/ML 
 |------|------|
 | `agents/venue-research-agent.md` | 期刊调研代理定义 |
 
-**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 1.5 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只执行调研，绝对不得修改项目中的任何文件**。
+**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 1.5 委托时，按 `academic-paper-writer/references/orchestration-workflow.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只执行调研并返回 Venue Brief Markdown 内容，绝对不得修改项目中的任何文件；文件写入由核心编排器负责**。
 
 ## 独立使用
 
@@ -70,7 +70,7 @@ description: "Research target venue requirements and writing style for CS/AI/ML 
 
 ### 执行约束
 - 独立使用时，开始前必须确认：目标 venue、调研类型、是否有本地风格参考文献库
-- 输出格式与编排器调度时一致：venue-brief.md 文件
+- 输出格式与编排器调度时一致：Venue Brief Markdown 内容。独立使用且用户明确要求生成文件时，才可写入用户指定的 venue-brief.md 路径。
 
 ### 组合使用指引
 | 场景 | 推荐方式 |

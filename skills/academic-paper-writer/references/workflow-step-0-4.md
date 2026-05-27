@@ -153,32 +153,32 @@ Task:
     venue: {venue}
     local_style_ref_dir: {local_style_ref_dir | null}
     research_type: full
-    output_path: ./docs/paper-drafts/venue-brief.md
+    suggested_output_path: ./docs/paper-drafts/venue-brief.md
 
     执行步骤:
     1. 读取 skills/academic-venue-research/SKILL.md，按 Step 1-4 执行
     2. 调研投稿要求（使用 webfetch 访问官方页面）
     3. 调研写作风格（读取本地风格参考文献库或通过其他方式获取论文）
-    4. 生成 venue-brief.md 文件
+    4. 返回 Venue Brief Markdown 内容与调研摘要；不要直接修改项目文件
 
-    约束: 遵循 academic-venue-research SKILL.md 中的 Red Lines
+    约束: 遵循 academic-venue-research SKILL.md 中的 Red Lines。子 Agent 只返回结构化内容，不写文件。
 
-    返回: venue-brief.md 文件路径 + 调研摘要
+    返回: venue-brief.md Markdown 内容 + 调研摘要 + suggested_output_path
 ```
 
 **输入**：
 - `venue`：目标 venue 名称
 - `local_style_ref_dir`：本地风格参考文献库路径（可选，来自 Step 1 第5项）
 - `research_type`：调研类型（full / requirements / style）
-- `output_path`：输出路径（默认 `./docs/paper-drafts/venue-brief.md`）
+- `suggested_output_path`：建议输出路径（默认 `./docs/paper-drafts/venue-brief.md`，由主 Agent 写入）
 
 **输出**：
-- `venue-brief.md` 文件
+- Venue Brief Markdown 内容（由主 Agent 写入 `venue-brief.md`）
 - 调研摘要（在对话中输出）
 
 ### 1.5.2 生成 Venue Brief 文件
 
-**必须**将调研结果写入 `./docs/paper-drafts/venue-brief.md`，格式如下：
+主 Agent **必须**将调研结果写入 `./docs/paper-drafts/venue-brief.md`，格式如下：
 
 ```markdown
 # Venue Brief

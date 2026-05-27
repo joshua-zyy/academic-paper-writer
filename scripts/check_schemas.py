@@ -123,6 +123,60 @@ def check_figure_dispatch_modes(skills_root: Path) -> list:
     return issues
 
 
+def _read_if_exists(path: Path) -> str:
+    return path.read_text(encoding="utf-8") if path.exists() else ""
+
+
+def check_min_citations_usage(skills_root: Path) -> list:
+    workflow = skills_root / "academic-paper-writer" / "references" / "workflow-step-6.6-9.md"
+    content = _read_if_exists(workflow)
+    hardcoded_patterns = ["< 35 篇", "未达到 35 篇", ">= 35", "至少 35"]
+    found = [pattern for pattern in hardcoded_patterns if pattern in content]
+    if found:
+        return [("FAIL", f"hardcoded citation threshold found in workflow-step-6.6-9.md: {found}")]
+    return [("PASS", "Citation threshold uses min_citations instead of hardcoded 35")]
+
+
+def check_figure_debt_flow(skills_root: Path) -> list:
+    paths = [
+        skills_root / "shared" / "schemas" / "verification-report.md",
+        skills_root / "academic-reviser" / "SKILL.md",
+        skills_root / "academic-paper-writer" / "references" / "workflow-step-6.6-9.md",
+    ]
+    content = "\n".join(_read_if_exists(path) for path in paths)
+    deadlock_patterns = [
+        "figure_debt = open 时 verdict 不得为 `passed`",
+        "figure_debt = open 时 verdict 不得为 passed",
+        "figure_debt 未闭合时判为 passed",
+    ]
+    found = [pattern for pattern in deadlock_patterns if pattern in content]
+    if found:
+        return [("FAIL", f"figure_debt deadlock language found: {found}")]
+    return [("PASS", "figure_debt is treated as soft section debt and final delivery gate")]
+
+
+def check_subagent_file_write_ownership(skills_root: Path) -> list:
+    workflow = skills_root / "academic-paper-writer" / "references" / "workflow-step-0-4.md"
+    content = _read_if_exists(workflow)
+    conflict = "你已加载 academic-venue-research" in content and "生成 venue-brief.md 文件" in content
+    if conflict:
+        return [("FAIL", "subagent write ownership conflict: venue research dispatch asks subagent to generate venue-brief.md directly")]
+    return [("PASS", "Subagent dispatch templates return structured content for orchestrator-owned writes")]
+
+
+def check_prose_gate_evidence_debt(skills_root: Path) -> list:
+    workflow = skills_root / "academic-paper-writer" / "references" / "workflow-step-6.6-9.md"
+    content = _read_if_exists(workflow)
+    blocking_phrases = [
+        "Confirm Step 6.5 `evidence_debt = closed` before executing",
+        "确认 Step 6.5 `evidence_debt = closed` before executing",
+    ]
+    found = [phrase for phrase in blocking_phrases if phrase in content]
+    if found:
+        return [("FAIL", f"Step 6.6 blocks all prose repair on closed evidence debt: {found}")]
+    return [("PASS", "Step 6.6 allows safe prose repair when evidence_debt is open")]
+
+
 def check_probe_types(skills_root: Path) -> list:
     issues = []
     probe_agent = skills_root / "academic-paper-writer" / "agents" / "probe-agent.md"
@@ -185,7 +239,31 @@ def main():
     for level, msg in issues:
         print(f"  [{level}] {msg}")
 
-    print("\n5. Probe type consistency:")
+    print("\n5. Citation threshold consistency:")
+    issues = check_min_citations_usage(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n6. Figure debt flow consistency:")
+    issues = check_figure_debt_flow(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n7. Subagent file ownership:")
+    issues = check_subagent_file_write_ownership(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n8. Prose gate evidence-debt behavior:")
+    issues = check_prose_gate_evidence_debt(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n9. Probe type consistency:")
     issues = check_probe_types(root)
     all_issues.extend(issues)
     for level, msg in issues:

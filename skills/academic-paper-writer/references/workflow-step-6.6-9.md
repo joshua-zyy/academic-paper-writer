@@ -9,14 +9,16 @@
 ## Step 6.6: Prose Quality Gate (Review Phase 2: Prose Gate) — 内化调用
 
 - Create a todo list for prose checks.
-- Confirm Step 6.5 `evidence_debt = closed` before executing.
+- Check Step 6.5 `evidence_debt` before selecting the prose operation level.
+- If `evidence_debt = closed`, run the full Prose Quality Gate and Claim Strength Audit.
+- If `evidence_debt = open`, run only safe language repair: grammar, clarity, meta-comment removal, and claim-strength downgrades. Do not make unsupported claims more persuasive or more certain.
 - **内化调用 `academic-polishing`**：主 Agent 读取 `skills/academic-polishing/SKILL.md` 的规则后自行执行润色与 claim 强度审计，不 dispatch 子 Agent。
 
 **执行方式**：
 
 1. 读取 `skills/academic-polishing/SKILL.md` 及其 references/ 下的相关文件
-2. 按 SKILL.md 中的 Step 1-6 执行 Prose Quality Gate
-3. 执行 Claim Strength Audit（零容忍触发词规则）
+2. 按 `evidence_debt` 状态选择完整 Prose Quality Gate 或安全语言修正
+3. 执行 Claim Strength Audit（零容忍触发词规则）；`evidence_debt = open` 时只允许降级或保守化 claim
 4. 若为 Method 节，执行 Method Prose Rewrite
 5. Prose Rewrite 最多 2 轮，2 轮后仍 open 则保留状态继续
 
@@ -124,7 +126,7 @@ Task:
     **verdict = passed 条件**：
     - 所有硬 debt 闭合：`prose_debt = closed`、`section_contract_debt = closed`、`citation_debt = closed`、`evidence_debt = closed`
     - `thin_draft = no`
-    - `figure_debt` 为软约束：open 时 verdict 不得为 passed，但可设为 `blocked` + `safe_to_continue = yes`
+    - `figure_debt` 为软发布债务：open 时不单独阻止当前 section passed，但必须记录到 Step 9 或外部阻塞清单
     - 任何硬 debt 未闭合 → verdict = blocked（禁止伪装为 passed）
     - blocked 时输出 safe_to_continue + frozen_claims
 
@@ -244,7 +246,7 @@ Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**生成引�
 
 1. 从 Cumulative Draft 中提取所有引用的外部文献条目（去重）
 2. 统计去重后引用总数
-3. 若总数 < 35 篇，在对话中提示用户："当前引用 X 篇，未达到 35 篇最低要求。建议补充以下方向的文献检索：[...]"。用户确认后可继续，但 `referenced-literature-checklist.md` 顶部标注 `⚠️ 引用数未达标`。
+3. 若总数 < `min_citations`，在对话中提示用户："当前引用 X 篇，未达到本轮配置的 min_citations={min_citations}。建议补充以下方向的文献检索：[...]"。用户确认后可继续，但 `referenced-literature-checklist.md` 顶部标注 `⚠️ 引用数未达标：X/{min_citations}`。
 4. 为每篇文献记录：标题、作者、venue、引用章节、引用目的
 5. **必须**写入 `./docs/paper-drafts/referenced-literature-checklist.md`
 
