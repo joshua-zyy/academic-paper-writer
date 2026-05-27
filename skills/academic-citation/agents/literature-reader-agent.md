@@ -80,7 +80,7 @@ task_context: string               # [required] 当前论文的任务/方法/数
 ## Invocation
 
 ### 编排器调用
-本 Agent 由 `citation_agent` 在本地文献库搜索步骤（Step 1a）委托调用，或在联网检索步骤（Step 5-6）中用于阅读获取到的全文。
+本 Agent 由 `citation_agent` 或 `academic-paper-writer` 编排器在 Step 3a（本地文献库搜索）或 Step 3b（联网全文获取）中委托调用。编排器 Step 3a/3b 对应本 agent 的内部调用入口。
 
 ### 独立使用
 本 Agent 不提供独立使用入口。独立阅读文献任务请直接使用 `academic-citation` Skill。
