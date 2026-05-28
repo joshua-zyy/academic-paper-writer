@@ -106,6 +106,9 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 
 - [Skills 一览](#-skills-一览)
 - [快速开始](#-快速开始)
+  - [Claude Code 插件安装](#方式一claude-code-插件安装推荐)
+  - [Codex CLI 安装](#方式二codex-cli-安装)
+  - [手动加载](#方式三手动加载)
 - [推荐配置](#-推荐配置)
 - [核心设计](#-核心设计)
 - [编排器核心工作流](#-编排器核心工作流)
@@ -135,13 +138,51 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 
 ## 🚀 快速开始
 
-### 1. 获取仓库
+### 方式一：Claude Code 插件安装（推荐）
+
+```bash
+# 1. 添加 marketplace
+/plugin marketplace add joshua-zyy/academic-paper-writer
+
+# 2. 安装插件
+/plugin install academic-paper-writer@academic-paper-writer
+```
+
+安装后可直接使用：
+- `/academic-paper-writer` - 完整论文工作流
+- `/academic-citation` - 文献检索与核验
+- `/academic-experiments` - 实验复核
+- `/academic-reviser` - 审稿验证
+- `/academic-polishing` - 文体打磨
+- `/academic-figure` - 图表生成
+- `/academic-venue-research` - 期刊调研
+
+**更新插件**：
+```bash
+/plugin update academic-paper-writer@academic-paper-writer
+```
+
+### 方式二：Codex CLI 安装
+
+```bash
+# 克隆到用户级目录（推荐）
+git clone https://github.com/joshua-zyy/academic-paper-writer.git ~/.agents/skills/academic-paper-writer
+
+# 或克隆到项目级目录
+git clone https://github.com/joshua-zyy/academic-paper-writer.git .codex/skills/academic-paper-writer
+```
+
+**更新插件**：
+```bash
+cd ~/.agents/skills/academic-paper-writer
+git pull
+```
+
+### 方式三：手动加载
 
 ```bash
 git clone https://github.com/joshua-zyy/academic-paper-writer.git
 ```
-
-### 2. 加载 Skill
 
 在支持 Skill 机制的 Agent 平台中加载对应 SKILL.md：
 
@@ -182,11 +223,11 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 ### 推荐 Agent 平台
 
-| 平台 | 说明 |
-|------|------|
-| 🤖 **Claude Code** | Anthropic 官方 CLI 工具，原生支持 Skill 机制 |
-| 🔧 **Codex** | OpenAI 代码助手，支持多种编程任务 |
-| ⚡ **OpenCode** | 开源 Agent 平台，灵活可扩展 |
+| 平台 | 安装方式 | 更新方式 | 说明 |
+|------|----------|----------|------|
+| 🤖 **Claude Code** | `/plugin marketplace add` + `/plugin install` | 自动更新（main分支）或手动 `/plugin update` | Anthropic 官方 CLI 工具，原生支持 Skill 机制，推荐使用 |
+| 🔧 **Codex CLI** | `git clone` 到 `~/.agents/skills/` | 手动 `git pull` | OpenAI 代码助手，支持多种编程任务 |
+| ⚡ **OpenCode** | 手动加载 SKILL.md | 手动更新 | 开源 Agent 平台，灵活可扩展 |
 
 > 💡 **提示**：使用支持 Skill 机制的 Agent 平台可获得最佳体验，其他平台也可通过加载 SKILL.md 文件使用本项目。
 
@@ -400,33 +441,38 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 academic-paper-writer/
 ├── README.md
 ├── LICENSE
-├── scripts/                          # 项目级工具脚本
-│   └── check_schemas.py              # 跨技能 schema 一致性检查
+├── .claude-plugin/                     # Claude Code 插件配置
+│   ├── plugin.json                     # 插件清单
+│   └── marketplace.json                # 市场定义
+├── .codex/                             # Codex CLI 插件配置
+│   └── skills/                         # Codex skills 目录
+├── scripts/                            # 项目级工具脚本
+│   └── check_schemas.py                # 跨技能 schema 一致性检查
 └── skills/
     ├── shared/
-    │   ├── schemas/                  # 跨技能数据契约（5 个 schema）
-    │   └── references/               # 共享概念与边界规则
-    ├── academic-paper-writer/        # 📌 核心编排器
+    │   ├── schemas/                    # 跨技能数据契约（5 个 schema）
+    │   └── references/                 # 共享概念与边界规则
+    ├── academic-paper-writer/          # 📌 核心编排器
     │   ├── SKILL.md
-    │   ├── agents/                   # probe agent 定义
-    │   └── references/               # 工作流（导航索引 + 3 阶段文件 + exemplars）
-    ├── academic-polishing/           # ✨ 文体打磨
-    ├── academic-citation/            # 🔍 文献取证
-    │   ├── agents/                   # citation_agent + literature-reader-agent
-    │   ├── scripts/                  # citation_audit.py + convert-pdfs-to-md.py
-    │   └── references/               # 检索策略、核验协议、引用映射、reading report schema
-    ├── academic-reviser/             # ✅ 审修验证
-    │   ├── agents/                   # reviser_agent
-    │   ├── scripts/                  # placeholder_audit.py
-    │   └── references/               # 检查清单、Verification 判定、常见陷阱
-    ├── academic-experiments/         # 🔬 实验取证
-    │   ├── agents/                   # experiment_agent
-    │   ├── scripts/                  # evidence_scanner.py
-    │   └── references/               # 证据盘点、运行策略、协议风险
-    └── academic-figure/              # 📊 图表生成
-        ├── agents/                   # figure_agent
-        ├── scripts/                  # chart_template.py + qa_figure.py
-        └── references/               # 设计理论、图表类型、QA、架构提示词
+    │   ├── agents/                     # probe agent 定义
+    │   └── references/                 # 工作流（导航索引 + 3 阶段文件 + exemplars）
+    ├── academic-polishing/             # ✨ 文体打磨
+    ├── academic-citation/              # 🔍 文献取证
+    │   ├── agents/                     # citation_agent + literature-reader-agent
+    │   ├── scripts/                    # citation_audit.py + convert-pdfs-to-md.py
+    │   └── references/                 # 检索策略、核验协议、引用映射、reading report schema
+    ├── academic-reviser/               # ✅ 审修验证
+    │   ├── agents/                     # reviser_agent
+    │   ├── scripts/                    # placeholder_audit.py
+    │   └── references/                 # 检查清单、Verification 判定、常见陷阱
+    ├── academic-experiments/           # 🔬 实验取证
+    │   ├── agents/                     # experiment_agent
+    │   ├── scripts/                    # evidence_scanner.py
+    │   └── references/                 # 证据盘点、运行策略、协议风险
+    └── academic-figure/                # 📊 图表生成
+        ├── agents/                     # figure_agent
+        ├── scripts/                    # chart_template.py + qa_figure.py
+        └── references/                 # 设计理论、图表类型、QA、架构提示词
 ```
 
 ### 建议阅读顺序
@@ -459,6 +505,31 @@ academic-paper-writer/
 
 ## 🔧 维护与验证
 
+### 版本管理
+
+本项目使用 Git 分支和标签进行版本管理：
+
+| 分支/标签 | 说明 | 适用场景 |
+|-----------|------|----------|
+| `main` | 开发分支，最新功能 | 开发者、早期用户 |
+| `stable` | 稳定分支，手动合并 | 生产环境、稳定性要求高的用户 |
+| `v1.0.0` 等标签 | 版本标记 | 需要锁定特定版本的用户 |
+
+**Claude Code 用户**：
+- 使用 `main` 分支：自动获取最新版本
+- 使用 `stable` 分支：需要手动执行 `/plugin update` 命令
+
+**Codex CLI 用户**：
+```bash
+# 切换到 stable 分支
+cd ~/.agents/skills/academic-paper-writer
+git checkout stable
+git pull
+
+# 切换到特定版本
+git checkout v1.0.0
+```
+
 ### 结构一致性检查
 
 ```bash
@@ -477,6 +548,12 @@ python scripts/check_schemas.py --skills-root ./skills
 - ⚡ [superpowers](https://github.com/obra/superpowers) 
 - 🌿 [nature-skills](https://github.com/Yuan1z0825/nature-skills)  
 - 🎓 [academic-research-skills](https://github.com/Imbad0202/academic-research-skills) 
+
+### 相关文档
+
+- 📘 [Claude Code 插件文档](https://docs.anthropic.com/en/docs/claude-code/plugins)
+- 📗 [Codex CLI 文档](https://github.com/openai/codex)
+- 📙 [Agent Skills 规范](https://agentskills.io)
 
 ---
 
