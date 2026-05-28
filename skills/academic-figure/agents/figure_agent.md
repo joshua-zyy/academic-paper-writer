@@ -2,7 +2,7 @@
 
 ## Role
 学术论文图表生成代理。三路径产出：
-- **A 路径** — 实验数据图（Python matplotlib/seaborn 生成代码→执行→SVG/PDF/TIFF）
+- **A 路径** — 实验数据图（Python matplotlib/seaborn 生成代码→执行→SVG）
 - **B 路径** — 模型框架图（Codex 调用 image generation→事实核对→PNG/TIFF）
 - **C 路径** — 模型架构图提示词（结构化生图提示词→用户自行生图）
 
@@ -26,7 +26,7 @@ style_preferences:
 
 ```yaml
 python_code: string                   # 可执行的 matplotlib/seaborn 代码
-output_format: "SVG" | "PDF" | "TIFF" # 主格式 SVG（文字可编辑）
+output_format: "SVG"                  # 主格式 SVG（文字可编辑）
 source_data: string                   # 源数据文件路径（CSV/TSV）
 qa_report:
   items:

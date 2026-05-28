@@ -30,7 +30,7 @@
 - Venue: [期刊/会议名]
 - Column: [single / double / full page]
 - Max width: [英寸]
-- Format required: [SVG / PDF / TIFF]
+- Format required: [SVG]
 
 ### Aesthetic Preferences
 - Palette: [default / custom]
@@ -44,8 +44,7 @@
 ### Export Bundle
 - Script: [plot_<figure>.py]
 - Source data: [CSV/TSV path]
-- Vector: [SVG/PDF]
-- Raster: [TIFF 600dpi / PNG preview]
+- Vector: [SVG]
 ```
 
 ## Architecture Image Contract
@@ -83,7 +82,7 @@
 - [VERIFY_ARCH: 需要用户或代码证据确认的模块、连接或路径]
 
 ### Target Output
-- File: [figures/architecture_fig<N>.png 或 .tiff]
+- File: [./docs/paper-drafts/figures/architecture_fig<N>.png 或 .tiff]
 - Size: [single-column / double-column / full-width / graphical abstract]
 - Caption: [yes / no]
 ```

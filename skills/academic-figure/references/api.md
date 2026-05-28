@@ -31,7 +31,6 @@ matplotlib.rcParams.update({
     "ytick.labelsize": 7,
     "legend.fontsize": 7,
     "svg.fonttype": "none",
-    "pdf.fonttype": 42,
     "figure.dpi": 150,
     "savefig.dpi": 300,
     "savefig.bbox": "tight",
@@ -59,7 +58,6 @@ def apply_pub_style():
         "axes.spines.top": False,
         "axes.spines.right": False,
         "svg.fonttype": "none",
-        "pdf.fonttype": 42,
     })
 ```
 
@@ -323,12 +321,8 @@ finalize_figure(fig, "multi_panel")
 ## 导出
 
 ```python
-def finalize_figure(fig, name, formats=("svg", "pdf", "tiff"), dpi=300):
+def finalize_figure(fig, name, formats=("svg",)):
     if "svg" in formats:
         fig.savefig(f"{name}.svg", format="svg")
-    if "pdf" in formats:
-        fig.savefig(f"{name}.pdf", format="pdf")
-    if "tiff" in formats or "tif" in formats:
-        fig.savefig(f"{name}.tiff", format="tiff", dpi=dpi)
-    print(f"Exported: {name}.{', '.join(formats)}")
+    print(f"Exported: {name}.svg")
 ```

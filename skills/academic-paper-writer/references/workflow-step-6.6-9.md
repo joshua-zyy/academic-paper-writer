@@ -292,27 +292,27 @@ Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**执行图�
 ### 触发条件
 
 - Abstract 已生成（隐含所有 core sections Verification = passed）
-- `./docs/paper-drafts/figures/figure_prompts.md` 或 `./docs/paper-drafts/figures/plot_*.py` 存在
+- `./docs/paper-drafts/figures/figure_prompts.md` 或 `./docs/paper-drafts/figures/codes/plot_*.py` 存在
 
 ### 9a. 扫描图片产出物
 
 1. 检查 `./docs/paper-drafts/figures/figure_prompts.md` 是否存在且包含未生成的架构图提示词
-2. 检查 `./docs/paper-drafts/figures/` 目录下是否存在 `plot_fig*.py` 且对应图片尚未生成
+2. 检查 `./docs/paper-drafts/figures/codes/` 目录下是否存在 `plot_fig*.py` 且对应图片尚未生成
 3. 统计：已生成图片数 / 提示词待生成数 / 代码待执行数
 
 ### 9b. 数据图批量执行
 
-对每个 `./docs/paper-drafts/figures/plot_fig{N}.py`：
+对每个 `./docs/paper-drafts/figures/codes/plot_fig{N}.py`：
 
 1. **环境检查**：确认 matplotlib、seaborn 等依赖可用
-2. **执行脚本**：使用 PowerShell 运行 `python ./docs/paper-drafts/figures/plot_fig{N}.py`
-3. **验证产出**：确认生成了对应的 SVG 和 PNG 文件
+2. **执行脚本**：使用 PowerShell 运行 `python ./docs/paper-drafts/figures/codes/plot_fig{N}.py`
+3. **验证产出**：确认生成了对应的 SVG 文件
 4. **QA 检查**（快速）：配色正确、坐标轴可读、无乱码
 5. 若执行失败：记录错误原因，标记为「待手动修复」，不阻塞后续图片执行
 
 **执行模板**：
 ```powershell
-$scriptPath = "./docs/paper-drafts/figures/plot_fig{N}.py"
+$scriptPath = "./docs/paper-drafts/figures/codes/plot_fig{N}.py"
 if (Test-Path $scriptPath) {
     python $scriptPath 2>&1
     if ($LASTEXITCODE -eq 0) {
@@ -373,10 +373,10 @@ Task:
 
 | 图片 | 类型 | 状态 | 路径/说明 |
 |------|------|------|----------|
-| Figure 1 | 架构图 | ✅ 已生成 | figures/fig1_arch.png |
-| Figure 2 | 数据图 | ❌ 待生成 | figures/plot_fig2.py 执行失败 |
+| Figure 1 | 架构图 | ✅ 已生成 | ./docs/paper-drafts/figures/fig1_arch.png |
+| Figure 2 | 数据图 | ❌ 待生成 | ./docs/paper-drafts/figures/codes/plot_fig2.py 执行失败 |
 | Figure 3 | 架构图 | ⚠️ 待手动 | 需用户自行使用 prompt 生成 |
-| Figure 4 | 数据图 | ✅ 已生成 | figures/fig4.svg |
+| Figure 4 | 数据图 | ✅ 已生成 | ./docs/paper-drafts/figures/fig4.svg |
 ```
 
 ### 9e. 更新 Cumulative Draft

@@ -79,9 +79,6 @@ required = ["matplotlib", "seaborn", "numpy", "pandas", "scipy"]
 ## Step 6：执行代码并导出
 
 - 主格式：SVG（`svg.fonttype='none'`，文字可编辑）
-- 副格式：PDF（`pdf.fonttype=42`）
-- 位图预览：PNG 300dpi
-- 投稿位图：TIFF 600dpi
 - 源数据（CSV/TSV）随图交付
 
 ## Step 7：QA Contract
@@ -106,5 +103,4 @@ python skills/academic-figure/scripts/qa_figure.py --input <svg_path> --venue <v
 1. 绘图脚本（`.py`）
 2. 源数据文件（CSV/TSV）
 3. SVG（矢量主文件）
-4. PDF / TIFF / PNG（副格式和预览）
-5. QA 报告
+4. QA 报告

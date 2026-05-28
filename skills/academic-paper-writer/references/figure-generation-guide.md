@@ -13,8 +13,10 @@
 
 | 图类型 | 遇到占位符时 | 输出 |
 |--------|:---:|------|
-| 架构图/框架图 | 自动生成提示词 | 写入 `figures/figure_prompts.md`，正文占位符替换为图编号引用 |
-| 数据结果图 | 自动生成 Python 绘图代码 | 代码写入 `figures/plot_{figure_id}.py`，正文保留占位符，**不自动执行** |
+| 架构图/框架图 | 自动生成提示词 | 写入 `./docs/paper-drafts/figures/figure_prompts.md`，正文占位符替换为图编号引用 |
+| 数据结果图 | 自动生成 Python 绘图代码 | 代码写入 `./docs/paper-drafts/figures/codes/plot_{figure_id}.py`，正文保留占位符，**不自动执行** |
+
+> 注：数据图代码在 Step 6.4 阶段不自动执行，留待 Step 9 全文完成后统一批量执行。
 
 ## 绘图代码规范
 
@@ -27,18 +29,9 @@
    plt.rcParams['svg.fonttype'] = 'none'
    ```
 2. **配色板**：使用学术色板（blue_main=#0F4D92, green_3=#8BCF8B, red_strong=#B64342, teal=#42949E, violet=#9A4D8E），同一方法在不同面板中保持颜色一致
-3. **导出格式**：SVG（主要）+ PNG 300dpi（次要预览），文本保持可编辑
+3. **导出格式**：SVG（矢量），文字保持可编辑
 4. **多面板架构**：遵循 overview → deviation → relationship 三层递进，反冗余检查（无两个面板回答同一科学问题）
 5. **简洁风格**：仅保留左+下 spine，frameless legend，tight_layout
-
-## 双路径处理（Step 6.4）
-
-| 图类型 | 遇到占位符时 | 输出 |
-|--------|:---:|------|
-| 架构图/框架图 | 自动生成提示词 | 写入 `figures/figure_prompts.md`，正文占位符替换为图编号引用 |
-| 数据结果图 | 自动生成 Python 绘图代码 | 代码写入 `figures/plot_{figure_id}.py`，正文保留占位符，**不自动执行** |
-
-> 注：数据图代码在 Step 6.4 阶段不自动执行，留待 Step 9 全文完成后统一批量执行。
 
 ## 图片批量生成（Step 9）
 
@@ -46,14 +39,14 @@
 
 ### 数据图批量执行
 
-1. 扫描 `./docs/paper-drafts/figures/` 下所有 `plot_fig*.py`
-2. 对每个脚本：检查 Python 环境 → 执行脚本 → 验证 SVG/PNG 输出 → 快速 QA
+1. 扫描 `./docs/paper-drafts/figures/codes/` 下所有 `plot_fig*.py`
+2. 对每个脚本：检查 Python 环境 → 执行脚本 → 验证 SVG 输出 → 快速 QA
 3. 执行失败不阻塞整体流程，记录为「待手动修复」
 
 ### 架构图批量生成
 
 1. 读取 `./docs/paper-drafts/figures/figure_prompts.md` 中所有未生成图片的提示词
-2. 若环境支持 image generation：按 architecture-image 模式逐张生成 → 保存为 `fig{N}_arch.png`
+2. 若环境支持 image generation：按 architecture-image 模式逐张生成 → 保存为 `./docs/paper-drafts/figures/fig{N}_arch.png`
 3. 若环境不支持：在对话中列出所有待手动生成的提示词
 
 ### 生成后验证清单

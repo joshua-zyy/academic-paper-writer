@@ -11,7 +11,7 @@
 | Panel label | 12 pt bold（a/b/c/d），左上角 |
 | 图例字号 | 7 pt |
 | 标题字号 | 9 pt bold |
-| 确保 embed 时文字保留为可编辑文本 | SVG: `fonttype="none"`, PDF: `fonttype=42` |
+| 确保 embed 时文字保留为可编辑文本 | SVG: `fonttype="none"` |
 
 ## 配色规范
 
@@ -114,9 +114,6 @@
 
 ### 格式优先顺序
 1. SVG（主格式，文字保留为 `<text>` 节点）
-2. PDF（副格式，Type-42 字体内嵌）
-3. TIFF（投稿位图，600 dpi）
-4. PNG（快速预览，300 dpi）
 
 ### 尺寸
 | 场景 | 宽度 |
@@ -126,8 +123,7 @@
 | 多面板大图 | 7-8 in |
 
 ### 分辨率
-- SVG / PDF：矢量格式，无 dpi 限制
-- TIFF / PNG：300 dpi（标准），600 dpi（密集柱状图/热力图）
+- SVG：矢量格式，无 dpi 限制
 
 ## 数据可视化伦理
 

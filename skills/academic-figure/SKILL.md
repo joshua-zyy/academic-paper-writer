@@ -9,7 +9,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 
 | 路径 | 类型 | 产出方式 |
 |------|------|---------|
-| **A** | 实验数据图（训练曲线、消融实验、性能对比、混淆矩阵等） | Python (matplotlib/seaborn) 生成代码→执行→SVG/PDF/TIFF |
+| **A** | 实验数据图（训练曲线、消融实验、性能对比、混淆矩阵等） | Python (matplotlib/seaborn) 生成代码→执行→SVG |
 | **B** | 模型框架图（复杂架构、overview、模块细节图） | Codex 调用 image generation→人工核对→交付 PNG/TIFF |
 | **C** | 架构图提示词（外部生图工具） | 生成结构化生图提示词→用户自行生图 |
 
@@ -19,7 +19,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 2. 禁止使用彩虹/jet/viridis 等高饱和度非学术色板
 3. 禁止在无 error bar 或统计信息时用强视觉效果暗示不确定性
 4. 禁止在架构图中编造不存在的网络结构、模块连接或数据流
-5. 实验数据图禁止输出仅 PNG 位图——必须提供可编辑矢量格式（SVG/PDF）；模型框架图若为 image-generated，必须同时交付 prompt、contract、caption 与核对报告
+5. 实验数据图禁止输出仅 PNG 位图——必须提供可编辑矢量格式（SVG）；模型框架图若为 image-generated，必须同时交付 prompt、contract、caption 与核对报告
 6. 禁止在生图提示词中包含无法实现的渲染细节（如"完美 3D 透视"）
 7. 禁止跳过 QA Contract
 8. 禁止把 image-generated 架构图当作未经核对的最终事实图；必须列出人工核对项
@@ -41,7 +41,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 3. 坐标轴从非零起点时必须标注截断标记，不得静默缩放。
 4. 误差棒 / 置信区间必须标注含义（std / SEM / 95% CI），不得只画不解释。
 5. 配色不得依赖纯色相作为唯一区分方式——必须结合亮度差、纹理或标注。
-6. 实验数据图的向量输出（SVG/PDF）必须是文字可编辑格式，不得将所有文字渲染为 path。
+6. 实验数据图的 SVG 输出必须是文字可编辑格式，不得将所有文字渲染为 path。
 7. 源数据（CSV/TSV）必须与图表同时交付，不得只给图片。
 8. 架构图提示词必须是工具无关的描述式语言，不得内嵌特定工具参数（--ar、--style 等）。
 9. 模型框架图必须严格来自用户提供的模型结构、论文草稿或代码证据；缺失连接必须标为待确认，不得补画。
@@ -109,7 +109,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 1. Figure Contract
 2. Python 绘图脚本
 3. 源数据文件
-4. SVG / PDF / TIFF
+4. SVG
 5. QA 报告
 
 ### arch-prompt
@@ -173,7 +173,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Sup
 - B 路径中复杂文字应转为编号、短标签或图例；详细解释放入 caption，避免 image model 生成长文本
 - C 路径提示词不得包含特定工具参数（`--ar`、`--style` 等）
 - Python 运行时不可用时按 Fallback 降级（见 figure_agent.md）
-- 实验数据图优先输出 SVG/PDF 矢量格式；模型框架图输出 PNG/TIFF 并保存 prompt 与核对清单
+- 实验数据图优先输出 SVG 矢量格式；模型框架图输出 PNG/TIFF 并保存 prompt 与核对清单
 
 ### 组合使用指引
 | 场景 | 推荐方式 |

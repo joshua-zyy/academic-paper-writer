@@ -8,7 +8,6 @@ Usage:
 This script is intended to be copied and adapted per figure. It enforces:
 - Academic color palette (grayscale-safe)
 - Editable SVG text (svg.fonttype='none')
-- PDF Type-42 fonts and 600dpi TIFF export
 - Figure size matching journal single/double-column standards
 """
 
@@ -92,7 +91,6 @@ def apply_pub_style(font_size=7, axes_linewidth=0.8):
         "figure.dpi": 300,
         "savefig.dpi": 600,
         "svg.fonttype": "none",  # editable text in SVG
-        "pdf.fonttype": 42,       # editable text in PDF
         "axes.spines.right": False,
         "axes.spines.top": False,
         "axes.linewidth": axes_linewidth,
@@ -213,21 +211,14 @@ def plot_bar(data, labels=None, groups=None, title="", xlabel="", ylabel="", wid
 
 
 def save_figure(fig, output_path: str):
-    """Save figure to SVG (primary), PDF (secondary), TIFF, and PNG preview."""
+    """Save figure to SVG (vector format with editable text)."""
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
 
     svg_path = out.with_suffix(".svg")
-    pdf_path = out.with_suffix(".pdf")
-    tiff_path = out.with_suffix(".tiff")
-    png_path = out.with_suffix(".png")
-
     fig.savefig(svg_path, format="svg", bbox_inches="tight")
-    fig.savefig(pdf_path, format="pdf", bbox_inches="tight")
-    fig.savefig(tiff_path, format="tiff", dpi=600, bbox_inches="tight")
-    fig.savefig(png_path, format="png", dpi=300, bbox_inches="tight")
     plt.close(fig)
-    print(f"Saved: {svg_path}, {pdf_path}, {tiff_path}, {png_path}")
+    print(f"Saved: {svg_path}")
 
 
 def save_pub_py(fig, filename, dpi=600):

@@ -416,11 +416,11 @@ After Draft v1, **必须**自动执行以下子步骤：
 - 按下文 Step 6.4g 的 dispatch 模板委托 `academic-figure` 的 arch-prompt 模式
 - 生成的提示词写入 `./docs/paper-drafts/figures/figure_prompts.md`（按图编号分节）
 - 正文中的占位符替换为图编号引用（如 `Figure X` 或 `图X`）
-- 若 `figures/figure_prompts.md` 不存在，使用 Write 工具创建；若已存在，使用 Edit 工具追加
+- 若 `./docs/paper-drafts/figures/figure_prompts.md` 不存在，使用 Write 工具创建；若已存在，使用 Edit 工具追加
 
 **chart-from-data 模式 — 数据图绘图代码**（purpose 含 curve / comparison / ablation / result / 曲线 / 对比 / 消融 / 结果 / plot / chart / bar 等）：
 - 按下文 Step 6.4h 的 dispatch 模板生成 Python 绘图代码
-- 绘图代码写入 `./docs/paper-drafts/figures/plot_fig{N}.py`
+- 绘图代码写入 `./docs/paper-drafts/figures/codes/plot_fig{N}.py`
 - 正文保留占位符，记入待补项列表
 - **不自动执行绘图代码**（全文完成后 Step 9 统一批量执行）
 
@@ -512,31 +512,30 @@ Task:
     - Core conclusion: {Step 6.4c 中定义的论点}
     - Evidence chain: {面板→论点映射}
     - Archetype: {图分类}
-    - Export contract: SVG + PNG 300dpi
+    - Export contract: SVG
 
     绘图代码规范（强制）:
     1. 脚本最前面必须包含以下初始化:
        ```python
        import matplotlib as mpl
        import matplotlib.pyplot as plt
-       mpl.rcParams.update({
-           "font.family": "sans-serif",
-           "font.sans-serif": ["Arial", "DejaVu Sans", "Liberation Sans"],
-           "svg.fonttype": "none",
-           "pdf.fonttype": 42,
-           "font.size": 16,
-           "axes.spines.right": False,
-           "axes.spines.top": False,
-           "axes.linewidth": 2.5,
-           "legend.frameon": False,
-       })
+        mpl.rcParams.update({
+            "font.family": "sans-serif",
+            "font.sans-serif": ["Arial", "DejaVu Sans", "Liberation Sans"],
+            "svg.fonttype": "none",
+            "font.size": 16,
+            "axes.spines.right": False,
+            "axes.spines.top": False,
+            "axes.linewidth": 2.5,
+            "legend.frameon": False,
+        })
        ```
     2. 配色使用学术色板: blue_main=#0F4D92, green_3=#8BCF8B, red_strong=#B64342, teal=#42949E, violet=#9A4D8E
     3. 同一方法在不同面板中保持颜色一致
     4. 多面板遵循 overview → deviation → relationship 三层递进
     5. 反冗余检查：无两个面板回答同一科学问题
-    6. 导出 SVG（主要）+ PNG 300dpi（次要预览）
-    7. 代码末尾包含 savefig 语句，输出到 ./docs/paper-drafts/figures/ 目录
+     6. 导出 SVG 到 ./docs/paper-drafts/figures/ 目录
+     7. 代码末尾包含 savefig 语句
 
     输出:
     - 完整可执行的 Python 绘图代码
@@ -547,7 +546,7 @@ Task:
     返回: Python 绘图代码 + 图表说明
 ```
 
-dispatch 返回后，**必须**将绘图代码写入 `./docs/paper-drafts/figures/plot_fig{N}.py`。**不自动执行代码**。
+dispatch 返回后，**必须**将绘图代码写入 `./docs/paper-drafts/figures/codes/plot_fig{N}.py`。**不自动执行代码**。
 
 ## Step 6.5: Evidence Compliance Review (Review Phase 1: Evidence)
 

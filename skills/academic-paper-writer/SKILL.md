@@ -73,7 +73,7 @@ Step 1 九项确认清单见 `references/workflow-step-0-4.md`。
 1. **输出目录**：`./docs/paper-drafts/`
 2. **论文文件**：`paper_draft.md` — 论文正文 + 参考文献 + 待补项清单，逐步追加更新
 3. **Blueprint文件**：`section_blueprint.md` — Section Blueprint（Step 5输出，每节更新）
-4. **图片目录**：`figures/` — `figure_prompts.md`（架构图提示词）+ `plot_*.py`（数据图代码）
+4. **图片目录**：`figures/` — SVG 文件 + `figure_prompts.md`（架构图提示词）；`figures/codes/` — `plot_*.py`（绘图代码）
 5. **对话输出限制**：禁止在对话中输出完整论文正文，仅显示简短进度摘要
 6. **写入时机**：每节 Draft 生成后、Verification 完成后，均须使用 Write/Edit 工具更新 `paper_draft.md`
 7. **中间状态**：Evidence Inventory、Verified References、Revision Queue 等在 agent 上下文中维护

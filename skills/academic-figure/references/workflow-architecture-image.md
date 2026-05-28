@@ -93,8 +93,8 @@ Avoid: decorative 3D, photorealistic lab scenes, busy gradients, unreadable tiny
 ## Step 6: Delivery
 
 默认交付：
-- `figures/architecture_fig<N>.png` 或 `.tiff`
-- `figures/architecture_fig<N>_prompt.md`
+- `./docs/paper-drafts/figures/architecture_fig<N>.png` 或 `.tiff`
+- `./docs/paper-drafts/figures/architecture_fig<N>_prompt.md`
 - Architecture Contract
 - Caption Draft
 - Verification Report
