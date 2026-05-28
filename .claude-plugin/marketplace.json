@@ -1,0 +1,25 @@
+{
+  "name": "academic-paper-writer",
+  "owner": {
+    "name": "joshua-zyy"
+  },
+  "plugins": [
+    {
+      "name": "academic-paper-writer",
+      "source": {
+        "source": "github",
+        "repo": "joshua-zyy/academic-paper-writer"
+      },
+      "description": "Evidence-driven, section-by-section CS/AI/ML paper writing skill collection",
+      "version": "1.0.0",
+      "author": {
+        "name": "joshua-zyy"
+      },
+      "homepage": "https://github.com/joshua-zyy/academic-paper-writer",
+      "repository": "https://github.com/joshua-zyy/academic-paper-writer",
+      "license": "MIT",
+      "keywords": ["academic", "paper", "writing", "cs", "ai", "ml"],
+      "category": "productivity"
+    }
+  ]
+}

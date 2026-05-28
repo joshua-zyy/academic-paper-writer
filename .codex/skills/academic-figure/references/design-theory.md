@@ -1,0 +1,141 @@
+# Design Theory: CS/AI/ML 论文图表设计规范
+
+所有路径通用的设计原则与出版规范。
+
+## 字体规范
+
+| 元素 | 规范 |
+|------|------|
+| 字体族 | Arial（首选）、Helvetica、DejaVu Sans |
+| 正文图字号 | 8 pt（axes labels、tick labels） |
+| Panel label | 12 pt bold（a/b/c/d），左上角 |
+| 图例字号 | 7 pt |
+| 标题字号 | 9 pt bold |
+| 确保 embed 时文字保留为可编辑文本 | SVG: `fonttype="none"` |
+
+## 配色规范
+
+### 基本原则
+- 色盲友好（区分红色盲和绿色盲，使用形状/纹理辅助）
+- 灰度打印友好（同色系区分度 > 30% 亮度差）
+- 每个图最多 6 种颜色
+- 不因"美观"牺牲可读性
+
+### 色板选择
+| 场景 | 推荐 |
+|------|------|
+| 多方法对比 | 低饱和同族色板，优先统一方法 family |
+| 消融实验 | 同色系渐变（深→浅） |
+| 热力图 | 白→蓝渐变（负值用 RdBu_r） |
+| 中性参考线 | 灰色 (#A0A0A0) 或黑色虚线 |
+
+### 统一学术色板
+| 名称 | 色值 | 用途 |
+|------|------|------|
+| blue_main | #0F4D92 | 主方法 / 本文方法 |
+| green_3 | #8BCF8B | 对比方法 2 / 正向指标 |
+| red_strong | #B64342 | 对比方法 3 / 负向指标 |
+| teal | #42949E | 对比方法 4 / 辅助 |
+| violet | #9A4D8E | 对比方法 5 / 消融变体 |
+| orange | #E08B2D | 对比方法 6 / 备选 |
+| gray_neutral | #A0A0A0 | 中性参考线 / baseline |
+
+同一方法在不同面板中必须保持颜色一致。
+
+### NMI Pastel 低饱和色板
+
+用于多方法、多尺度模型或同族 baseline 对比。相比高饱和蓝/绿/红轮换，它更适合顶刊风格的密集多面板图。
+
+| 名称 | 色值 | 用途 |
+|------|------|------|
+| baseline_dark | #484878 | 强 baseline / reference method |
+| baseline_mid | #7884B4 | baseline family |
+| baseline_soft | #B4C0E4 | weaker baseline / small variant |
+| ours_tiny | #E4E4F0 | 本文小模型 / light variant |
+| ours_base | #E4CCD8 | 本文主模型 |
+| ours_large | #F0C0CC | 本文大模型 |
+| neutral_light | #D8D8D8 | 背景 band / disabled |
+| neutral_mid | #A8A8A8 | secondary label |
+| neutral_dark | #606060 | axis / annotation |
+| delta_up | #2E9E44 | improvement marker |
+| delta_down | #E53935 | degradation marker |
+
+绿色/红色主要保留给方向性标注（gain/drop），不要作为普通方法类别的默认颜色。
+
+### 禁止使用的色板
+- rainbow / jet / gist_ncar
+- 纯红 + 纯绿作为唯一区分方式
+- 高饱和度荧光色
+
+## 坐标轴规范
+
+### Axes / Spines
+- 只保留左轴和下轴（top 和 right spines 去掉）
+- Spine 线宽 0.8 pt
+- Tick 朝外，长度 3 pt，线宽 0.6 pt
+- Tick 数量 4-6 个为宜
+
+### 坐标轴范围
+- 训练曲线 y 轴可以 non-zero start，但必须用截断标记（//）
+- 柱状图 y 轴必须 zero-start
+- 需要截断时，在轴上标注 `break` 符号
+
+### 网格
+- 不使用网格，或仅使用浅灰虚线作为辅助
+- 数据区域应保持干净
+
+## 排版规范
+
+### Panel 标签
+- 格式：`(a)` `(b)` `(c)` 或 `A` `B` `C`
+- 字体：bold，12 pt
+- 位置：panel 左上角，与数据区域有 2-3 pt 间距
+- 顺序：自左向右、自上向下
+
+### Multi-panel 布局
+- 优先非对称 hero 布局（一个主 panel 占更大空间）
+- 视觉对齐（所有 panel 的 x/y 轴标签对齐）
+- Panel 间距 2-4 pt
+- 不同 panel 的坐标轴使用同尺度（除非有理由）
+- 大 legend 应放入独立 legend panel，避免压缩数据区域
+- 多指标比较可使用 ultra-wide panel，让读者从左到右扫描证据链
+
+### 图例
+- 优先直接标注（在图上标文字）而非图例
+- 必须用图例时，放在图外（右侧或下方）
+- 图例框线不要（frameon=False）
+
+### 标注
+- 显著性：`* p < 0.05`、`** p < 0.01`、`*** p < 0.001`
+- 误差棒：必须说明含义（std / SEM / 95% CI）
+- 最优值用 `*` 或箭头标注
+
+## 输出规范
+
+### 格式优先顺序
+1. SVG（主格式，文字保留为 `<text>` 节点）
+
+### 尺寸
+| 场景 | 宽度 |
+|------|------|
+| 单栏图 | 3.2-3.5 in（~8.5 cm） |
+| 双栏图 | 5.5-7 in（~14-17.5 cm） |
+| 多面板大图 | 7-8 in |
+
+### 分辨率
+- SVG：矢量格式，无 dpi 限制
+
+## 数据可视化伦理
+
+### 禁止的误导性实践
+1. 截断 y 轴而不标记（夸大组间差异）
+2. 用 3D 效果展示 2D 数据（遮挡 + 透视扭曲）
+3. 选择性展示有利结果而隐藏负面结果
+4. 用不等宽柱状图暗示权重
+5. 在不显著的结果上标注星号
+
+### 强制要求
+1. 误差棒必须标注含义
+2. 样本量（n）必须在图注中说明
+3. 统计检验方法必须在图注中说明
+4. 所有 outlier 必须在图注中解释
