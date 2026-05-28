@@ -10,7 +10,7 @@ section: string                     # [required] 目标章节
 keywords: string[] | null           # [optional] 检索关键词（null 时自动生成）
 target_venue: string | null         # [optional] 目标期刊/会议
 seed_references: string[] | null    # [optional] 用户提供的种子文献列表
-local_lit_md_dir: string | null     # [optional] 本地文献库 MD 目录（papersToMd/），不为 null 时优先本地搜索
+local_lit_md_dir: string | null     # [optional] 本地文献库 MD 目录（refs_md/），不为 null 时优先本地搜索
 ```
 
 ### keywords 自动生成策略（用户未提供时）

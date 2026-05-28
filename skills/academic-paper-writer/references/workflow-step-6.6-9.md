@@ -266,7 +266,7 @@ Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**生成引�
 1. 将上述文献的 PDF 放入本地文献库目录
 2. 运行转换命令：
    ```
-   python skills/academic-citation/scripts/convert-pdfs-to-md.py <pdf_dir> <papersToMd_dir>
+   python skills/academic-citation/scripts/convert-pdfs-to-md.py <pdf_dir> <refs_md_dir>
    ```
 3. 告知 agent："确认引用"
 4. Agent 将 dispatch literature-reader-agent 逐篇阅读，

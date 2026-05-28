@@ -54,7 +54,7 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
 - 是否在当前项目中维护了本地文献库（存放待引用 PDF 论文的目录）？
   - 有 → 记录路径为 `local_lit_pdf_dir`
   - 没有 → `local_lit_pdf_dir = null`，跳过本地文献流程
-- 如果有，告知将在其同级创建 `papersToMd/` 目录存放转换后的 MD 文档
+- 如果有，告知将在其同级创建 `refs_md/` 目录存放转换后的 MD 文档
 - **必须检查 `markitdown` 是否已安装**，未安装时提供命令：
   ```
   pip install markitdown
@@ -66,7 +66,9 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
 
 ### Step 1 完整执行清单（9 项，Blocking Gate）
 
-执行Step 1时，**必须按以下顺序逐项完成**。任一未完成不得进入Step 2。
+执行Step 1时，**必须按以下顺序逐项完成**。**任一未完成，立即 STOP 并解决，不得进入 Step 2。每完成一项打勾 `[x]`，全部打勾后方可继续。**
+
+> ⚠️ **强制约束**：此清单由 skill 规定，agent 不得跳过、不得简化、不得合并。用户催促时也必须逐项完成。
 
 - [ ] 1. **确认venue**（Blocking）
       - 询问："目标期刊/会议是？"
@@ -115,7 +117,7 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
 ```
 本地文献库已确认: <local_lit_pdf_dir>
 
-请先确保 markitdown 已安装（如未安装）, 需注意python版本>=3.12：
+请先确保 markitdown 已安装（如未安装）：
   pip install markitdown
 
 然后从项目根目录运行以下命令：
@@ -124,6 +126,8 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
 转换完毕后请告知我，我将从本地文献库中搜索可引用的文献。
 （在此期间我将先进行项目证据审计和联网文献检索）
 ```
+
+> ⚠️ **以上命令由用户自行运行，Agent 不得代为执行。Agent 只输出提示，不运行脚本。**
 
 输出提示后，**立即进入Step 2**，不等待转换完成。
 
@@ -313,8 +317,8 @@ Venue Brief 生成后，在后续步骤中**必须参考**：
 
 计算 MD 输出目录：
 ```python
-md_output_dir = <local_lit_pdf_dir>/../papersToMd/
-# 例: D:\AI\literature\ → D:\AI\papersToMd\
+md_output_dir = <local_lit_pdf_dir>/../refs_md/
+# 例: D:\AI\literature\ → D:\AI\refs_md\
 ```
 记录为 `local_lit_md_dir`。
 
@@ -334,6 +338,8 @@ md_output_dir = <local_lit_pdf_dir>/../papersToMd/
 转换完毕后请告知我，我将从本地文献库中搜索可引用的文献。
 （在此期间我将先进行项目证据审计和联网文献检索）
 ```
+
+> ⚠️ **以上命令由用户自行运行，Agent 不得代为执行。Agent 只输出提示，不运行脚本。**
 
 ### 1b.4 延迟等待
 
@@ -571,14 +577,25 @@ For Method, also audit model data flow, module boundaries, tensor shapes, recove
 
 **条件**: 仅在 `local_lit_md_dir != null` 且目录中存在 MD 文件时执行。
 
-1. 读取 `<local_lit_md_dir>/_index.json`（由 `convert-pdfs-to-md.py` 生成）
-2. 用从 section 提取的关键词在索引中搜索（匹配 title、first_500_chars）
-3. 命中的候选文献，使用 **并行 dispatch** 模板（见下方"并行阅读 dispatch 模板"）同时 dispatch 多个 `literature-reader-agent`
-4. 每个 reader 返回 LiteratureReadingReport
-5. 主 agent 综合报告决定是否引用
+#### 3a.1 关键词搜索（强制，不可跳过）
+
+**必须先按关键词搜索 `_index.json`，仅 dispatch 搜索命中的候选文献。禁止直接读取全部 MD 文件。**
+
+1. **提取关键词**：从当前 section 的主题、方法名、任务名、数据集名中提取 3-8 个关键词。例如：
+   - Introduction → `{任务领域, 方法家族, 核心问题}`
+   - Related Work → `{方法名, 竞争方法, 基线名称, 技术路线}`
+   - Method → `{模块名称, 技术组件, 算法类型}`
+2. **搜索索引**：读取 `<local_lit_md_dir>/_index.json`，在每个条目的 `title` 和 `first_500_chars` 字段中匹配关键词。匹配规则：
+   - 至少匹配 1 个关键词的条目视为候选
+   - 匹配多个关键词的条目优先排序
+   - 搜索示例：`["graph neural network", "EEG", "brain connectivity", "spatial-temporal", "transformer"]`
+3. **限制候选数量**：若匹配结果 > 10 篇，按关键词命中数排序，只取前 10 篇。若匹配结果 > 5 篇且均为同一子领域，进一步筛选最相关的 5 篇。
+4. 仅对命中的候选文献使用下方的并行 dispatch 模板
+5. 每个 reader 返回 LiteratureReadingReport
+6. 主 agent 综合报告决定是否引用
 
 **判定路径**：
-- 若本地搜索找到 0 篇候选 → 跳过 Step 3a，直接进入 Step 3b
+- 若关键词搜索找到 0 篇候选 → 跳过 Step 3a，直接进入 Step 3b
 - 若找到候选但所有 `recommendation` 均为 `skip` → 进入 Step 3b 补充
 - 若找到候选且至少部分被采纳 → 采纳的进入 Verified References，不足处继续 Step 3b
 
@@ -609,7 +626,7 @@ For Method, also audit model data flow, module boundaries, tensor shapes, recove
     4. 输出遵循 literature-reading-report.md schema
 
     Red Lines:
-    1. 只阅读，不修改任何文件
+    1. 只阅读 + 只返回结构化内容，不修改、不创建、不写入、不删除任何文件
     2. 禁止编造论文中不存在的内容
     3. 严格区分原文提取与推断
 

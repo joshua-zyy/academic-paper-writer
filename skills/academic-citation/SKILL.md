@@ -33,7 +33,7 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
 2. **targeted-citation-search** — 为特定 claim、section 或主题检索文献
 3. **exemplar-set-only** — 只构建 Exemplar Set 用于学习章节组织，不强制全部进入正文引用
 4. **citation-verification** — 核验已有候选文献列表的元数据准确性
-5. **local-citation-pass** — 优先从本地文献库（`papersToMd/`）检索与核验引用，不足时再联网补充。依赖 `literature-reader-agent` 进行全文阅读。
+5. **local-citation-pass** — 优先从本地文献库（`refs_md/`）检索与核验引用，不足时再联网补充。依赖 `literature-reader-agent` 进行全文阅读。
 6. **citation-verification-with-reading** — 对已下载到本地文献库的引用文献，逐篇阅读全文并验证引用合理性（claim_accuracy 检查）。用于论文撰写完毕后的引用确认流程。
 
 ## 工作流

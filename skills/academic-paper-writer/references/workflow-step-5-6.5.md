@@ -168,7 +168,7 @@ Task B:
     - 可用于对比的 precedent works
 
     约束:
-    1. 只读，不修改任何文件
+    1. 只读 + 只返回结构化内容，不修改、不创建、不写入、不删除任何文件
     2. 严格区分原文提取与推断
     3. 无本地文献库时返回"无本地文献"
 
@@ -255,7 +255,7 @@ Task B:
     - Related Work 中常见的组织方式（按技术路线/按任务/按限制类型）
 
     约束:
-    1. 只读，不修改任何文件
+    1. 只读 + 只返回结构化内容，不修改、不创建、不写入、不删除任何文件
     2. 严格区分原文提取与推断
     3. 无本地文献库时返回"无本地文献"
 
@@ -338,6 +338,28 @@ Draft v1 生成后，**必须**立即将正文内容写入 `./docs/paper-drafts/
 **禁止在对话中输出完整 Draft 正文。** 对话中仅输出简短进度摘要：
 
 > **{Section}**: Draft v1 已写入文件，进入审查阶段
+
+---
+
+### ⚠️ Section 完成门控（强制，每节必执行）
+
+> **Draft v1 ≠ 初稿完成。** 只有完成 Step 6.4 → 6.9 全部子步骤后，当前 section 才算初稿完成，方可推进到下一节。
+
+**本门控为概要清单。以下每个子步骤均有各自的详细执行清单**（如 6.4 有 6.4a→6.4h 八项子清单、6.6 有零容忍触发词规则等）。**仅勾选概要项而未执行详细子步骤，视为未完成。**
+
+**以下清单必须在离开本节前逐项完成。任一未完成，禁止开始下一节。用户催促时也不得跳过 6.4→6.9 审查阶段。**
+
+- [ ] **6.4** 占位符审计 + 图表生成（详细清单: 6.4a→6.4h，即使无占位符也必须执行扫描）
+- [ ] **6.5** 证据合规审查（Review Phase 1 — dispatch academic-reviser，`evidence_debt = closed` 方可继续）
+- [ ] **6.6** Prose Quality Gate（Review Phase 2 — 内化调用 academic-polishing，含零容忍触发词规则）
+- [ ] **6.7** Expansion Pass（内容密度检查，参考 `content-density.md` 的 thin draft 判定）
+- [ ] **6.8** Self-Review & Verification（dispatch academic-reviser，verdict = passed 方可继续）
+- [ ] **6.9** 更新 Cumulative Draft → 推进到下一节
+
+**违反门控的典型错误**：Draft v1 写入文件后直接跳到下一节，跳过 6.4→6.9 审查阶段。
+**正确行为**：Draft v1 写入 → 逐项按详细清单执行 6.4 → 6.5 → 6.6 → 6.7 → 6.8 → 6.9 → 然后才推进下一节。
+
+---
 
 ## Step 6.4: Placeholder Audit, Figure Contract, Architecture Figure Pre-generation, and Debt List（**强制执行，不可跳过**）
 

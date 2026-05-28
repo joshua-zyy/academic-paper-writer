@@ -66,6 +66,7 @@ Step 1 九项确认清单见 `references/workflow-step-0-4.md`。
 17. **最大迭代次数**：修订循环（Step 6.7→6.8→7）最多执行 3 轮。3 轮后仍有未闭合 debt 时，标记为 `unresolvable`，输出修订报告并终止循环，不得继续重试。
 18. **Section Contract 先于 prose**：每节在 Step 5 必须根据 `references/section-writing-contracts.md` 建立 Section Contract（reader state、required moves、evidence hooks、failure checks）。Step 6 Draft v1 不得跳过该 contract 直接写正文；润色只能在 contract debt 基本闭合后执行。
 19. **数字引用格式（默认）**：正文中所有 inline citation 默认使用数字格式 `[1]`, `[2]`, `[1,3,5]`, `[2-4]`。当 `venue-brief.md` 中 `Citation Format` 明确指定为 author-year 格式时，遵循 venue 要求，使用作者-年份格式。参考文献列表的编号/格式与正文引用一一对应。
+20. **标准化 Todo 强制使用**：任务开始后，必须使用 TodoWrite 工具创建并维护标准化 Todo 列表（模板见 `references/standard-todo-template.md`），不得自行规划、不得跳过子步骤。每完成一个 Step 或子步骤，更新 TodoWrite 状态。
 
 ## 文件输出规范
 
@@ -208,6 +209,7 @@ Agent 定义、dispatch 模板、职责边界见各子 skill 的 `agents/` 目�
 | `references/test-scenarios.md` | 压力测试场景索引 |
 | `references/figure-generation-guide.md` | 图表生成规范（详见 academic-figure） |
 | `references/examples/example-usage.md` | 三个端到端使用场景示例 |
+| `references/standard-todo-template.md` | 标准化 Todo 模板（规则 20 强制执行） |
 
 ## 不适用场景
 
@@ -232,6 +234,9 @@ Agent 定义、dispatch 模板、职责边界见各子 skill 的 `agents/` 目�
 | Abstract 前置 | 证据未稳时就先写 Abstract | Abstract 必须后置，等主体章节证据稳定后再写 |
 | 无证据式 SOTA | 未与强基线比较就声称 SOTA | 任何 SOTA / state-of-the-art 表述必须附 baseline 比较表 |
 | 自我审查赦免 | 因接近截止期就缩短审查流程 | Hard Gates 不可跳过，每种核实步骤都至少执行一遍 |
+| Draft v1 即完成 | Draft v1 写入文件后直接跳到下一节 | 必须完成 6.4→6.9 全部审查阶段后再推进，参考 Section 完成门控 |
+| 自行规划 Todo | 不按标准化模板创建 TodoWrite，自行规划跳过子步骤 | 按规则 20 强制使用 `standard-todo-template.md`，不得删除条目 |
+| 子 Agent 写文件 | literature-reader-agent 在项目目录下创建 reading_report 等文件 | 子 Agent 只返回结构化内容，文件写入由主 Agent 负责 |
 
 ## Example Usage
 
