@@ -61,7 +61,7 @@ Step 1 九项确认清单见 `references/workflow-step-0-4.md`。
 12. **失败不伪装**：Verification 未通过且非外部阻塞时，必须继续下一轮修订，不得直接结束或假装通过。
 13. **完整流程执行**：执行 full-paper-planning 时，必须按 Step 0→1→1.5(Venue Requirements Research)→1b(若适用)→2→3(3a→3b→3c→3d)→4→5→6(6.0→6.9)→7→8→9 的顺序逐一执行，不得跳步。用户催促时也不得跳过 Step 1.5（Venue Requirements Research）、证据审计（Step 2）、文献检索（Step 3）、实验复核（Step 4）、Hard Gates（A/B/C）中的任何一个。
 14. **引用产物必输出**：Step 3 完成后，必须在上下文中维护 Verified References 列表和 Citation-to-Claim Map。缺少任一 → 不得进入 Step 6。
-15. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 `min_citations`（默认 35，short paper 建议 20，workshop 建议 15）。**Step 1 必须询问用户预期引用数量**，用户指定时记录为 `min_citations`，未指定时使用默认值。论文完成后 Step 8 生成引用清单时自动核验。
+15. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 `min_citations`。Step 1 可询问用户预期引用数量（可选），用户未指定时由 Step 1.5 venue 调研后根据 venue-brief.md 中的引用密度自动推断（详见 `workflow-step-0-4.md` 1.5.3b 节）。论文完成后 Step 8 生成引用清单时自动核验。
 16. **两阶段写作**：Step 5 Blueprint 可使用 bullet points 和提纲式结构，但 Step 6 Draft v1 必须是完整 prose 段落。bullet points 仅用于规划阶段，不得出现在最终论文正文中。
 17. **最大迭代次数**：修订循环（Step 6.7→6.8→7）最多执行 3 轮。3 轮后仍有未闭合 debt 时，标记为 `unresolvable`，输出修订报告并终止循环，不得继续重试。
 18. **Section Contract 先于 prose**：每节在 Step 5 必须根据 `references/section-writing-contracts.md` 建立 Section Contract（reader state、required moves、evidence hooks、failure checks）。Step 6 Draft v1 不得跳过该 contract 直接写正文；润色只能在 contract debt 基本闭合后执行。
@@ -133,7 +133,7 @@ Step 1 九项确认清单见 `references/workflow-step-0-4.md`。
 | A: 证据完备 | Step 2 → Step 6 | 至少一条可引用证据（`newly_run`/`preexisting_artifact`） | 降级路径或阻塞 |
 | B: 引用就绪 | Step 3 → Step 6 | 至少一条 `VERIFIED` 引用或明确"无需文献" | 按 section 分流，Intro/RW 阻塞，Method 可占位 |
 | C: Verification | Step 6.8 → Step 7 | 所有硬 debt 闭合 + thin_draft = no（figure_debt 为软约束，open 时可 blocked + safe_to_continue） | passed/blocked/failed，详细见 workflow |
-| D: 引用数量 | Step 8 → 输出 | 全文去重后引用总数 >= `min_citations`（默认 35） | 未达标时提醒用户，可继续补充后重检 |
+| D: 引用数量 | Step 8 → 输出 | 全文去重后引用总数 >= `min_citations` | 未达标时提醒用户，可继续补充后重检 |
 
 ## 默认交付物
 

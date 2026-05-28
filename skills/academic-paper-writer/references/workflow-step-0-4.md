@@ -39,10 +39,10 @@ Blocking confirmations — must stop and ask if missing:
    - 用户选择"自动"或未指定 → 记录 `continuation_mode = auto`
    - **一次性确认**：确认后全程不再重复询问，用户可随时切换
 4. **Current section**: Determined by Step 0 if user did not specify.
-5. **预期引用数量（min_citations）**：**必须询问**用户预期的参考文献数量。
-   - 询问方式："您预期这篇论文的参考文献数量大约是多少篇？（默认 35 篇，short paper 建议 20 篇，workshop 建议 15 篇）"
-   - 用户指定时记录为 `min_citations`
-   - 用户未指定或说"默认"时使用默认值 35
+5. **预期引用数量（min_citations）**：**可选询问**用户预期的参考文献数量。
+   - 询问方式："您预期这篇论文的参考文献数量大约是多少篇？（可留空，由 Step 1.5 venue 调研后自动推断）"
+   - 用户指定时记录为 `min_citations`，后续以用户指定为准
+   - 用户未指定或说"留空"时记录为 `min_citations = null`，待 Step 1.5 完成后根据 venue 要求自动推断
    - **一次性确认**：确认后全程不再重复询问，Step 8 生成引用清单时自动核验。
 
 If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venue Requirements Research，使用 webfetch 访问官方页面获取投稿要求并生成 `venue-brief.md`。
@@ -77,9 +77,10 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
       - 询问："论文用中文还是英文撰写？"
       - 未指定 → 默认英文
 
-- [ ] 3. **确认min_citations**
-      - 询问："预期参考文献数量？（默认35篇，short paper建议20，workshop建议15）"
-      - 未指定 → 默认35
+- [ ] 3. **确认min_citations**（可选）
+      - 询问："预期参考文献数量？（可留空，由 Step 1.5 venue 调研后自动推断）"
+      - 用户指定 → 记录 `min_citations = 用户指定值`
+      - 用户未指定/留空 → 记录 `min_citations = null`，待 Step 1.5 后推断
 
 - [ ] 4. **确认推进模式**
       - 询问："选择逐节撰写（每节完成后暂停确认）还是自动全部生成初稿？（默认自动）"
@@ -261,6 +262,32 @@ Venue Brief 生成后，在后续步骤中**必须参考**：
 | Step 6 (Draft) | 根据 Anonymous Review 决定是否去除可识别信息 |
 | Step 8 (引用清单) | 根据 Appendix Policy 决定附录内容 |
 | Step 9 (图片生成) | 根据 Template 确定图片尺寸和分辨率要求 |
+
+### 1.5.3b 自动推断 min_citations
+
+**条件**：仅当 Step 1 中用户未指定 min_citations（`min_citations = null`）时执行。
+
+**推断逻辑**：
+
+1. 从 `venue-brief.md` 的"写作风格备注 → 引用密度 → 平均引用数量"字段读取 venue 的典型引用数
+2. 按以下规则推断 `min_citations`：
+
+| venue-brief 中的平均引用数 | 推断的 min_citations | 说明 |
+|---------------------------|---------------------|------|
+| 有具体数值（如 25-30） | 取该范围的上限 + 5（如 35） | 留有余量 |
+| 标注为 Unknown | 默认 35 | 安全默认值 |
+| venue-brief.md 不存在 | 默认 35 | 降级处理 |
+
+3. 推断完成后，在对话中输出确认信息：
+   ```
+   min_citations 已根据 venue 要求自动推断：{min_citations} 篇
+   （依据：{venue} 平均引用数约 {N} 篇，留余量后设定为 {min_citations}）
+   如需调整，请告知。
+   ```
+
+4. 用户可在收到确认信息后覆盖此值；未覆盖则以推断值为准。
+
+**用户已指定时**：跳过本节，直接使用用户指定的 `min_citations`。
 
 ### 1.5.4 失败处理
 

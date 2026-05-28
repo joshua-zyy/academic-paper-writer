@@ -33,7 +33,7 @@
 | Step | 动作 | 委托方式 | 触发方式 | DP |
 |------|------|---------|---------|-----|
 | 0 | 判定 mode、scope、当前 section | — | 自动 | — |
-| 1 | 确认 venue / 语言 / min_citations + 本地文献库（Blocking Gate，**不含** venue 调研） | — | 自动 | — |
+| 1 | 确认 venue / 语言 / min_citations（可选）+ 本地文献库（Blocking Gate，**不含** venue 调研） | — | 自动 | — |
 | 1.5 | **Venue Requirements Research**（强制）— webfetch 访问官方页面，生成 venue-brief.md | — | 自动 | DP-1 |
 | 1b | 可选: PDF→MD 转换准备（生成脚本，提示用户运行，不阻塞） | — | 自动（条件执行） | — |
 | 2 | 证据审计（并行 dispatch probe agents） | — | 自动，涉及多 probe 时**必须并行** | — |
