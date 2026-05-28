@@ -140,15 +140,46 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 
 ### 方式一：Claude Code 插件安装（推荐）
 
+#### 选项 A：开发版（自动更新）
+
+使用 `main` 分支，每次启动 Claude Code 自动获取最新版本。
+
 ```bash
-# 1. 添加 marketplace
+# 1. 添加 marketplace（main 分支）
 /plugin marketplace add joshua-zyy/academic-paper-writer
 
 # 2. 安装插件
 /plugin install academic-paper-writer@academic-paper-writer
 ```
 
-安装后可直接使用：
+> 💡 **自动更新**：main 分支版本无需手动更新，每次启动 Claude Code 会自动检测并同步最新代码。
+
+#### 选项 B：稳定版（手动更新）
+
+使用 `stable` 分支，只获取经过测试的稳定版本。
+
+```bash
+# 1. 添加 marketplace（stable 分支）
+/plugin marketplace add joshua-zyy/academic-paper-writer@stable
+
+# 2. 安装插件
+/plugin install academic-paper-writer@academic-paper-writer
+```
+
+> ⚠️ **手动更新**：稳定版需要手动执行更新命令：
+> ```bash
+> /plugin update academic-paper-writer@academic-paper-writer
+> ```
+
+#### 版本对比
+
+| 版本 | 分支 | 更新方式 | 适用场景 |
+|------|------|----------|----------|
+| **开发版** | `main` | 自动更新 | 开发者、早期用户、想要最新功能 |
+| **稳定版** | `stable` | 手动更新 | 生产环境、稳定性要求高的用户 |
+
+#### 安装后可用命令
+
 - `/academic-paper-writer` - 完整论文工作流
 - `/academic-citation` - 文献检索与核验
 - `/academic-experiments` - 实验复核
@@ -157,12 +188,9 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 - `/academic-figure` - 图表生成
 - `/academic-venue-research` - 期刊调研
 
-**更新插件**：
-```bash
-/plugin update academic-paper-writer@academic-paper-writer
-```
-
 ### 方式二：Codex CLI 安装
+
+#### 选项 A：开发版（main 分支）
 
 ```bash
 # 克隆到用户级目录（推荐）
@@ -172,11 +200,47 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git ~/.agents/skil
 git clone https://github.com/joshua-zyy/academic-paper-writer.git .codex/skills/academic-paper-writer
 ```
 
-**更新插件**：
+#### 选项 B：稳定版（stable 分支）
+
 ```bash
-cd ~/.agents/skills/academic-paper-writer
-git pull
+# 克隆 stable 分支到用户级目录
+git clone -b stable https://github.com/joshua-zyy/academic-paper-writer.git ~/.agents/skills/academic-paper-writer
+
+# 或克隆到项目级目录
+git clone -b stable https://github.com/joshua-zyy/academic-paper-writer.git .codex/skills/academic-paper-writer
 ```
+
+#### 选项 C：指定版本（tag）
+
+```bash
+# 克隆特定版本
+git clone -b v1.0.0 https://github.com/joshua-zyy/academic-paper-writer.git ~/.agents/skills/academic-paper-writer
+```
+
+#### 更新插件
+
+```bash
+# 进入 skill 目录
+cd ~/.agents/skills/academic-paper-writer
+
+# 拉取最新代码（main 分支）
+git pull
+
+# 或切换到 stable 分支
+git checkout stable
+git pull
+
+# 或切换到特定版本
+git checkout v1.0.0
+```
+
+#### 版本对比
+
+| 版本 | 分支/标签 | 更新方式 | 适用场景 |
+|------|-----------|----------|----------|
+| **开发版** | `main` | `git pull` | 开发者、早期用户 |
+| **稳定版** | `stable` | `git pull` | 生产环境 |
+| **指定版本** | `v1.0.0` 等 | 手动切换 | 需要锁定版本 |
 
 ### 方式三：手动加载
 
