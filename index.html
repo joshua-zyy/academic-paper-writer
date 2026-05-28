@@ -518,7 +518,7 @@
 
     .gate-row {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 14px;
       margin-top: 18px;
     }
@@ -751,7 +751,7 @@
         <div class="badges" aria-label="项目标签">
           <span class="badge">MIT License</span>
           <span class="badge">CS / AI / ML</span>
-          <span class="badge">6 Skills</span>
+          <span class="badge">7 Skills</span>
           <span class="badge">Core + Subskills</span>
           <span class="badge">Active</span>
         </div>
@@ -770,7 +770,7 @@
 <span class="key">promise</span>: verifiable, modular, claim-aware writing</pre>
         </div>
         <div class="metrics">
-          <div class="metric"><b>6</b><span>specialized skills</span></div>
+          <div class="metric"><b>7</b><span>specialized skills</span></div>
           <div class="metric"><b>4</b><span>hard gates</span></div>
           <div class="metric"><b>35+</b><span>default citations</span></div>
         </div>
@@ -823,7 +823,7 @@
         <div class="section-head">
           <div>
             <p class="section-kicker">Skill System</p>
-            <h2>Core 编排器 + 5 个专项 Subskills</h2>
+            <h2>Core 编排器 + 6 个专项 Subskills</h2>
           </div>
           <p class="section-desc">主 Agent 保持论文叙事风格一致，子 skill 只提供文献、实验、审修、润色和图表等工具型输出</p>
         </div>
@@ -876,6 +876,14 @@
             </div>
             <div class="tag-row"><span class="tag">绘图</span><span class="tag">训练曲线</span><span class="tag">architecture</span></div>
           </article>
+
+          <article class="card skill-card">
+            <div>
+              <div class="skill-title"><span>🏛️</span><h3>academic-venue-research</h3></div>
+              <p>调研目标会议/期刊的投稿要求与写作风格，生成标准化 Venue Brief</p>
+            </div>
+            <div class="tag-row"><span class="tag">期刊调研</span><span class="tag">venue research</span><span class="tag">venue brief</span></div>
+          </article>
         </div>
       </div>
     </section>
@@ -902,6 +910,7 @@
           </div>
 
           <div class="gate-row">
+            <div class="gate"><b>Gate E · Venue 调研</b><p>venue 确认后必须完成调研，生成 venue-brief.md，否则阻塞</p></div>
             <div class="gate"><b>Gate A · 证据完备</b><p>至少存在一条可引用证据，否则降级或阻塞</p></div>
             <div class="gate"><b>Gate B · 引用就绪</b><p>Introduction / Related Work 零 VERIFIED 引用时必须阻塞</p></div>
             <div class="gate"><b>Gate C · Verification</b><p>所有 debt 闭合且内容达标后，才能进入下一节</p></div>
@@ -916,10 +925,11 @@
         <div>
           <p class="section-kicker">Dispatch Model</p>
           <h2>编排器派发 sub-agent，各司其职</h2>
-          <p class="section-desc" style="max-width: 620px; margin-top: 18px;">核心编排器不直接处理所有任务——写作前通过并行 probe-agent 探查项目，调研阶段顺序派发引用核验和实验复核，章节循环中按需派发图表生成和终审验证；润色则由编排器内化调用规则自行完成，确保文体风格一致</p>
+          <p class="section-desc" style="max-width: 620px; margin-top: 18px;">核心编排器不直接处理所有任务——写作前通过并行 probe-agent 探查项目，调研阶段顺序派发期刊调研、引用核验和实验复核，章节循环中按需派发图表生成和终审验证；润色则由编排器内化调用规则自行完成，确保文体风格一致</p>
         </div>
         <div class="dispatch" aria-label="编排派发模型">
-          <pre><span class="dp-orch">主编排器</span><span class="dp-tb"> ──┬── </span><span class="dp-ag">引用核验</span><span class="dp-tb"> ──── </span><span class="ta">文献检索与 VERIFIED 判定</span>
+          <pre><span class="dp-orch">主编排器</span><span class="dp-tb"> ──┬── </span><span class="dp-ag">期刊调研</span><span class="dp-tb"> ──── </span><span class="ta">投稿要求与写作风格调研</span>
+<span class="dp-tb">          ├── </span><span class="dp-ag">引用核验</span><span class="dp-tb"> ──── </span><span class="ta">文献检索与 VERIFIED 判定</span>
 <span class="dp-tb">          ├── </span><span class="dp-ag">实验复核</span><span class="dp-tb"> ──── </span><span class="ta">实验日志与结果表核验</span>
 <span class="dp-tb">          ├── </span><span class="dp-na">润色</span><span class="dp-tb"> ──────── </span><span class="ta">Prose Gate · Claim 强度审计</span><span class="dp-tb">  </span><span class="dp-note">(内化执行)</span>
 <span class="dp-tb">          ├── </span><span class="dp-ag">图表生成</span><span class="dp-tb"> ──── </span><span class="ta">数据可视化与架构图代码</span>
@@ -940,14 +950,14 @@
             <div class="step">
               <div>
                 <h3>① 加载编排器</h3>
-                <p>加载核心 <code>SKILL.md</code>，自动注册 5 个 built-in sub-agent 及其能力边界</p>
+                <p>加载核心 <code>SKILL.md</code>，自动注册 6 个 built-in sub-agent 及其能力边界</p>
               </div>
             </div>
             <br>
             <div class="step">
               <div>
                 <h3>② 按阶段派发</h3>
-                <p>并行探查（probe-agent）→ 并行文献阅读（reader-agent）→ 顺序调研（citation、experiments）→ 章节循环（figure、reviser）</p>
+                <p>并行探查（probe-agent）→ 并行文献阅读（reader-agent）→ 顺序调研（venue research、citation、experiments）→ 章节循环（figure、reviser）</p>
               </div>
             </div>
             <br>
@@ -975,6 +985,7 @@ task("config",          probe-agent)
 task("lit_read", literature-reader-agent)
 
 # 调研阶段（顺序执行）
+task("期刊调研", academic-venue-research)
 task("引用核验", academic-citation)
 task("实验复核", academic-experiments)
 

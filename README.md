@@ -7,7 +7,7 @@
     </a>
     <img src="https://img.shields.io/badge/domain-CS%2FAI%2FML-brightgreen" alt="Domain">
     <img src="https://img.shields.io/badge/status-active-success" alt="Status">
-    <img src="https://img.shields.io/badge/skill%20system-6%20skills-9A4D8E" alt="Skills">
+    <img src="https://img.shields.io/badge/skill%20system-7%20skills-9A4D8E" alt="Skills">
     <img src="https://img.shields.io/badge/architecture-Core%20%2B%20Subskills-orange" alt="Architecture">
   </p>
     <p align="center">
@@ -129,6 +129,7 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 | ✅ **academic-reviser** | 审稿人 | 证据审查、三轮自审、Verification 判定 | `审修`、`self review` |
 | ✨ **academic-polishing** | 文体打磨 | Prose Quality Gate、Claim Strength Audit、去 AI 化 | `润色`、`claim strength` |
 | 📊 **academic-figure** | 图表生成 | 实验数据图（Python 代码） + 架构图提示词 | `绘图`、`训练曲线`、`架构图` |
+| 🏛️ **academic-venue-research** | 期刊调研 | 调研目标 venue 投稿要求与写作风格，产出标准化 Venue Brief | `期刊调研`、`venue research`、`投稿要求` |
 
 ---
 
@@ -219,6 +220,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 | Core 环节 | 委托 Skill | 处理方式 |
 |-----------|-----------|---------|
+| 🏛️ 目标 Venue 调研 | `academic-venue-research` | dispatch 子 Agent |
 | 🔍 文献检索与核验（含本地文献库优先 + subagent 全文阅读） | `academic-citation` + `literature-reader-agent` | dispatch 子 Agent |
 | 🔬 实验证据复核 | `academic-experiments` | dispatch 子 Agent |
 | 📊 图表 / 架构图 | `academic-figure` | dispatch 子 Agent |
@@ -229,10 +231,11 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 ### 🚧 Hard Gates + 数据契约
 
-四个不可跳过的基础关卡：
+五个不可跳过的基础关卡：
 
 | Gate | 触发位置 | 核心条件 | 失败处理 |
 |------|---------|---------|---------|
+| 🏛️ **E：Venue 调研** | Step 1 → Step 2 | venue 确认后必须完成 Step 1.5，生成 venue-brief.md | 阻塞，不得进入 Step 2 |
 | 🔬 **A：证据完备** | Step 2 → Step 6 | 至少一条可引用证据 | 降级路径或阻塞 |
 | 📖 **B：引用就绪** | Step 3 → Step 6 | 至少一条 VERIFIED 引用 | Intro/RW 阻塞；Method 可占位 |
 | 🚪 **C：Verification** | Step 6.8 → Step 7 | 所有 debt 闭合 + 内容达标 | passed/blocked/failed |
@@ -245,6 +248,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 ✅ Verified References      # 核验文献清单   → academic-citation    → orchestrator
 📖 LiteratureReadingReport # 文献阅读报告   → literature-reader-agent → orchestrator
 📋 Verification Report     # 验证状态报告   → academic-reviser     → orchestrator
+🗺️ Citation-to-Claim Map   # 引用-主张映射   → academic-citation    → orchestrator
 ```
 
 ---
@@ -258,6 +262,8 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 │   🎯 Step 0  判定任务模式                                                 │
 │    ↓                                                                    │
 │   🔒 Step 1  确认 venue / 语言 + 本地文献库（🔴硬阻塞）                   │
+│    ↓                                                                    │
+│   🏛️ Step 1.5  Venue 调研（🔴硬阻塞，生成 venue-brief.md）                │
 │    ↓                                                                    │
 │   ⏭  Step 1b  可选 PDF→MD 转换（生成脚本提示用户，不阻塞主流程）           │
 │    ↓                                                                    │
@@ -398,7 +404,7 @@ academic-paper-writer/
 │   └── check_schemas.py              # 跨技能 schema 一致性检查
 └── skills/
     ├── shared/
-    │   ├── schemas/                  # 跨技能数据契约（3 个 schema）
+    │   ├── schemas/                  # 跨技能数据契约（5 个 schema）
     │   └── references/               # 共享概念与边界规则
     ├── academic-paper-writer/        # 📌 核心编排器
     │   ├── SKILL.md
@@ -465,19 +471,6 @@ python scripts/check_schemas.py --skills-root ./skills
 - ✅ 所有 debt 字段在 schema 和 SKILL.md 之间是否对齐
 - ✅ SKILL.md 中引用的 reference 文件是否存在
 - ✅ 步骤编号是否一致
-
-### 压力场景验证
-
-> **状态**：以下为计划的验证场景，具体用例文件尚未创建。
-
-| 场景 | 计划文件 | 核心验证点 |
-|------|------|-----------|
-| 📄 Introduction 文献不足 | `test/pressure-scenarios/scenario-1-phantom-citation.md` | 是否阻塞虚构文献 |
-| 🧠 Method 设计动机缺失 | `test/pressure-scenarios/scenario-2-evidence-gap.md` | 缺证据时是否降级 |
-| 📊 Results 仅 preexisting | `test/pressure-scenarios/scenario-3-batch-output.md` | 是否遵循逐节推进 |
-| ⚠️ 弱 claim 试图升级 | `test/pressure-scenarios/scenario-4-weak-claim-upgrade.md` | Claim 强度是否匹配 |
-
----
 
 ## 📖 参考项目
 

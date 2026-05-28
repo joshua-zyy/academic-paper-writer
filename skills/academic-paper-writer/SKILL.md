@@ -172,7 +172,7 @@ Step 1 九项确认清单见 `references/workflow-step-0-4.md`。
 
 ## 跨技能数据契约（Schemas）
 
-详见 `references/orchestration-workflow.md` 的"Shared Inputs and References"节。Schema 文件位于各子 skill 的 `references/schemas/` 目录。
+详见 `references/orchestration-workflow.md` 的"Shared Inputs and References"节。权威 Schema 文件位于 `skills/shared/schemas/` 目录，各子 skill 的 `references/schemas/` 下为指针文件。
 
 ## Agent 资源与执行架构
 
