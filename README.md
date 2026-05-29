@@ -281,9 +281,11 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 ### 推荐模型
 
-| 模型 | 说明                                                  |
-|------|-----------------------------------------------------|
-| 🚀 **DeepSeek V4 Flash** | 没其他原因，主要是token价格低，且是推理模型支持1m上下文，目前opencode zen中免费使用 |
+| 模型                       | 说明                                                             |
+|--------------------------|----------------------------------------------------------------|
+| 🚀 **gpt-5.5**           | anyRouter中提供免费的api，地址: https://anyrouter.top/register?aff=hZXa |
+| 🚀 **claude-4.8**        | anyRouter中提供免费的api，地址: https://anyrouter.top/register?aff=hZXa |
+| 🚀 **DeepSeek V4 Flash** | 没其他原因，主要是token价格低，且是推理模型支持1m上下文，可以用于测试skill效果                  |
 
 ### 推荐 Agent 平台
 
