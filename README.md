@@ -289,11 +289,12 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 ### 推荐 Agent 平台
 
-| 平台 | 安装方式 | 更新方式 | 说明 |
-|------|----------|----------|------|
-| 🤖 **Claude Code** | `/plugin marketplace add` + `/plugin install` | 自动更新（main分支）或手动 `/plugin update` | Anthropic 官方 CLI 工具，原生支持 Skill 机制，推荐使用 |
-| 🔧 **Codex CLI** | `git clone` 到 `~/.agents/skills/` | 手动 `git pull` | OpenAI 代码助手，支持多种编程任务 |
-| ⚡ **OpenCode** | 手动加载 SKILL.md | 手动更新 | 开源 Agent 平台，灵活可扩展 |
+| 平台 | 安装方式 | 更新方式 | 说明                                         |
+|------|----------|----------|--------------------------------------------|
+| ⚡ **OpenCode** | `git clone` 到 `~/.agents/skills/` | 手动 `git pull` | 强烈推荐，对于本skill多智能体派发编排最适配，开源 Agent 平台，灵活可扩展 |
+| 🤖 **Claude Code** | `/plugin marketplace add` + `/plugin install` | 自动更新（main分支）或手动 `/plugin update` | Anthropic 官方 CLI 工具，原生支持 Skill 机制，推荐使用     |
+| 🔧 **Codex CLI** | `git clone` 到 `~/.agents/skills/` | 手动 `git pull` | OpenAI 代码助手，支持多种编程任务                       |
+
 
 > 💡 **提示**：使用支持 Skill 机制的 Agent 平台可获得最佳体验，其他平台也可通过加载 SKILL.md 文件使用本项目。
 
