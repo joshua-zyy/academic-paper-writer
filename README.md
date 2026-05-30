@@ -341,13 +341,13 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 五个不可跳过的基础关卡：
 
-| Gate | 触发位置 | 核心条件 | 失败处理 |
-|------|---------|---------|---------|
-| 🏛️ **E：Venue 调研** | Step 1 → Step 2 | venue 确认后必须完成 Step 1.5，生成 venue-brief.md | 阻塞，不得进入 Step 2 |
-| 🔬 **A：证据完备** | Step 2 → Step 6 | 至少一条可引用证据 | 降级路径或阻塞 |
-| 📖 **B：引用就绪** | Step 3 → Step 6 | 至少一条 VERIFIED 引用 | Intro/RW 阻塞；Method 可占位 |
-| 🚪 **C：Verification** | Step 6.8 → Step 7 | 所有 debt 闭合 + 内容达标 | passed/blocked/failed |
-| 📚 **D：引用数量** | Step 8 → 输出 | 全文去重引用 >= `min_citations` 篇（默认 35） | 未达标时提醒，可补充后重检 |
+| Gate                  | 触发位置 | 核心条件 | 失败处理 |
+|-----------------------|---------|---------|---------|
+| 🏛️ **A：Venue 调研**    | Step 1 → Step 2 | venue 确认后必须完成 Step 1.5，生成 venue-brief.md | 阻塞，不得进入 Step 2 |
+| 🔬 **B：证据完备**         | Step 2 → Step 6 | 至少一条可引用证据 | 降级路径或阻塞 |
+| 📖 **C：引用就绪**         | Step 3 → Step 6 | 至少一条 VERIFIED 引用 | Intro/RW 阻塞；Method 可占位 |
+| 🚪 **D：Verification** | Step 6.8 → Step 7 | 所有 debt 闭合 + 内容达标 | passed/blocked/failed |
+| 📚 **E：引用数量**         | Step 8 → 输出 | 全文去重引用 >= `min_citations` 篇（默认 35） | 未达标时提醒，可补充后重检 |
 
 跨 skill 之间通过显式 **数据契约** 交换信息：
 
