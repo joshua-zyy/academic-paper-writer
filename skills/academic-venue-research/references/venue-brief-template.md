@@ -11,6 +11,8 @@
 - Official Source: {官方页面 URL}
 - Language: {语言} [User Config]
 - Min Citations: {预期引用数} [User Config]
+- Fetch Timestamp: {YYYY-MM-DD HH:MM 或 Unknown}
+- Source Confidence: high / medium / low
 
 ## 投稿要求
 
@@ -19,6 +21,8 @@
 - Template: {模板要求}
 - Anonymous Review: {是否双盲}
 - Citation Format: {引用格式}
+- Figure/Table Constraints: {图表数量、格式、分辨率、补充材料约束}
+- Reproducibility / Artifact Expectations: {代码、数据、模型、补充材料要求}
 - Appendix Policy: {附录政策}
 - File Format: {文件格式要求}
 - Other Requirements: {其他特殊要求}
@@ -69,6 +73,8 @@
 | Anonymous Review | VERIFIED / Unknown | {URL 或 agent_knowledge (unverified)} |
 | Citation Format | VERIFIED / Unknown | {URL 或 agent_knowledge (unverified)} |
 | Appendix Policy | VERIFIED / Unknown | {URL 或 agent_knowledge (unverified)} |
+| Figure/Table Constraints | VERIFIED / Unknown | {URL 或 agent_knowledge (unverified)} |
+| Reproducibility / Artifact Expectations | VERIFIED / Unknown | {URL 或 agent_knowledge (unverified)} |
 ```
 
 ---
@@ -85,6 +91,9 @@
 - **Appendix Policy**：附录政策（如 "允许附录，不计入页数限制"）
 - **File Format**：PDF/A、文件大小限制等（如 "PDF 格式，不超过 10MB"）
 - **Other Requirements**：其他特殊要求（如 "需要 Data Availability Statement"）
+- **Source Confidence**：基于来源层级给出 high / medium / low。官方 guidelines/CFP/模板为 high，已录用论文观察为 medium，agent_knowledge 为 low 且必须标 unverified。
+- **Figure/Table Constraints**：图表尺寸、格式、分辨率、补充材料、caption 或 source data 要求。
+- **Reproducibility / Artifact Expectations**：代码、数据、模型、附录、rebuttal checklist 或 artifact 相关要求。
 
 ### 写作风格备注部分
 

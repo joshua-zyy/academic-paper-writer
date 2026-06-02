@@ -1,4 +1,4 @@
-# 路径 A: chart-from-data 工作流
+# chart-from-data 工作流
 
 ## 入口
 

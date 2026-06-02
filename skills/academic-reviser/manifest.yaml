@@ -1,0 +1,41 @@
+name: academic-reviser
+description: >
+  Declarative routing manifest for evidence-first draft review, verification,
+  targeted evidence checks, cross-section consistency checks, and optional mock
+  reviewer packages.
+
+always_load:
+  - references/revision-checklist.md
+  - references/verification-status.md
+
+axes:
+  mode:
+    detect: |
+      Use explicit user mode first. A single section draft maps to
+      full-section-review. Multiple sections or consistency language maps to
+      cross-section-review. Verdict-only requests map to verification-only.
+      Citation/evidence-only requests map to targeted-evidence-mode. Simulated
+      reviewer or pre-submission critique requests map to mock-reviewer-package.
+    values:
+      full-section-review: references/revision-checklist.md
+      cross-section-review: references/revision-checklist.md
+      verification-only: references/verification-status.md
+      targeted-review: references/revision-checklist.md
+      targeted-evidence-mode: references/verification-checklists.md
+      mock-reviewer-package: references/reviewer-package.md
+    multi: false
+
+references:
+  on_demand:
+    - condition: three-round evidence, argument, and style review
+      path: references/revision-checklist.md
+    - condition: verdict and debt status output
+      path: references/verification-status.md
+    - condition: section critique output formatting
+      path: references/templates/section-critique.md
+    - condition: verification report schema
+      path: references/schemas/verification-report.md
+    - condition: self-deception and common review pitfalls
+      path: references/common-pitfalls.md
+    - condition: optional mock reviewer package
+      path: references/reviewer-package.md

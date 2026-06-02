@@ -372,7 +372,7 @@ Draft v1 生成后，**必须**立即将正文内容写入 `./docs/paper-drafts/
 - [ ] **6.4c** 为每个 `[FIGURE_NEEDED]` 建立 Figure Contract
 - [ ] **6.4d** 双路径图表处理（architecture → prompts，data → code）
 - [ ] **6.4e** 追加待补项清单到 Draft 末尾
-- [ ] **6.4f** 报告审计结果（`placeholder_debt`）
+- [ ] **6.4f** 报告审计结果（`placeholder_stats`）
 - [ ] **6.4g** Dispatch 架构图子代理（对每个架构图类占位符）
 - [ ] **6.4h** Dispatch 数据图子代理（对每个数据图类占位符）
 
@@ -445,7 +445,7 @@ After Draft v1, **必须**自动执行以下子步骤：
 ```
 
 ### 6.4f. 报告审计结果
-将占位符统计信息（`placeholder_debt`）纳入 Section Critique，供 Step 6.8 Verification 引用。
+将占位符统计信息（`placeholder_stats`）纳入 Section Critique，供 Step 6.8 Verification 引用。
 
 ### 6.4g. 架构图 dispatch 模板（arch-prompt 模式）
 对架构图类的 `[FIGURE_NEEDED]`，按此模板 dispatch：
@@ -566,7 +566,7 @@ Task:
     Draft: <传入 Draft v1 文本>
     Evidence Map: <传入证据清单>
     Verified References: <传入已核验引用>
-    placeholder_debt: <传入占位符统计>
+    placeholder_stats: <传入占位符统计>
 
      执行步骤:
      1. 读取 skills/academic-reviser/SKILL.md，按 targeted-evidence-mode 执行
@@ -587,7 +587,7 @@ Task:
 
 This is Review Phase 1 (Evidence). Only proceed to Review Phase 2 (Prose Gate) after `evidence_debt = closed`.
 
-Input: Draft v1 text, Evidence Map, Verified References, placeholder_debt from Step 6.4.
+Input: Draft v1 text, Evidence Map, Verified References, placeholder_stats from Step 6.4.
 Output: `evidence_debt` (open|closed), `evidence_issues` list.
 
 If protocol risks from Step 4 materially weaken a claim's support (for example: no independent test set, missing strong baselines, or single-run results used for strong conclusions), keep `evidence_debt = open` for that claim until the text is downgraded, the risk is made explicit, or the claim is frozen/blocked.

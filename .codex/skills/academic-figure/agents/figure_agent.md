@@ -1,19 +1,22 @@
 # Figure Agent
 
 ## Role
-学术论文图表生成代理。三路径产出：
-- **A 路径** — 实验数据图（Python matplotlib/seaborn 生成代码→执行→SVG）
-- **B 路径** — 模型框架图（Codex 调用 image generation→事实核对→PNG/TIFF）
-- **C 路径** — 模型架构图提示词（结构化生图提示词→用户自行生图）
+学术论文图表生成代理。六模式产出：
+- **chart-from-data** — 实验数据图（Python matplotlib/seaborn 生成代码→执行→SVG）
+- **architecture-image** — 模型框架图（Codex 调用 image generation→事实核对→PNG/TIFF）
+- **arch-prompt** — 模型架构图提示词（结构化生图提示词→用户自行生图）
+- **figure-blueprint** — 论文章节的图类型建议列表
+- **figure-audit** — 审查现有 figure 是否满足发表标准
+- **figure-revision** — 修改已有 figure
 
 ## Input Schema
 
 ```yaml
-path: "A" | "B" | "C"                 # [required] 缺失时按路由逻辑推断
-data_source: string | null            # [optional] A 路径需要：CSV/TSV/Numpy 路径
-chart_type: string | null             # [optional] A 路径需要：如 bar, line, heatmap
+mode: "chart-from-data" | "architecture-image" | "arch-prompt" | "figure-blueprint" | "figure-audit" | "figure-revision"  # [required] 缺失时按路由逻辑推断
+data_source: string | null            # [optional] chart-from-data 需要：CSV/TSV/Numpy 路径
+chart_type: string | null             # [optional] chart-from-data 需要：如 bar, line, heatmap
 figure_purpose: string                # [required] 图表在论文中的用途
-architecture_description: string | null # [optional] B/C 路径需要：模型结构、模块、连接、数据流
+architecture_description: string | null # [optional] architecture-image/arch-prompt 需要：模型结构、模块、连接、数据流
 style_preferences:
   color_palette: "academic" | "grayscale" | "custom" | null  # [optional]
   width: "single_column" | "double_column" | null            # [optional]
@@ -22,7 +25,7 @@ style_preferences:
 
 ## Output Schema
 
-### A 路径（实验数据图）
+### chart-from-data（实验数据图）
 
 ```yaml
 python_code: string                   # 可执行的 matplotlib/seaborn 代码
@@ -36,7 +39,7 @@ qa_report:
       details: string
 ```
 
-### B 路径（模型框架图 image）
+### architecture-image（模型框架图 image）
 
 ```yaml
 architecture_contract:
@@ -68,7 +71,7 @@ verification_report:
       details: string
 ```
 
-### C 路径（模型架构图提示词）
+### arch-prompt（模型架构图提示词）
 
 ```yaml
 prompt: string                        # 生图提示词（工具无关描述式语言）。必须包含完整可执行的提示词文本，不得包含引用、占位符或 `[见...]` 类标记
@@ -81,28 +84,30 @@ figure_description:
 
 ## Execution
 
-### 路径路由逻辑
+### 模式路由逻辑
 
 ```yaml
 输入判断:
-  - 用户提供了数据文件或数值 → A 路径（chart-from-data）
-  - 用户描述了模型结构且要求架构图/框架图/overview/模块细节图/顶刊风格图 → B 路径（architecture-image）
-  - 用户描述了模型结构且明确要求 prompt/外部生图工具 → C 路径（arch-prompt）
-  - 用户未提供数据也未提供结构描述 → 询问用户意图
-  - path 字段显式指定 → 按指定路径执行
+  - 用户提供了数据文件或数值 → chart-from-data
+  - 用户描述了模型结构且要求架构图/框架图/overview/模块细节图/顶刊风格图 → architecture-image
+  - 用户描述了模型结构且明确要求 prompt/外部生图工具 → arch-prompt
+  - 用户提供论文章节描述和 claim 清单 → figure-blueprint
+  - 用户提供现有图文件要求审查 → figure-audit
+  - 用户提供现有图和修改要求 → figure-revision
+  - mode 字段显式指定 → 按指定模式执行
 
-B 路径触发条件（path 缺失时自动推断）:
-  满足任一即选 B:
+architecture-image 触发条件（mode 缺失时自动推断）:
+  满足任一即选 architecture-image:
     - figure_purpose 含以下关键词: framework, overview, model architecture, architecture, structure, pipeline, diagram, network, flow
     - figure_purpose 含以下关键词: 模型框架图, 架构图, 模块细节图, 机制图, 顶刊风格, 精美, 投稿图
     - figure_purpose 明确描述模型组件、模块连接或数据流（而非数据对比/性能分析）
     - data_source 为 null 且用户描述指向架构而非实验数据
-  C 路径触发条件（path 缺失时自动推断）:
+  arch-prompt 触发条件（mode 缺失时自动推断）:
     - figure_purpose 含以下关键词: prompt, 生图提示词, 外部生图, Midjourney, DALL-E
-  A 路径触发条件（path 缺失时自动推断）:
+  chart-from-data 触发条件（mode 缺失时自动推断）:
     - data_source 非空且 figure_purpose 指向性能对比/曲线/分布
     - figure_purpose 含以下关键词: comparison, curve, distribution, ablation, training, loss
-  - 均不匹配 → 请求用户明确指定路径
+  - 均不匹配 → 请求用户明确指定模式
 ```
 
 ### QA Contract（内联检查项）
@@ -177,7 +182,7 @@ architecture_image_qa_items:
 ### 独立使用
 本 Agent 不提供独立使用入口。独立图表生成任务请直接使用 `academic-figure` Skill。
 
-## Fallback: Python 运行时不可用（A 路径）
+## Fallback: Python 运行时不可用（chart-from-data 模式）
 
 ```yaml
 运行时检查:
@@ -185,19 +190,19 @@ architecture_image_qa_items:
   - 缺失 → 提供安装命令，不自动 fallback
 
 安装失败或用户拒绝安装:
-  - path_A_full: "generate_code_only"
+  - chart_from_data_full: "generate_code_only"
     action: 只交付可独立运行的 Python 脚本 + CSV 源数据文件
     note: "用户需在本地 Python 环境中执行脚本"
-  - path_A_fallback: "generate_figure_blueprint"
+  - chart_from_data_fallback: "generate_figure_blueprint"
     action: 只输出 figure blueprint（图表类型建议 + 数据映射 + 布局描述）
     note: "用户可参考 blueprint 手动绘图或用其他工具生成"
-  - path_B: 依赖 Codex image generation；若不可用，降级为 C 路径输出 prompt
-  - path_C: 不受影响（提示词路径不依赖运行时）
+  - architecture_image: 依赖 Codex image generation；若不可用，降级为 arch-prompt 输出 prompt
+  - arch_prompt: 不受影响（提示词模式不依赖运行时）
 ```
 
 不阻塞整体流程（safe_to_continue: yes），所有降级路径均能交付可用的输出（代码、blueprint 或提示词）。
 
-### 路径选择优先级
+### 模式选择优先级
 1. 优先尝试 `generate_code_only`（交付代码 + 数据）
 2. 用户明确不需要代码 → `generate_figure_blueprint`
 

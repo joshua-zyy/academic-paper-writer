@@ -200,5 +200,5 @@ Before a section can enter prose polishing, confirm:
 - The required moves for that section are present or explicitly marked as missing.
 - Each strong claim has a citation, artifact, result, figure/table, or placeholder.
 - The section's first and last paragraphs change the reader state in the intended direction.
-- The section does not rely on fluent prose to conceal open evidence, rationale, result, or protocol debt.
+- The section does not rely on fluent prose to conceal open evidence_debt, rationale_debt, result_debt, or protocol_debt.
 - All inline citations use numeric `[1]` format consistently; no author-year citations exist in the prose.

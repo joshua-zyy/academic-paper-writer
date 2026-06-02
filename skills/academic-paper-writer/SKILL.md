@@ -7,6 +7,13 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 将此 skill 视为"证据闭环型、分节推进的论文编排代理"。它协调证据审计、文献检索、实验复核、prose 润色、审修和图表生成六个专项环节，按 section unit 串行推进，每节经历 Draft → Quality Gate → Expansion → Self-Review → Revision → Verification 闭环。
 
+## Router Protocol
+
+1. 读取 `manifest.yaml`，识别 `mode`、`paper_type`、`section` 和 `language`。
+2. 读取 `static/core/stance.md`、`static/core/workflow.md` 和 `static/core/output-contract.md`，建立本次写作的共享约束。
+3. 只在执行到对应步骤时读取 `references/` 中的深层工作流文件，不预加载全部规则。
+4. 子 skill 和 subagent 返回结构化内容；最终 `./docs/paper-drafts/` 写入由本 orchestrator 负责。
+
 ## Step 1 执行清单（Blocking Gate，9 项）
 
 执行 Step 1 时，**必须**按顺序逐项完成。任一未完成不得进入 Step 2。
@@ -133,7 +140,7 @@ Step 1 九项确认清单见 `references/workflow-step-0-4.md`。
 | E: Venue 调研 | Step 1 → Step 2 | venue 确认后必须完成 Step 1.5，生成 venue-brief.md | 阻塞，不得进入 Step 2 |
 | A: 证据完备 | Step 2 → Step 6 | 至少一条可引用证据（`newly_run`/`preexisting_artifact`） | 降级路径或阻塞 |
 | B: 引用就绪 | Step 3 → Step 6 | 至少一条 `VERIFIED` 引用或明确"无需文献" | 按 section 分流，Intro/RW 阻塞，Method 可占位 |
-| C: Verification | Step 6.8 → Step 7 | 所有硬 debt 闭合 + thin_draft = no（figure_debt 为软约束，open 时可 blocked + safe_to_continue） | passed/blocked/failed，详细见 workflow |
+| C: Verification | Step 6.8 → Step 7 | 所有硬 debt 闭合 + thin_draft = no（figure_debt 为软发布债务，open 时不单独阻止当前 section passed） | passed/blocked/failed，详细见 workflow |
 | D: 引用数量 | Step 8 → 输出 | 全文去重后引用总数 >= `min_citations` | 未达标时提醒用户，可继续补充后重检 |
 
 ## 默认交付物
@@ -210,6 +217,9 @@ Agent 定义、dispatch 模板、职责边界见各子 skill 的 `agents/` 目�
 | `references/figure-generation-guide.md` | 图表生成规范（详见 academic-figure） |
 | `references/examples/example-usage.md` | 三个端到端使用场景示例 |
 | `references/standard-todo-template.md` | 标准化 Todo 模板（规则 20 强制执行） |
+| `static/core/stance.md` | 启动本 Skill 后建立全局证据、边界和非编造约束 |
+| `static/core/workflow.md` | 需要 Step 0-9 总览但不需要加载完整 references 时 |
+| `static/core/output-contract.md` | 确认文件输出边界和 orchestrator 写入所有权时 |
 
 ## 不适用场景
 

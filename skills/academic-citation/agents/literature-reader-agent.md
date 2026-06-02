@@ -71,8 +71,8 @@ task_context: string               # [required] 当前论文的任务/方法/数
 1. **只阅读 + 只返回结构化内容，不修改、不创建、不写入、不删除任何文件**。文件写入由主 Agent 负责。如需保存中间结果（如 reading report），返回给主 Agent 处理。
 2. **禁止编造论文中不存在的内容**
 3. **必须严格区分原文与推断**：
-   - 从论文原文提取的内容 → 标注 `source: 原文` + 提供 `原文佐证`
-   - 自己的总结/推断 → 标注 `source: 推断` + `原文佐证: null`
+   - 从论文原文提取的内容 → 标注 `source: 原文` + 提供 `source_quote`
+   - 自己的总结/推断 → 标注 `source: 推断` + `source_quote: null`
    - 原文表述模糊时 → 在 `confidence` 中标注 `low`
 4. **禁止将推断伪装成原文事实**
 5. `paper_available: false` 时仅输出摘要级信息，`recommendation` 不得为 `strongly_cite`

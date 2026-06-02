@@ -1,243 +1,82 @@
 ---
 name: academic-figure
-description: "Create, revise, or audit academic figures for CS/AI/ML papers. Supports publication-ready data plots, high-quality image-generated model architecture figures, and tool-agnostic architecture prompts. Use when: generating model framework images, overview figures, module detail figures, data plots from experiment results, auditing existing figures, suggesting figure types for paper sections, revising figure colors/layouts/labels. Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, 模型框架图, overview figure, model architecture, plot, publication figure, 数据可视化, generate plot, architecture diagram, figure blueprint, 建议图表类型, figure audit, 审查图表, figure revision, 修改图表."
+description: "Create, revise, or audit academic figures for CS/AI/ML papers using Python-only data plotting and structured architecture-figure prompts. Supports publication-ready plots, model framework images, tool-agnostic architecture prompts, figure blueprints, figure audits, and figure revisions. Use when: generating model framework images, overview figures, module detail figures, data plots from experiment results, auditing existing figures, suggesting figure types for paper sections, revising figure colors/layouts/labels. Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, 模型框架图, overview figure, model architecture, plot, publication figure, 数据可视化, generate plot, architecture diagram, figure blueprint, 建议图表类型, figure audit, 审查图表, figure revision, 修改图表."
 ---
 
 # Academic Figure
 
-将此 skill 视为"学术论文图表代理"——负责 CS/AI/ML 论文中三类图表的生产：
+This skill is the CS/AI/ML academic-figure router. It is Python-only for data plots: use Python scripts and matplotlib/seaborn-style outputs for drawing, previewing, exporting, and QA of quantitative figures.
 
-| 路径 | 类型 | 产出方式 |
-|------|------|---------|
-| **A** | 实验数据图（训练曲线、消融实验、性能对比、混淆矩阵等） | Python (matplotlib/seaborn) 生成代码→执行→SVG |
-| **B** | 模型框架图（复杂架构、overview、模块细节图） | Codex 调用 image generation→人工核对→交付 PNG/TIFF |
-| **C** | 架构图提示词（外部生图工具） | 生成结构化生图提示词→用户自行生图 |
+## Routing Protocol
 
-## Red Lines（绝对禁止）
+1. Read `manifest.yaml`.
+2. Read every file in `always_load`: `static/core/stance.md` and `static/core/output-contract.md`.
+3. Select exactly one `mode` from the manifest unless the user explicitly asks for a multi-step package.
+4. Read only the selected mode fragment under `static/fragments/mode/`.
+5. Reach for `references/` only when the selected fragment says the deeper detail is needed.
 
-1. 禁止用虚构数据绘图——必须使用用户提供的实验数据或已核验的证据
-2. 禁止使用彩虹/jet/viridis 等高饱和度非学术色板
-3. 禁止在无 error bar 或统计信息时用强视觉效果暗示不确定性
-4. 禁止在架构图中编造不存在的网络结构、模块连接或数据流
-5. 实验数据图禁止输出仅 PNG 位图——必须提供可编辑矢量格式（SVG）；模型框架图若为 image-generated，必须同时交付 prompt、contract、caption 与核对报告
-6. 禁止在生图提示词中包含无法实现的渲染细节（如"完美 3D 透视"）
-7. 禁止跳过 QA Contract
-8. 禁止把 image-generated 架构图当作未经核对的最终事实图；必须列出人工核对项
+## Modes
 
-## AI 介入边界（Traffic Light）
+| Mode | Use when |
+|---|---|
+| `chart-from-data` | The user provides data files or numeric results and needs a publication plot. |
+| `architecture-image` | The user provides model structure and wants a framework/overview/module image. |
+| `arch-prompt` | The user wants a tool-agnostic architecture image prompt. |
+| `figure-blueprint` | The user wants figure suggestions for a paper section. |
+| `figure-audit` | The user wants an existing figure reviewed for publication readiness. |
+| `figure-revision` | The user wants an existing figure revised. |
 
-| 🟢 Green — 直接执行 | 🟡 Yellow — 谨慎执行 | 🔴 Red — 禁止 |
-|---------------------|---------------------|-------------|
-| 从数据文件自动选择坐标范围 | 自动预设显著性水平（需确认用户预期） | 编造数据或网络结构 |
-| 应用配色规则（学术色板、字体） | 猜测缺失的统计数据 | 输出最终出版版本未经 review |
-| 添加 panel label (a/b/c/d) | 自动选择图类型（含糊请求须确认） | 用 3D 柱状图替代 2D |
-| 标准布局排版与对齐 | 将多张分离图表合为 multi-panel | 使用色盲不友好的配色 |
-| 检测缺失依赖包并提示安装 | 对架构图推测缺失的模块 | 把占位图当作最终输出 |
+If the request is ambiguous, choose the smallest mode that satisfies the user request and ask one concise clarification only when data source, architecture evidence, or target use is missing.
 
-## 非协商规则
+## Red Lines
 
-1. 图表必须服务 claim，不得为"好看"而堆砌视觉效果。
-2. 每个 panel 必须回答一个独特问题，不得出现冗余面板。
-3. 坐标轴从非零起点时必须标注截断标记，不得静默缩放。
-4. 误差棒 / 置信区间必须标注含义（std / SEM / 95% CI），不得只画不解释。
-5. 配色不得依赖纯色相作为唯一区分方式——必须结合亮度差、纹理或标注。
-6. 实验数据图的 SVG 输出必须是文字可编辑格式，不得将所有文字渲染为 path。
-7. 源数据（CSV/TSV）必须与图表同时交付，不得只给图片。
-8. 架构图提示词必须是工具无关的描述式语言，不得内嵌特定工具参数（--ar、--style 等）。
-9. 模型框架图必须严格来自用户提供的模型结构、论文草稿或代码证据；缺失连接必须标为待确认，不得补画。
+1. Do not invent data, experiment results, model modules, architecture connections, losses, datasets, or training flows.
+2. Do not use high-saturation rainbow-style palettes or visual effects that imply certainty without statistics.
+3. Do not deliver data plots without an editable vector output, preferably SVG.
+4. Do not treat image-generated architecture figures as factual final figures without an Architecture Contract and human-verifiable checklist.
+5. Do not overwrite source data or project code. Create new scripts or output files only for figure delivery.
 
-## 任务模式
+## Reference Loading
 
-| Mode | 用途 |
-|------|------|
-| `chart-from-data` | 给定实验数据和图表类型，出实验数据图（Python 代码生成 + 执行） |
-| `architecture-image` | 给定模型结构描述，生成顶刊风格模型框架图片 |
-| `arch-prompt` | 给定模型结构描述，出外部生图工具可用的架构图提示词 |
-| `figure-blueprint` | 给定论文章节，建议需要哪些图和对应图表类型 |
-| `figure-audit` | 审查现有 figure 是否符合发表标准 |
-| `figure-revision` | 修改已有 figure（换色、调布局、加标注、修改风格） |
+| Reference | Open when |
+|---|---|
+| `references/figure-contract.md` | Building Figure Contract or Architecture Contract. |
+| `references/workflow-chart-from-data.md` | Executing `chart-from-data`. |
+| `references/workflow-architecture-image.md` | Executing `architecture-image`. |
+| `references/workflow-arch-prompt.md` | Executing `arch-prompt`. |
+| `references/qa-contract.md` | Before final delivery, audit, or revision. |
+| `references/api.md` | Writing Python plotting code. |
+| `references/chart-types.md` | Choosing chart type. |
+| `references/design-theory.md` | Color, layout, typography, and export rationale. |
+| `references/nature-style-chart-patterns.md` | Dense, high-impact multi-panel plot patterns. |
+| `references/architecture-prompting.md` | Architecture prompt wording. |
+| `references/tutorials.md` | End-to-end examples are needed. |
 
-若用户请求含糊，优先选择最小满足需求的 mode。
+## Agent Resource
 
-## 工作流
+`agents/figure_agent.md` contains the delegated figure-agent contract. In orchestrated use, the agent returns figure artifacts, scripts, prompts, and reports; it must not independently edit project source code or experimental data.
 
-### 入口分流
+## Completion Criteria
 
-```
-用户请求 → 判断图类型
-  ├─ 实验数据图 → chart-from-data 模式
-  ├─ 模型架构图 / framework / overview / 模块细节图 → architecture-image 模式
-  └─ 模型架构图 + 用户明确要外部生图工具提示词 → arch-prompt 模式
-
-自动触发：academic-paper-writer 的 Step 6.4 在 Draft v1 完成后，会自动扫描正文中的 [FIGURE_NEEDED] 占位符，
-对架构图类占位符默认以 architecture-image 模式调用本 Skill；若模型结构证据不足，则输出待确认清单并降级为 arch-prompt 或 `[FIGURE_NEEDED]`。
-```
-
-### 路径 A — chart-from-data（实验数据图）
-
-详见 `references/workflow-chart-from-data.md`。核心步骤：确认用途 → 选择图表类型 → Figure Contract → 检查运行时 → 生成代码 → 执行导出 → QA Contract → 交付。
-
-### 路径 B — architecture-image（模型框架图）
-
-详见 `references/workflow-architecture-image.md`。核心步骤：Architecture Contract → Prompt Spec → image generation → 视觉/事实核对 → 交付。
-
-### 路径 C — arch-prompt（模型架构图提示词）
-
-详见 `references/workflow-arch-prompt.md`。核心步骤：确认模型结构 → 选择提示词模板 → 生成结构化提示词 → 输出 + 使用说明。
-
-### figure-blueprint 模式
-
-**Step 1**：确认论文上下文（章节结构、venue 图表惯例）。
-**Step 2**：扫描章节，识别可图示化内容（方法流程→架构图，实验结果→训练曲线/对比图，分析→分布图/散点图）。
-**Step 3**：输出建议清单（图类型、对应章节、核心 claim、数据来源、是否已有数据覆盖）。
-
-### figure-audit 模式
-
-**Step 1**：确认审查范围（单张图或全文所有图）。
-**Step 2**：逐项执行 QA（详见 `references/qa-contract.md`）：核心结论、配色、可读性、统计信息、SVG 可编辑性、坐标轴伦理。
-**Step 3**：输出审查报告（Figure、Verdict、Passed items、Failed items、Risk flags）。
-
-### figure-revision 模式
-
-**Step 1**：确认修改目标（文件路径、修改内容）。
-**Step 2**：判断可执行路径（有脚本→修改重跑，仅有图片→简单调整，架构图→修改提示词）。
-**Step 3**：执行修改 → QA → 交付。
-
-## 默认交付物
-
-### chart-from-data
-1. Figure Contract
-2. Python 绘图脚本
-3. 源数据文件
-4. SVG
-5. QA 报告
-
-### arch-prompt
-1. 架构分析说明
-2. 生图提示词（通用格式）
-3. 使用说明
-
-### architecture-image
-1. Architecture Contract
-2. Image Prompt Spec
-3. PNG / TIFF 图片
-4. 图注草稿
-5. 事实核对清单与风险提示
-
-### figure-blueprint
-1. 针对当前章节的图类型建议列表
-2. 每个建议图的核心 claim 与数据需求
-
-### figure-audit
-1. QA 判定清单（pass / fail per item）
-2. 具体问题列表与修改建议
-
-## Agent 资源
-
-本 Skill 目录下的 `agents/` 文件夹包含以下辅助文件：
-
-| 文件 | 用途 |
-|------|------|
-| `agents/figure_agent.md` | 图表类型选择与生成规范 |
-
-**使用方式**：由 `academic-paper-writer` 核心编排器在 Step 6.4 委托时，按 `academic-paper-writer/references/workflow-step-5-6.5.md` 中的 dispatch 模板创建工具型子代理执行。**此 agent 只生成图表，绝对不得修改项目源代码、配置文件或数据文件，也不得独立撰写论文正文**。
-
-## 独立使用
-
-当本 Skill 被独立加载（不通过 `academic-paper-writer` 编排器）时：
-
-### 典型请求
-- "帮我根据这个 CSV 画一个性能对比柱状图"
-- "帮我画一个顶刊风格的模型框架图"
-- "生成一个双分支 Transformer 的架构图提示词"
-- "看看我这张图能不能直接投稿"
-- "建议一下我 Method 部分需要什么图"
-
-### 入口分流
-
-| 用户输入特征 | 匹配模式 | 优先级 | 行为 |
-|------------|---------|--------|------|
-| 提供数据文件（CSV/TSV） | chart-from-data | 2（文件特征触发） | A 路径：类型选择 → Contract → 代码 → QA → SVG |
-| 描述模型结构并要求画图/框架图/overview/模块细节图/顶刊风格图 | architecture-image | 2（内容特征） | B 路径：Contract → Prompt Spec → image generation → 核对 |
-| 描述模型结构并明确要提示词/prompt/外部生图 | arch-prompt | 3（内容特征） | C 路径：分析架构 → 生成提示词（工具无关） |
-| 提供论文章节描述 | figure-blueprint | 4（需询问） | 分析可图示化内容 → 输出建议 + 数据需求 |
-| 提供现有图文件 | figure-audit | 1（用户显式指定） | QA 检查 → 审查报告 |
-| 提供现有图 + 修改要求 | figure-revision | 1（用户显式指定） | 判断可执行路径 → 修改 → QA |
-| 指定路径字段 `path: "A"` / `"B"` / `"C"` | 按指定 | 0（最高） | 忽略自动推断，按指定路径执行 |
-
-### 执行约束
-- 开始前必须确认：图表用途（支撑哪个 claim）、数据来源（如有）、目标 venue 图表规范
-- A 路径必须经过 QA Contract（8 项）方可交付，最多 2 轮
-- B 路径必须先建立 Architecture Contract，再调用 image generation；不得直接凭审美生成
-- B 路径不得编造模块、连接、损失函数、输入输出或训练流程；不确定项保留 `[VERIFY_ARCH: ...]`
-- B 路径中复杂文字应转为编号、短标签或图例；详细解释放入 caption，避免 image model 生成长文本
-- C 路径提示词不得包含特定工具参数（`--ar`、`--style` 等）
-- Python 运行时不可用时按 Fallback 降级（见 figure_agent.md）
-- 实验数据图优先输出 SVG 矢量格式；模型框架图输出 PNG/TIFF 并保存 prompt 与核对清单
-
-### 组合使用指引
-| 场景 | 推荐方式 |
-|------|---------|
-| 只需生成单张图 | 本 Skill（独立） |
-| 起草论文时自动补全 [FIGURE_NEEDED] | academic-paper-writer 编排器（Step 6.4） |
-| 需在不同 section 保持风格统一 | 先独立生成所有图，再由编排器整合 |
-
-## 何时读取 references/
-
-| Reference 文件 | 打开条件 |
-|---------------|---------|
-| `references/api.md` | chart-from-data 模式的 Step 5（代码生成） |
-| `references/chart-types.md` | chart-from-data 模式的 Step 2（类型选择） |
-| `references/design-theory.md` | 所有涉及配图输出的场景（全局规范） |
-| `references/nature-style-chart-patterns.md` | chart-from-data 模式中需要顶刊式布局、hero panel、legend panel、消融 ladder 或密集多面板图时 |
-| `references/architecture-prompting.md` | arch-prompt 模式（架构图提示词生成） |
-| `references/workflow-architecture-image.md` | architecture-image 模式（调用 image generation 生成模型框架图） |
-| `references/figure-contract.md` | chart-from-data 模式的 Step 3 |
-| `references/qa-contract.md` | chart-from-data 的 Step 7 / architecture-image 的事实核对 / figure-audit 的 Step 2 |
-| `references/tutorials.md` | 用户需要端到端参考示例时 |
-
-## 终止条件
-
-图表视为完成（可交付）须满足：
-
-### chart-from-data
-- 所有 QA 项 pass
-- SVG 文字可编辑验证通过
-- 源数据文件已随图交付
-- 统计信息（误差棒含义、样本量、检验方法）已在图注中说明
-
-### arch-prompt
-- 提示词覆盖了核心组件、数据流、配色、标注
-- 无特定生图工具的硬编码参数
-- 提示词中无虚构的模块或连接
-
-### architecture-image
-- 图片生成前已完成 Architecture Contract
-- 所有模块、连接、输入输出均来自 Contract 或明确标记为待确认
-- 复杂文字未直接压入图片主体，正文解释转入 caption 或图例
-- 输出含生成 prompt、图片文件、图注草稿与人工核对清单
-
-### figure-audit
-- 所有审查项已完成判定
-- Failed items 含具体修改建议
-
-### figure-blueprint
-- 每个建议的图表都有对应的 claim 和数据来源说明
-- 无建议出不可执行的图表（如缺数据）
-
-## 不适用场景
-
-- 非学术文体的通用商业图表
-- 需要交互式绘图（Plotly、Bokeh、D3.js）
-- 已有 Adobe Illustrator / TikZ 完成图且无需修改
-- 仅需数据统计汇报（EDA 图），无发表目标
+- `chart-from-data`: QA passes, Figure Contract, Python script, source data, editable SVG, and QA report are delivered.
+- `architecture-image`: Architecture Contract, prompt spec, generated image path or prompt fallback, caption draft, and verification checklist are delivered.
+- `arch-prompt`: Tool-agnostic prompt covers components, data flow, labels, visual hierarchy, and unconfirmed items.
+- `figure-audit`: Every QA item has pass/fail status and concrete remediation.
+- `figure-blueprint`: Every suggested figure maps to a paper claim and data/evidence source.
+- `figure-revision`: Revised artifact or revised instructions, QA report, and unchanged evidence traceability.
 
 ## Anti-Patterns
 
-| 模式 | 问题 | 正确做法 |
-|------|------|---------|
-| 美观优先 | 用彩虹/jet 色板使图表"好看" | 灰度安全色调 + 简洁明晰的学术风格 |
-| 无 QA 出图 | 代码跑通就直接交付用户 | 必须经过 QA Contract：可读性、数据一致性、格式合规 |
-| 硬编码路径 | 图中路径写死开发者本地路径 | 使用相对路径或参数化配置 |
-| 虚构架构 | 生图提示词中包含不存在的模块连接 | 架构描述必须与代码/论文中的模块定义一致 |
-| 未经核对的 image 架构图 | 图片看起来精美但模块或箭头可能不真实 | Contract 先行，生成后逐项核对模块、连接与文字 |
+| Pattern | Problem | Correct |
+|---|---|---|
+| Aesthetics first | Using rainbow/jet palettes to make charts "look good" | Grayscale-safe restrained academic palette |
+| No QA delivery | Code runs → delivery without review | QA Contract required: readability, data consistency, format compliance |
+| Invented architecture | Prompts include non-existent module connections | Architecture from code/paper evidence only; unconfirmed items marked |
+| Delivering unchecked generated images | Image looks professional but modules/arrows may be wrong | Contract first, verify module-by-module after generation |
+
+## Out of Scope
+
+- Non-academic commercial charts
+- Interactive plotting (Plotly, Bokeh, D3.js)
+- Adobe Illustrator / TikZ completed figures that need no modification
+- EDA-only statistics reporting without publication target

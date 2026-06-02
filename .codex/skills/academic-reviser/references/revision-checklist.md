@@ -97,4 +97,4 @@
 - [ ] 模块段首是否直接落在"该模块解决什么问题"
 - [ ] 是否遗漏训练 / 推理中的关键实现细节
 - [ ] 是否把审查备注错误写进 Paper Body
-- [ ] 是否仍存在未闭合的 [RATIONALE_NEEDED: ...] 或 rationale debt
+- [ ] 是否仍存在未闭合的 [RATIONALE_NEEDED: ...] 或 rationale_debt

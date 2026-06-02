@@ -20,6 +20,7 @@ import os
 import sys
 import time
 from pathlib import Path
+from typing import Optional
 
 try:
     from markitdown import MarkItDown
@@ -31,7 +32,7 @@ except ImportError:
     sys.exit(1)
 
 
-def convert_pdf_to_md(md_converter: MarkItDown, pdf_path: Path, md_path: Path) -> str | None:
+def convert_pdf_to_md(md_converter: MarkItDown, pdf_path: Path, md_path: Path) -> Optional[str]:
     md_path.parent.mkdir(parents=True, exist_ok=True)
     result = md_converter.convert(str(pdf_path))
     text = result.text_content

@@ -6,7 +6,7 @@
 ## Input Schema
 
 ```yaml
-mode: "full_section" | "targeted_evidence" | "verification_only" | "cross_section"  # [required] 默认为 full_section
+mode: "full-section-review" | "cross-section-review" | "verification-only" | "targeted-review" | "targeted-evidence-mode" | "mock-reviewer-package"  # [required]
 section: string                         # [required] 当前 section 名称
 draft: string                           # [required] 待审查的草稿文本
 evidence_map:
@@ -18,9 +18,13 @@ evidence_map:
       verification_status: "verified" | "unverified" | "blocked"
 preceding_status:
   prose_debt: "open" | "closed"
+  section_contract_debt: "open" | "closed"
   citation_debt: "open" | "closed"
   evidence_debt: "open" | "closed"
   figure_debt: "open" | "closed"
+  protocol_debt: "open" | "closed"
+  result_debt: "open" | "closed"
+  rationale_debt: "open" | "closed"
   thin_draft: boolean
   frozen_claims:
     - claim: string
@@ -47,6 +51,9 @@ verification_report:
   citation_debt: "open" | "closed"
   evidence_debt: "open" | "closed"
   figure_debt: "open" | "closed"
+  protocol_debt: "open" | "closed"
+  result_debt: "open" | "closed"
+  rationale_debt: "open" | "closed"
   section_contract_debt: enum         # open / closed
   thin_draft: boolean
   frozen_claims:

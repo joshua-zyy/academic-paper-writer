@@ -1,4 +1,4 @@
-# 路径 C: arch-prompt 工作流
+# arch-prompt 工作流
 
 ## 入口
 

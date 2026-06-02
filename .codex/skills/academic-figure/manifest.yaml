@@ -1,0 +1,53 @@
+name: academic-figure
+description: >
+  Declarative routing manifest for Python-only academic figure work. SKILL.md
+  uses this file to load the shared figure stance, output contract, one mode
+  fragment, and deeper references only when needed.
+
+always_load:
+  - static/core/stance.md
+  - static/core/output-contract.md
+
+axes:
+  mode:
+    detect: |
+      Select the smallest mode that satisfies the request. Use an explicit user
+      mode if provided. Data files or numeric results imply chart-from-data.
+      Model structure plus a request to draw implies architecture-image.
+      A request for an external image prompt implies arch-prompt. Existing
+      figure files plus critique language imply figure-audit; existing figures
+      plus requested edits imply figure-revision. Section-level figure planning
+      implies figure-blueprint.
+    values:
+      chart-from-data: static/fragments/mode/chart-from-data.md
+      architecture-image: static/fragments/mode/architecture-image.md
+      arch-prompt: static/fragments/mode/arch-prompt.md
+      figure-blueprint: static/fragments/mode/figure-blueprint.md
+      figure-audit: static/fragments/mode/figure-audit.md
+      figure-revision: static/fragments/mode/figure-revision.md
+    multi: false
+
+references:
+  on_demand:
+    - condition: build a Figure Contract or Architecture Contract
+      path: references/figure-contract.md
+    - condition: execute Python data plotting workflow
+      path: references/workflow-chart-from-data.md
+    - condition: generate or verify model architecture image workflow
+      path: references/workflow-architecture-image.md
+    - condition: generate tool-agnostic architecture prompt
+      path: references/workflow-arch-prompt.md
+    - condition: write Python plotting code
+      path: references/api.md
+    - condition: select chart type
+      path: references/chart-types.md
+    - condition: final delivery, audit, or revision QA
+      path: references/qa-contract.md
+    - condition: color, typography, layout, and export rationale
+      path: references/design-theory.md
+    - condition: dense multi-panel or high-impact layout pattern
+      path: references/nature-style-chart-patterns.md
+    - condition: architecture prompt wording details
+      path: references/architecture-prompting.md
+    - condition: user needs an end-to-end example
+      path: references/tutorials.md

@@ -1,0 +1,77 @@
+name: academic-paper-writer
+description: >
+  Declarative routing manifest for the academic-paper-writer orchestrator. The
+  orchestrator keeps the existing Step 0-9 workflow and loads only the core
+  stance, workflow summary, output contract, and step references needed for the
+  current request.
+
+always_load:
+  - static/core/stance.md
+  - static/core/workflow.md
+  - static/core/output-contract.md
+
+axes:
+  mode:
+    detect: |
+      Use explicit user intent first. Full paper or from-scratch requests map
+      to full-paper-planning. Single section drafting maps to section-drafting.
+      Existing draft edits map to section-revision. Citation-only and
+      experiment-only requests pass through to the corresponding sub-skill.
+    values:
+      full-paper-planning: references/orchestration-workflow.md
+      section-drafting: references/workflow-step-5-6.5.md
+      section-revision: references/workflow-step-6.6-9.md
+      related-work-or-citation-pass: references/workflow-step-0-4.md
+      experiment-evidence-pass: references/workflow-step-0-4.md
+    multi: false
+  paper_type:
+    detect: |
+      Determine from user input or target venue. Default to research when not
+      specified. Keep existing paper type semantics in references/paper-types.md.
+    values:
+      research: references/paper-types.md
+      methods: references/paper-types.md
+      algorithmic: references/paper-types.md
+      review: references/paper-types.md
+    multi: false
+  section:
+    detect: |
+      Detect requested section from user wording or current section queue.
+      Load section contracts when drafting or revising a section.
+    values:
+      abstract: references/section-writing-contracts.md
+      introduction: references/section-writing-contracts.md
+      related-work: references/section-writing-contracts.md
+      method: references/section-writing-contracts.md
+      experiments: references/section-writing-contracts.md
+      discussion: references/section-writing-contracts.md
+      conclusion: references/section-writing-contracts.md
+    multi: true
+  language:
+    detect: |
+      Use the user's requested writing language. If unspecified, ask during
+      Step 1 as part of the existing context confirmation gate.
+    values:
+      en: references/writing-guidelines.md
+      zh: references/writing-guidelines.md
+      zh-to-en: references/writing-guidelines.md
+    multi: false
+
+references:
+  on_demand:
+    - condition: complete orchestrator workflow, dispatch templates, and shared inputs
+      path: references/orchestration-workflow.md
+    - condition: Step 0-4 execution and venue setup
+      path: references/workflow-step-0-4.md
+    - condition: Blueprint and Step 6.0-6.5 execution
+      path: references/workflow-step-5-6.5.md
+    - condition: Step 6.6-9 execution and final gates
+      path: references/workflow-step-6.6-9.md
+    - condition: section-specific required moves and reader-state transitions
+      path: references/section-writing-contracts.md
+    - condition: default section queue
+      path: references/paper-structure.md
+    - condition: placeholder rules
+      path: references/placeholder-guide.md
+    - condition: evidence type semantics
+      path: ../shared/core/evidence-policy.md

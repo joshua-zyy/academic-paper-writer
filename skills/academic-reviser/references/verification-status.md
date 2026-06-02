@@ -26,6 +26,9 @@
 - citation_debt: open / closed
 - evidence_debt: open / closed
 - figure_debt: open / closed
+- protocol_debt: open / closed
+- result_debt: open / closed
+- rationale_debt: open / closed
 - thin_draft: yes / no
 - Checks performed:
 - Remaining issues:
@@ -55,8 +58,8 @@
 - 未核验内容被清楚标记
 - 结果、表格、摘要相互一致
 - 核心章节不再只是骨架式短稿（thin_draft = no）
-- 无未闭合的硬 debt：citation debt、evidence debt、protocol debt、result debt、section_contract_debt、rationale debt、prose debt
-- figure debt 为软约束：open 时 verdict 不得为 passed，但可 blocked + safe_to_continue = yes
+- 无未闭合的硬 debt：citation_debt、evidence_debt、protocol_debt、result_debt、section_contract_debt、rationale_debt、prose_debt
+- figure_debt 为软发布债务：open 时不单独阻止当前 section passed，但必须记录到最终图表生成、Step 9 或外部阻塞清单
 
 ### failed
 
@@ -103,13 +106,13 @@
 
 | debt 类型 | 含义 | 影响 |
 |-----------|------|------|
-| citation debt | 需要文献支撑的段落缺少 inline citation 或 [REF_NEEDED] | passed 失效 |
-| evidence debt | 存在无证据支撑的 claim 或 [RESULT_UNVERIFIED] | passed 失效 |
-| figure debt | 存在未替换的 [FIGURE_NEEDED] 或 [TABLE_NEEDED] | 软约束，可 safe_to_continue |
-| protocol debt | 实验协议细节不可确认或混入领域默认值 | passed 失效 |
-| result debt | 缺实验结果、表格或指标 | passed 失效 |
-| section contract debt | 缺少对应 section 的 required moves、reader-state 转换或 evidence hooks | passed 失效 |
-| rationale debt | 核心模块缺设计动机/预期收益/边界说明 | passed 失效 |
-| prose debt | 正文仍存在元评论、代码讲解、审稿人对话口吻或 checklist 痕迹 | passed 失效 |
+| citation_debt | 需要文献支撑的段落缺少 inline citation 或 [REF_NEEDED] | passed 失效 |
+| evidence_debt | 存在无证据支撑的 claim 或 [RESULT_UNVERIFIED] | passed 失效 |
+| figure_debt | 存在未替换的 [FIGURE_NEEDED] 或 [TABLE_NEEDED] | 软约束，可 safe_to_continue |
+| protocol_debt | 实验协议细节不可确认或混入领域默认值 | passed 失效 |
+| result_debt | 缺实验结果、表格或指标 | passed 失效 |
+| section_contract_debt | 缺少对应 section 的 required moves、reader-state 转换或 evidence hooks | passed 失效 |
+| rationale_debt | 核心模块缺设计动机/预期收益/边界说明 | passed 失效 |
+| prose_debt | 正文仍存在元评论、代码讲解、审稿人对话口吻或 checklist 痕迹 | passed 失效 |
 
-citation debt、evidence debt、protocol debt、result debt、section contract debt、rationale debt、prose debt 任一存在 → passed 判定失效 → 至少为 failed 或 blocked。figure_debt 为软约束，可标记但允许 safe_to_continue = yes。
+citation_debt、evidence_debt、protocol_debt、result_debt、section_contract_debt、rationale_debt、prose_debt 任一存在 → passed 判定失效 → 至少为 failed 或 blocked。figure_debt 为软约束，可标记但允许 safe_to_continue = yes。

@@ -127,6 +127,145 @@ def _read_if_exists(path: Path) -> str:
     return path.read_text(encoding="utf-8") if path.exists() else ""
 
 
+def _repo_root_from_skills(skills_root: Path) -> Path:
+    return skills_root.resolve().parent
+
+
+def _extract_frontmatter(path: Path) -> dict:
+    content = path.read_text(encoding="utf-8")
+    if not content.startswith("---\n"):
+        return {}
+    end = content.find("\n---", 4)
+    if end == -1:
+        return {}
+    fields = {}
+    for line in content[4:end].splitlines():
+        if ":" not in line or line.startswith(" "):
+            continue
+        key, value = line.split(":", 1)
+        fields[key.strip()] = value.strip()
+    return fields
+
+
+def _manifest_paths_from_text(text: str) -> list:
+    paths = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped.startswith("-"):
+            value = stripped[1:].strip()
+            if value.endswith(".md") or value.endswith(".py") or value.endswith(".yaml"):
+                paths.append(value)
+            continue
+        if ":" in stripped:
+            _, value = stripped.split(":", 1)
+            value = value.strip().strip('"').strip("'")
+            if value.endswith(".md") or value.endswith(".py") or value.endswith(".yaml"):
+                paths.append(value)
+    return paths
+
+
+def check_manifest_links(skills_root: Path) -> list:
+    issues = []
+    manifests = sorted(skills_root.glob("*/manifest.yaml"))
+    if not manifests:
+        return [("WARN", "No skill manifests found")]
+
+    for manifest in manifests:
+        base = manifest.parent
+        for rel in _manifest_paths_from_text(manifest.read_text(encoding="utf-8")):
+            target = base / rel
+            if not target.exists():
+                issues.append(("FAIL", f"{manifest.relative_to(skills_root)} references missing file: {rel}"))
+    if not issues:
+        issues.append(("PASS", f"All {len(manifests)} skill manifest file references exist"))
+    return issues
+
+
+def check_skill_frontmatter(skills_root: Path) -> list:
+    issues = []
+    for skill_md in sorted(skills_root.glob("*/SKILL.md")):
+        fields = _extract_frontmatter(skill_md)
+        keys = set(fields)
+        if keys != {"name", "description"}:
+            issues.append(("FAIL", f"{skill_md.relative_to(skills_root)} frontmatter keys must be exactly name+description, got {sorted(keys)}"))
+    if not issues:
+        issues.append(("PASS", "All SKILL.md frontmatter blocks contain only name and description"))
+    return issues
+
+
+def check_package_noise(skills_root: Path) -> list:
+    repo_root = _repo_root_from_skills(skills_root)
+    roots = [skills_root, repo_root / ".codex" / "skills"]
+    noisy = []
+    for root in roots:
+        if not root.exists():
+            continue
+        noisy.extend(p.resolve() for p in root.rglob("*.pyc"))
+        noisy.extend(p.resolve() for p in root.rglob("__pycache__") if p.is_dir())
+    if noisy:
+        return [("FAIL", "Package noise found: " + ", ".join(str(p.relative_to(repo_root)) for p in noisy))]
+    return [("PASS", "No .pyc or __pycache__ files under skills/ or .codex/skills/")]
+
+
+def check_python_only_figure_policy(skills_root: Path) -> list:
+    figure_root = skills_root / "academic-figure"
+    if not figure_root.exists():
+        return [("WARN", "academic-figure skill not found")]
+    forbidden = ["ggplot2", "patchwork", "ComplexHeatmap", "Rscript", "Python or R"]
+    hits = []
+    for path in figure_root.rglob("*.md"):
+        content = path.read_text(encoding="utf-8", errors="ignore")
+        for token in forbidden:
+            if token in content:
+                hits.append(f"{path.relative_to(skills_root)}:{token}")
+    for path in figure_root.rglob("*.yaml"):
+        content = path.read_text(encoding="utf-8", errors="ignore")
+        for token in forbidden:
+            if token in content:
+                hits.append(f"{path.relative_to(skills_root)}:{token}")
+    if hits:
+        return [("FAIL", "academic-figure contains non-Python backend language: " + ", ".join(hits))]
+    return [("PASS", "academic-figure contains no non-Python backend language")]
+
+
+def check_codex_mirror_drift(skills_root: Path) -> list:
+    repo_root = _repo_root_from_skills(skills_root)
+    codex_root = repo_root / ".codex" / "skills"
+    if not codex_root.exists():
+        return [("WARN", ".codex/skills directory not found")]
+    drift = []
+    missing = []
+    extra = []
+    for source in sorted(skills_root.rglob("*")):
+        if not source.is_file():
+            continue
+        rel = source.relative_to(skills_root)
+        mirror = codex_root / rel
+        if not mirror.exists():
+            missing.append(str(rel))
+        elif source.read_bytes() != mirror.read_bytes():
+            drift.append(str(rel))
+    for mirror in sorted(codex_root.rglob("*")):
+        if not mirror.is_file():
+            continue
+        rel = mirror.relative_to(codex_root)
+        source = skills_root / rel
+        if not source.exists():
+            extra.append(str(rel))
+    issues = []
+    if missing:
+        issues.append(("FAIL", ".codex/skills missing files: " + ", ".join(missing)))
+    if extra:
+        issues.append(("FAIL", ".codex/skills has extra files not in skills/: " + ", ".join(extra)))
+    if drift:
+        issues.append(("FAIL", ".codex/skills content drift: " + ", ".join(drift)))
+    if not issues:
+        issues.append(("PASS", ".codex/skills mirrors matching files under skills/"))
+    return issues
+
+
 def check_min_citations_usage(skills_root: Path) -> list:
     workflow = skills_root / "academic-paper-writer" / "references" / "workflow-step-6.6-9.md"
     content = _read_if_exists(workflow)
@@ -192,13 +331,115 @@ def check_probe_types(skills_root: Path) -> list:
     workflow_content = "\n".join(p.read_text(encoding="utf-8") for p in workflow_dir.rglob("*.md"))
     referenced_types = set(re.findall(r'probe_type:\s*(\w+)', workflow_content))
 
+    unused = defined_types - referenced_types
     undefined = referenced_types - defined_types
     if undefined:
         issues.append(("FAIL", f"Probe types referenced in workflow but not defined in probe-agent.md: {undefined}"))
+    elif unused:
+        issues.append(("PASS", f"All {len(referenced_types)} referenced probe types defined; {len(unused)} defined types unused: {sorted(unused)}"))
     else:
-        issues.append(("PASS", f"All {len(referenced_types)} probe types defined"))
+        issues.append(("PASS", f"All {len(defined_types)} probe types defined and referenced"))
 
     return issues
+
+
+def check_figure_agent_mode_names(skills_root: Path) -> list:
+    paths = [
+        skills_root / "academic-figure" / "agents" / "figure_agent.md",
+        skills_root / "academic-figure" / "references" / "workflow-chart-from-data.md",
+        skills_root / "academic-figure" / "references" / "workflow-arch-prompt.md",
+        skills_root / "academic-figure" / "references" / "workflow-architecture-image.md",
+    ]
+    stale_patterns = [
+        r'A\s*路径', r'B\s*路径', r'C\s*路径',
+        r'path_A', r'path_B', r'path_C',
+        r'"A"\s*\|\s*"B"\s*\|\s*"C"',
+        r'路径 A', r'路径 B', r'路径 C',
+    ]
+    hits = []
+    for path in paths:
+        if not path.exists():
+            continue
+        content = path.read_text(encoding="utf-8")
+        for pattern in stale_patterns:
+            for m in re.finditer(pattern, content):
+                line = content[:m.start()].count('\n') + 1
+                hits.append(f"{path.relative_to(skills_root)}:{line}: {m.group(0)}")
+    if hits:
+        return [("FAIL", "Stale A/B/C path labels in figure agent/workflows: " + ", ".join(hits))]
+    return [("PASS", "Figure agent and workflow references use mode names, not legacy path labels")]
+
+
+def check_debt_schema_completeness(skills_root: Path) -> list:
+    shared = skills_root / "shared" / "schemas" / "verification-report.md"
+    reviser_vs = skills_root / "academic-reviser" / "references" / "verification-status.md"
+    if not shared.exists() or not reviser_vs.exists():
+        return [("WARN", "Cannot check debt completeness — missing shared schema or reviser verification-status")]
+
+    schema_content = shared.read_text(encoding="utf-8")
+    versus_content = reviser_vs.read_text(encoding="utf-8")
+
+    schema_debts = set(re.findall(r'(\w+_debt)', schema_content))
+    versus_debts = set(re.findall(r'\| (\w+_debt)', versus_content))
+
+    missing_in_schema = versus_debts - schema_debts
+    missing_in_versus = schema_debts - versus_debts
+
+    issues = []
+    if missing_in_schema:
+        issues.append(("FAIL", f"Debt types in reviser verification-status but missing from shared schema: {missing_in_schema}"))
+    if missing_in_versus:
+        issues.append(("WARN", f"Debt types in shared schema but missing from reviser verification-status table: {missing_in_versus}"))
+    if not issues:
+        issues.append(("PASS", f"All {len(schema_debts)} shared schema debt types are present in reviser verification-status table"))
+    return issues
+
+
+def check_agent_input_schema_debts(skills_root: Path) -> list:
+    shared = skills_root / "shared" / "schemas" / "verification-report.md"
+    agent = skills_root / "academic-reviser" / "agents" / "reviser_agent.md"
+    if not shared.exists() or not agent.exists():
+        return [("WARN", "Cannot check agent schema — missing files")]
+
+    schema_debts = set(re.findall(r'(\w+_debt)', shared.read_text(encoding="utf-8")))
+    agent_debts = set(re.findall(r'(\w+_debt)', agent.read_text(encoding="utf-8")))
+
+    missing = schema_debts - agent_debts
+    if missing:
+        return [("FAIL", f"Reviser agent input schema missing debt fields from shared schema: {missing}")]
+    return [("PASS", f"Reviser agent input schema covers all {len(schema_debts)} debt fields")]
+
+
+def check_verification_output_template(skills_root: Path) -> list:
+    shared = skills_root / "shared" / "schemas" / "verification-report.md"
+    vs = skills_root / "academic-reviser" / "references" / "verification-status.md"
+    if not shared.exists() or not vs.exists():
+        return [("WARN", "Cannot check output template — missing files")]
+
+    schema_debts = set(re.findall(r'(\w+_debt)', shared.read_text(encoding="utf-8")))
+    vs_content = vs.read_text(encoding="utf-8")
+
+    block_start = vs_content.find("## Verification Status")
+    block_end = vs_content.find("```", vs_content.find("```", block_start) + 3) if block_start >= 0 else -1
+    template_text = vs_content[block_start:block_end] if block_start >= 0 and block_end > block_start else vs_content
+
+    template_debts = set(re.findall(r'-\s+(\w+_debt):', template_text))
+    missing = schema_debts - template_debts
+    if missing:
+        return [("FAIL", f"Verification Status output template missing debt fields: {missing}")]
+    return [("PASS", f"Verification Status output template covers all {len(schema_debts)} debt fields")]
+
+
+def check_citation_hardcoded_threshold(skills_root: Path) -> list:
+    path = skills_root / "academic-citation" / "SKILL.md"
+    if not path.exists():
+        return [("WARN", "academic-citation SKILL.md not found")]
+    content = path.read_text(encoding="utf-8")
+    patterns = ["至少 35 篇", "应达到 35 篇", "< 35 篇", "未达到 35 篇"]
+    found = [p for p in patterns if p in content]
+    if found:
+        return [("FAIL", f"academic-citation SKILL.md has hardcoded citation threshold: {found}")]
+    return [("PASS", "academic-citation SKILL.md uses configurable min_citations")]
 
 
 def main():
@@ -265,6 +506,66 @@ def main():
 
     print("\n9. Probe type consistency:")
     issues = check_probe_types(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n10. Figure agent mode names (no legacy path labels):")
+    issues = check_figure_agent_mode_names(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n11. Debt schema completeness (shared vs reviser):")
+    issues = check_debt_schema_completeness(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n12. Agent input schema debt coverage:")
+    issues = check_agent_input_schema_debts(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n13. Verification output template debt coverage:")
+    issues = check_verification_output_template(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n14. Citation threshold (configurable vs hardcoded):")
+    issues = check_citation_hardcoded_threshold(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n15. Manifest file references:")
+    issues = check_manifest_links(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n16. SKILL.md frontmatter:")
+    issues = check_skill_frontmatter(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n17. Package hygiene:")
+    issues = check_package_noise(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n18. Python-only figure policy:")
+    issues = check_python_only_figure_policy(root)
+    all_issues.extend(issues)
+    for level, msg in issues:
+        print(f"  [{level}] {msg}")
+
+    print("\n19. .codex mirror drift:")
+    issues = check_codex_mirror_drift(root)
     all_issues.extend(issues)
     for level, msg in issues:
         print(f"  [{level}] {msg}")

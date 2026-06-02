@@ -1,0 +1,40 @@
+name: academic-citation
+description: >
+  Declarative workflow manifest for citation search, verification, local
+  literature reading, exemplar construction, and citation-to-claim mapping.
+
+always_load:
+  - references/workflow-citation-pass.md
+
+axes:
+  workflow:
+    detect: |
+      Use explicit user mode first. Section or claim reference search maps to
+      targeted-citation-search unless a full paper or complete section pass is
+      requested. Existing citation lists map to citation-verification. Local MD
+      literature paths map to local-citation-pass. Full-text validation of used
+      citations maps to citation-verification-with-reading. Requests for writing
+      exemplars map to exemplar-set-only.
+    values:
+      full-citation-pass: references/workflow-citation-pass.md
+      targeted-citation-search: references/search-strategy.md
+      exemplar-set-only: references/search-strategy.md
+      citation-verification: references/verification-protocol.md
+      local-citation-pass: references/workflow-citation-pass.md
+      citation-verification-with-reading: references/verification-protocol.md
+    multi: false
+
+references:
+  on_demand:
+    - condition: search query design
+      path: references/search-strategy.md
+    - condition: candidate metadata or claim support verification
+      path: references/verification-protocol.md
+    - condition: citation-to-claim map construction
+      path: references/citation-mapping.md
+    - condition: verified references schema
+      path: references/schemas/verified-references.md
+    - condition: literature reading schema
+      path: references/schemas/literature-reading-report.md
+    - condition: literature reader agent dispatch
+      path: agents/literature-reader-agent.md

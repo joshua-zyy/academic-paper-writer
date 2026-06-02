@@ -7,6 +7,13 @@ description: "Research target venue requirements and writing style for CS/AI/ML 
 
 将此 skill 视为"期刊调研代理"，负责调研目标期刊/会议的投稿要求和写作风格。
 
+## Router Protocol
+
+1. 读取 `manifest.yaml`。
+2. 根据用户请求选择 `full-venue-research`、`requirements-only` 或 `style-only`。
+3. 投稿要求必须优先使用官方来源；已录用论文只能作为风格观察证据。
+4. 编排器调用时返回 Venue Brief Markdown 内容，由主 orchestrator 写入文件。
+
 ## Red Lines（绝对禁止）
 
 1. 禁止编造期刊要求或写作风格信息
@@ -23,6 +30,7 @@ description: "Research target venue requirements and writing style for CS/AI/ML 
 2. **一级证据优先**：官方 CFP、author guidelines、模板说明等一级证据优先于二级证据
 3. **二级证据仅用于风格**：已录用论文仅用于观察写作风格，不能定义 venue 规范
 4. **本地文献库优先**：有本地风格参考文献库时，优先使用本地文献进行风格分析
+5. **来源层级**：官方 guidelines/CFP/模板 > 官方模板说明 > 已录用论文风格观察 > agent_knowledge (unverified)。不得把低层级来源写成高层级要求。
 
 ## 任务模式
 
@@ -85,3 +93,4 @@ description: "Research target venue requirements and writing style for CS/AI/ML 
 | `references/venue-research-workflow.md` | 执行完整调研流程时 |
 | `references/style-analysis-guide.md` | 分析写作风格时 |
 | `references/venue-brief-template.md` | 生成 Venue Brief 时 |
+| `manifest.yaml` | 独立使用时进行 mode 路由 |

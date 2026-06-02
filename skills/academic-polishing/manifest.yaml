@@ -1,0 +1,36 @@
+name: academic-polishing
+description: >
+  Declarative routing manifest for academic prose polishing modes. SKILL.md
+  loads the shared stance and output contract, then reaches for detailed
+  references only for the selected mode.
+
+always_load:
+  - static/core/stance.md
+  - static/core/output-contract.md
+
+axes:
+  mode:
+    detect: |
+      Choose the smallest mode that satisfies the request. General polish maps
+      to prose-quality-gate. AI-style removal maps to de-ai-pass. Claim strength
+      or overclaiming maps to claim-strength-audit. Method narrative repair maps
+      to method-prose-rewrite.
+    values:
+      prose-quality-gate: references/de-ai-patterns.md
+      method-prose-rewrite: references/method-narrative.md
+      de-ai-pass: references/de-ai-patterns.md
+      claim-strength-audit: references/claim-strength.md
+    multi: false
+
+references:
+  on_demand:
+    - condition: AI-style pattern removal or generic prose quality gate
+      path: references/de-ai-patterns.md
+    - condition: overclaiming, claim-strength downgrade, or trigger-word audit
+      path: references/claim-strength.md
+    - condition: Method section narrative repair
+      path: references/method-narrative.md
+    - condition: section-level move diagnosis
+      path: references/section-moves.md
+    - condition: phrase-level support is explicitly requested
+      path: references/phrasebank-playbook.md

@@ -7,6 +7,13 @@ description: "Audit, run, or verify experimental evidence for CS/AI/ML papers. P
 
 将此 skill 视为"实验取证代理"，目标是建立最短且可信的证据链，而不是尽量多跑实验。
 
+## Router Protocol
+
+1. 读取 `manifest.yaml`。
+2. 根据用户请求选择一个最小执行模式：完整审计、仅盘点或最小可复核运行。
+3. 将证据类型语义对齐到 `skills/shared/core/evidence-policy.md`。
+4. 输出 Evidence Inventory 时，为每个结果给出 claim-readiness 分类。
+
 ## Red Lines（绝对禁止）
 
 1. 禁止编造实验结果、图表、命令或运行日志
@@ -74,6 +81,7 @@ description: "Audit, run, or verify experimental evidence for CS/AI/ML papers. P
 - Output Artifacts: （输出文件路径）
 - Metrics Used In Draft: （正文中引用的指标值）
 - Protocol Risks: （见 Step 4）
+- Claim Readiness: paper_ready / weaken_claim / blocked / author_input_needed
 ```
 
 **证据类型标注规则**：
@@ -179,6 +187,7 @@ description: "Audit, run, or verify experimental evidence for CS/AI/ML papers. P
 | `references/evidence-inventory.md` | 执行证据盘点时（Step 1） |
 | `references/run-strategy.md` | 规划运行策略和记录结果时（Step 2-3） |
 | `references/protocol-risks.md` | 评估协议风险时（Step 4） |
+| `skills/shared/core/evidence-policy.md` | 确认证据类型语义时 |
 
 ## 输出数据格式
 

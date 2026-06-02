@@ -11,7 +11,7 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 
 1. 禁止跳过检查顺序：必须证据→论证→风格，不得先修风格再查事实
 2. 禁止输出批评说明后沿用原稿：Revised Draft 必须真正吸收修改点
-3. 禁止在 citation debt / evidence debt / protocol debt / result debt / prose debt 未闭合时判为 passed；figure debt 是最终交付前必须处理的软发布债务，不单独阻止当前 section passed
+3. 禁止在 citation_debt / evidence_debt / protocol_debt / result_debt / prose_debt 未闭合时判为 passed；figure_debt 是最终交付前必须处理的软发布债务，不单独阻止当前 section passed
 4. 禁止删除占位符而不补真实内容
 5. 禁止因草稿篇幅长就假设它足够可信
 6. 禁止用更华丽的写法掩盖内容不足（如 related work 薄用漂亮 prose 包装）
@@ -35,7 +35,18 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
    - 每个 inline citation 是否对应 Verified References 中已核验条目
    - 所有占位符使用是否符合规范（如 [REF_NEEDED] 含方向说明）
    - 是否存在无证据支撑的"裸 claim"
-   输出 evidence_debt (open|closed) + evidence_issues 清单，不允许修改正文。
+    输出 evidence_debt (open|closed) + evidence_issues 清单，不允许修改正文。
+6. **mock-reviewer-package** — 可选的投稿前模拟审稿包。基于同一事实库输出 3 份 reviewer-style reports + cross-review synthesis；不得替代 Verification Status，也不得编造审稿人身份或未提供的证据。
+
+## Bounded Assessment
+
+当执行跨节审查、投稿前模拟审稿或输入材料不完整时，先声明：
+- Input scope：本次看到的是全文、单节、摘要、图注还是用户备注
+- Assessment boundary：哪些问题可判断，哪些因材料不足无法判断
+- Visible evidence base：当前可见的实验证据、引用、图表或方法描述
+- Missing materials：影响置信度的缺失材料，使用 `AUTHOR_INPUT_NEEDED` 或既有占位符标记
+
+不得从常识或审稿习惯推断不存在的实验、引用、行号、图号、审稿人身份或领域专家背景。
 
 ## 工作流
 
@@ -77,7 +88,7 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 **Section Critique** 明确：
 - 本节已解决的问题
 - 本节仍缺的证据
-- 本节是否仍存在 formula-heavy / rationale-thin / prose debt 问题
+- 本节是否仍存在 formula-heavy / rationale-thin / prose_debt 问题
 - 下一节最合理的候选
 
 **Verification Status** 明确：
@@ -128,6 +139,7 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 | 只要求判定（已有自查结果） | verification-only | 1（用户显式指定） | 基于已有信息直接输出 Verdict |
 | 指定检查内容（"只看引用"） | targeted-review | 1（用户显式指定） | 仅执行指定维度的检查 |
 | 要求检查证据合规（"哪些 claim 没证据"） | targeted-evidence-mode | 1（用户显式指定） | 仅输出 evidence_debt 清单，不修改正文 |
+| 要求模拟审稿/投稿前 reviewer package | mock-reviewer-package | 1（用户显式指定） | 输出 3 reviewer reports + cross-review synthesis + unsupported claims |
 
 ### 执行约束
 - 开始前必须确认：审查范围（哪个/哪些 section）、审查模式、是否已有证据清单
@@ -153,6 +165,8 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 | `references/schemas/verification-report.md` | 理解输出数据格式 |
 | `references/templates/section-critique.md` | 组织 Section Critique 输出格式 |
 | `references/verification-checklists.md` | Gate C Verification 的按 section 类型验证检查清单 |
+| `references/reviewer-package.md` | 执行 mock-reviewer-package 模式时 |
+| `references/examples/reviser-output-examples.md` | 需要 Verification Status 或 Section Critique 的完整输出示例时 |
 
 ## 不适用场景
 
@@ -170,7 +184,7 @@ description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical 
 - 结果、表格、摘要相互一致
 - style brief 与正文不冲突（若适用）
 - 核心章节不再只是骨架式短稿
-- 无未闭合的 citation debt、protocol debt、result debt、section_contract_debt、prose debt、rationale debt、evidence debt；figure debt 已记录到最终图表生成或外部阻塞清单
+- 无未闭合的 citation_debt、protocol_debt、result_debt、section_contract_debt、prose_debt、rationale_debt、evidence_debt；figure_debt 已记录到最终图表生成或外部阻塞清单
 
 否则，输出"当前最佳版本 + 未闭合问题清单"。
 

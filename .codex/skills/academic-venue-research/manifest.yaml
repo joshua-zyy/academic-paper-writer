@@ -1,0 +1,30 @@
+name: academic-venue-research
+description: >
+  Declarative mode manifest for venue requirement research, writing-style
+  analysis, and combined Venue Brief generation.
+
+always_load:
+  - references/venue-research-workflow.md
+  - references/venue-brief-template.md
+
+axes:
+  mode:
+    detect: |
+      Use explicit user mode first. A venue without local style papers maps to
+      requirements-only. Local style papers without a requirements request maps
+      to style-only. Venue plus style corpus or full brief request maps to
+      full-venue-research.
+    values:
+      full-venue-research: references/venue-research-workflow.md
+      requirements-only: references/venue-research-workflow.md
+      style-only: references/style-analysis-guide.md
+    multi: false
+
+references:
+  on_demand:
+    - condition: full workflow details
+      path: references/venue-research-workflow.md
+    - condition: style analysis from accepted papers or local literature
+      path: references/style-analysis-guide.md
+    - condition: Venue Brief formatting
+      path: references/venue-brief-template.md

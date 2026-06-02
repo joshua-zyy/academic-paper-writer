@@ -7,6 +7,13 @@ description: "Polish academic prose, de-AI-ify text, control claim strength, or 
 
 将此 skill 视为"学术文体打磨代理"——不是简单润色，而是执行 prose 质量闸门、去AI化改写、claim 强度控制和 Method 专项叙事强化。
 
+## Router Protocol
+
+1. 读取 `manifest.yaml`。
+2. 读取 `static/core/stance.md` 和 `static/core/output-contract.md`。
+3. 根据用户请求选择一个最小满足需求的 `mode`。
+4. 仅在对应模式需要时读取 `references/de-ai-patterns.md`、`references/claim-strength.md` 或 `references/method-narrative.md`。
+
 ## Red Lines（绝对禁止）
 
 1. 禁止将编造内容包装成学术表述
@@ -178,6 +185,8 @@ Prose Quality Gate + Rewrite 循环最多 2 轮。2 轮后仍未通过，保留 
 | `references/de-ai-patterns.md` | 执行去AI化改写、Prose Quality Gate 通用检查时 |
 | `references/claim-strength.md` | 执行 Claim Strength Audit、overclaim 检查或学术风格检查时 |
 | `references/method-narrative.md` | 当前为 Method section、执行 Method Prose Rewrite 时 |
+| `static/core/stance.md` | 启动本 Skill 后确认 evidence-aware polishing 边界 |
+| `static/core/output-contract.md` | 组织输出格式时 |
 | `references/section-moves.md` | 需要按节类型获取 move order、phrase families 或过渡表达参考时 |
 | `references/phrasebank-playbook.md` | 需要证据强度用词替换、过渡词族、gap/limitation/implication 短语参考时 |
 
