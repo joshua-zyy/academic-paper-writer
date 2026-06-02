@@ -199,6 +199,22 @@ Before a section can enter prose polishing, confirm:
 
 - The required moves for that section are present or explicitly marked as missing.
 - Each strong claim has a citation, artifact, result, figure/table, or placeholder.
+- **Verified References 覆盖检查**（强制）：
+  - 该节中 VERIFIED 状态的实际引用数 ≥ 该节的**最低阈值**（硬门禁）：
+    | Section | 最低阈值 | 建议目标（Step 5 预检用） |
+    |---------|---------|--------------------------|
+    | Introduction | ≥5 | 5-8 |
+    | Related Work | ≥8 | 8-15 |
+    | Method | ≥3 | 3-5 |
+    | Experimental Setup | ≥2 | 2-3 |
+    | Main Results | ≥2 | 2-3 |
+    | Ablation | ≥1 | 1-2 |
+    | Discussion | ≥3 | 3-5 |
+    | Conclusion | ≥1 | 1-2 |
+  - Contract Gate 检查最低阈值（不满足则硬阻塞）；Step 5 预检使用建议目标（不满足时触发补充检索但允许继续）
+  - 该节中 `[REF_NEEDED]` 占位符数 ≤ 该节引用总数的 20%（即该节 80% 以上的引用已有 VERIFIED 来源）
+  - 若 `[REF_NEEDED]` 占比 > 20% → 回退到 Step 3b 补充文献，不得继续起草
 - The section's first and last paragraphs change the reader state in the intended direction.
 - The section does not rely on fluent prose to conceal open evidence_debt, rationale_debt, result_debt, or protocol_debt.
 - All inline citations use numeric `[1]` format consistently; no author-year citations exist in the prose.
+- **引用列表约束**：全稿仅维护一份文末引用列表（References section），各节不得单独列出该节引用列表。正文中仅使用 inline citation marker（如 `[1]`, `[2-4]`），不再在各节末尾重复列出参考文献。

@@ -11,7 +11,7 @@
    - `full`：完整调研投稿要求和写作风格
    - `requirements`：仅调研投稿要求
    - `style`：仅调研写作风格
-3. 确认是否有本地风格参考文献库（`local_style_ref_dir`）
+3. 确认是否有本地风格参考文献库 MD 输出目录（`local_style_md_dir`）
 
 ## Step 2: 调研投稿要求
 
@@ -47,20 +47,38 @@
 
 ## Step 3: 调研写作风格
 
-### 3.1 获取论文
+### 3a. 筛选与研究主题最接近的同期论文（强制前置步骤）
 
-**优先级**：
-1. 本地风格参考文献库（`local_style_ref_dir`）
-2. 开放获取论文（通过 webfetch 访问 arXiv、OpenReview 等）
-3. 基于摘要和已知信息进行风格分析
+**输入**: `project_keywords`（5-8 个关键词）、`project_description`（一句话摘要）、`local_style_md_dir`（可选）
 
-### 3.2 分析内容
+1. **从本地风格文献库搜索**（若 `local_style_md_dir` 存在）：
+   - 读取 `<local_style_md_dir>/_index_style.json`
+   - 在每个条目的 `title` 和 `first_500_chars` 字段中匹配 `project_keywords`
+   - 至少匹配 2 个关键词的条目视为候选
+   - 匹配多个关键词的条目优先排序
+2. **从 webfetch 获取**（若无本地风格文献库）：
+   - webfetch 目标期刊最新（近 2 年）论文列表
+   - 通过标题和摘要与 `project_keywords` 进行关键词匹配筛选
+3. 从候选中选择 **3-5 篇最相似的论文**：
+   - 优先：任务相同 + 方法家族相同
+   - 次选：任务相同 + 方法家族不同
+   - 补充：任务不同 + 方法家族相同
+4. 对每篇入选论文标注相似度原因（共享任务/方法/数据集中的哪几项）
+5. 若无法从同期刊找到足够相似论文 → 扩展至同领域顶会/顶刊，标注 `source_venue: different`
 
-详见 `references/style-analysis-guide.md`。
+### 3b. 执行逐节深度风格分析
 
-### 3.3 生成写作风格备注
+对 Step 3a 筛选出的 3-5 篇论文，按 `references/style-analysis-guide.md` 第 6 节执行逐节深度分析：
 
-按照 `references/venue-brief-template.md` 格式生成写作风格备注部分。
+1. Introduction 深度分析：段落级逻辑链、逻辑展开模式、gap 搭建方式、贡献陈述句式、段落过渡规律、高频短语
+2. Related Work 深度分析：工作簇分组逻辑、每簇论述结构、聚类粒度、区别点表达方式
+3. Method 深度分析：公式密度、架构叙事顺序、设计理由表述、模块边界描述、常见记号风格
+4. Experiments 深度分析：实验叙事结构、数据集描述模式、基线选择、结果报告方式、消融设计、解释语言、图表说明风格
+5. Dataset 描述模式（若适用）
+
+### 3c. 生成写作风格备注
+
+按照 `references/venue-brief-template.md` 格式生成写作风格备注部分，包括"逐节风格深度分析" section。
 
 ## Step 4: 生成 Venue Brief
 

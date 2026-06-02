@@ -8,14 +8,29 @@
 ## Input Schema
 
 ```yaml
-markdown_content: string | null    # [required] 论文全文 MD（null 表示无可读全文）。未完成 MD 转换时，也可传入 PDF 路径让 agent 直接读取
+# 单篇模式（独立使用或单篇 dispatch 时）
+markdown_content: string | null    # 论文全文 MD（null 表示无可读全文）
 paper_metadata:
   title: string                     # [required]
   authors: string                  # [required]
   year: integer | null             # [optional]
   venue: string | null             # [optional]
   source: string | null            # [optional] URL 或文件路径
-task_context: string               # [required] 当前论文的任务/方法/数据集描述，帮助判定关联度
+task_context: string               # [required] 当前论文的任务/方法/数据集描述
+
+# 批量模式（Step 3a 批量 dispatch 时，与单篇模式互斥）
+papers:                             # [optional] 批量阅读时的论文列表，每项等价于单篇模式的完整输入
+  - markdown_content: string | null
+    paper_metadata:
+      title: string
+      authors: string
+      year: integer | null
+      venue: string | null
+      source: string | null
+  # ... 每批 ≤3 篇
+task_context: string               # [required] 共享的任务上下文
+
+# 两种模式互斥：papers 与 markdown_content 不同时存在
 ```
 
 ### markdown_content 为 null 时的行为

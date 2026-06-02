@@ -8,16 +8,16 @@
 
 ## Step 1a: 本地文献库优先检索
 
-当配置了 `local_lit_md_dir` 时，在联网检索之前执行：
+当配置了 `local_ref_md_dir` 时，在联网检索之前执行：
 
-1. 读取 `<local_lit_md_dir>/_index.json`，用关键词搜索索引
+1. 读取 `<local_ref_md_dir>/_index_ref.json`，用关键词搜索索引
 2. 命中的候选文献，dispatch `literature-reader-agent` 并行阅读 MD 全文
 3. 每个阅读任务产出 LiteratureReadingReport，包含核心主张、方法概述、关键结果、可引用 claim 列表、关联度评估、引用建议
 4. 主 agent 综合所有报告，决定是否引用及用于何处
 5. 若本地搜索结果充分且内容匹配 → 跳过联网检索
 6. 若不足或不匹配 → 进入 Step 2 联网检索
 
-**并行 dispatch 规则**：当有 2 篇以上候选文献时，**必须并行** dispatch reader agent（同一次消息中发出多个 Task），不得串行等待。
+**并行 dispatch 规则**：当候选文献 ≥3 篇时，**必须并行** dispatch ≥3 个 reader agent（同一次消息中发出多个 Task），不得串行等待。候选文献数 N、agents 数 M = max(3, ceil(N/3))，确保每个 agent 阅读不超过 3 篇文献。候选文献 <3 篇时，全部并行 dispatch（每篇 1 个 agent）。
 
 ## Step 2: 执行多轮检索
 

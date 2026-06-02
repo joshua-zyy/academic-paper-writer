@@ -10,3 +10,4 @@
 8. 在正文没有任何 inline citation 的情况下输出参考文献列表
 9. 把审查备注、元评论、代码讲解口吻混入 Paper Body
 10. **能并行时必须并行**：当 dispatch 模板明确标注"必须并行"时，能并行时必须并行。平台不支持并行时允许串行降级，但必须在输出中标注 `dispatched_sequentially: true`。故意串行等待（非平台限制）→ Skill 执行失败。
+11. **禁止 per-section 引用列表**：全稿仅维护一份文末 References 列表。各节末尾不得单独列出该节引用。正文中仅使用 inline citation marker（如 `[1]`, `[2-4]`）。

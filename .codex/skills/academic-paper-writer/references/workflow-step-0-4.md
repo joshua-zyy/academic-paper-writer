@@ -52,19 +52,19 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
 **venue/language/min_citations 确认后立即询问，在进入 Step 2 前必须给出明确答案**：
 
 - 是否在当前项目中维护了本地文献库（存放待引用 PDF 论文的目录）？
-  - 有 → 记录路径为 `local_lit_pdf_dir`
-  - 没有 → `local_lit_pdf_dir = null`，跳过本地文献流程
+  - 有 → 记录路径为 `local_ref_pdf_dir`
+  - 没有 → `local_ref_pdf_dir = null`，跳过本地文献流程
 - 如果有，告知将在其同级创建 `refs_md/` 目录存放转换后的 MD 文档
 - **必须检查 `markitdown` 是否已安装**，未安装时提供命令：
   ```
   pip install markitdown
   ```
 - 接下来进入 **Step 1b** 的 PDF→MD 转换准备
-- 若用户明确没有本地文献库或跳过转换：`local_lit_md_dir = null`，跳过 Step 1b
+- 若用户明确没有本地文献库或跳过转换：`local_ref_md_dir = null`，跳过 Step 1b
 
 **Failure to confirm venue**: Stop and wait. Do not proceed to Step 2. Do not generate Outline or Section Queue until venue is resolved.
 
-### Step 1 完整执行清单（9 项，Blocking Gate）
+### Step 1 完整执行清单（10 项，Blocking Gate）
 
 执行Step 1时，**必须按以下顺序逐项完成**。**任一未完成，立即 STOP 并解决，不得进入 Step 2。每完成一项打勾 `[x]`，全部打勾后方可继续。**
 
@@ -91,45 +91,109 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
       - **一次性确认**：确认后全程不再重复询问，用户可随时切换
 
 - [ ] 5. **询问本地风格参考文献库**
-      - 询问："是否有本地目标期刊风格参考文献库（存放目标期刊近年论文PDF的目录）？"
-      - 有 → 记录路径为 `local_style_ref_dir`，进入第6项
-      - 没有 → 跳过第6项，提示用户可以创建一个用于分析目标期刊写作风格
+       - 询问："是否有本地目标期刊风格参考文献库（存放目标期刊近年论文PDF的目录）？"
+       - 有 → 记录路径为 `local_style_pdf_dir`，MD 输出目录记为 `local_style_md_dir`（`<local_style_pdf_dir>/../style_md/`）
+       - 没有 → 记录 `local_style_pdf_dir = null`
 
-- [ ] 6. **询问本地文献库**
-      - 询问："是否有本地文献库（存放PDF的目录）？"
-      - 有 → 记录路径，进入第7项
-      - 没有 → 跳过第7项
+- [ ] 6. **询问本地参考文献库**
+       - 询问："是否有本地参考文献库（存放待引用论文PDF的目录）？"
+       - 有 → 记录路径为 `local_ref_pdf_dir`，MD 输出目录记为 `local_ref_md_dir`（`<local_ref_pdf_dir>/../refs_md/`）
+       - 没有 → 记录 `local_ref_pdf_dir = null`
 
-- [ ] 7. **本地文献库处理**（仅当第6项为"有"时）
-      - 检查markitdown是否已安装
-      - 未安装 → 提供安装命令：`pip install markitdown`
-      - 输出PDF→MD转换提示（见下方模板）
-      - 确认用户已收到提示
+- [ ] 7. **本地文献库自动转换**（仅当第5项或第6项为"有"时）
+       - 计算两个 MD 输出目录（见 Step 1b）
+       - **检测 markitdown**：执行 `python -c "import markitdown; print('ok')"` 检测是否已安装
+       - 未安装 → 输出 `pip install markitdown` 安装提示 → 等待用户安装完毕后，再次运行 `python -c "import markitdown; print('ok')"` 验证 → 通过后自动继续执行转换
+       - 已安装 → **自动执行转换**（Agent 自行调用 `bash` 工具，两个库可并行执行）
+       - 转换完成后自动进入第8项（Step 1.4），无需用户介入
 
-- [ ] 8. **进入 Step 1.5**（强制）— venue 确认后，必须执行 Venue Requirements Research（详见下方 Step 1.5），不可跳过
+- [ ] 8. **项目上下文提取**（强制 — 必须在 venue 调研前执行）
+       - 主 Agent 直接读取项目关键文件（不 dispatch 子 agent）：
+         - `README.md`（如存在）→ 提取项目描述、研究目标
+         - `config.py` / `config.yaml` / `config.json`（如存在）→ 提取任务名、数据集名、模型名
+         - 代码入口文件（`main.py` / `train.py` / `run.py`）→ 提取函数签名、参数名
+       - 输出 `project_keywords`（5-8 个关键词：任务领域、方法家族、数据集/模态、核心模块名）
+       - 输出 `project_description`（一句话项目摘要："本项目研究 {任务}，采用 {方法} 对 {数据/模态} 进行 {目标}"）
+       - 目的：供 Step 1.5 venue 调研时筛选与项目研究内容最接近的目标期刊论文
 
-- [ ] 9. **以上全部完成**（含 Step 1.5） → 进入Step 2
+- [ ] 9. **进入 Step 1.5**（强制）— venue 确认后，必须执行 Venue Requirements Research（详见下方 Step 1.5），不可跳过
 
-### Step 1b 转换提示模板（第7项使用）
+- [ ] 10. **以上全部完成**（含 Step 1.5） → 进入Step 2
 
-当用户有本地文献库时，**必须**输出以下提示：
+### Step 1 自动转换执行规则（第7项使用）
+
+当用户提供了本地风格参考文献库或本地参考文献库路径后，**Agent 自动执行转换，无需用户介入**。两个库可并行执行：
 
 ```
-本地文献库已确认: <local_lit_pdf_dir>
+{当 local_style_pdf_dir 不空时:}
+bash: python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_style_pdf_dir> <local_style_md_dir> --type style
 
-请先确保 markitdown 已安装（如未安装）：
-  pip install markitdown
-
-然后从项目根目录运行以下命令：
-  python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_lit_pdf_dir> <local_lit_md_dir>
-
-转换完毕后请告知我，我将从本地文献库中搜索可引用的文献。
-（在此期间我将先进行项目证据审计和联网文献检索）
+{当 local_ref_pdf_dir 不空时:}
+bash: python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_ref_pdf_dir> <local_ref_md_dir> --type ref
 ```
 
-> ⚠️ **以上命令由用户自行运行，Agent 不得代为执行。Agent 只输出提示，不运行脚本。**
+**转换后验证**：检查各目录是否生成对应索引文件（`_index_style.json` / `_index_ref.json`）。若转换失败，输出错误信息并告知用户；若成功，自动进入第8项（Step 1.4 项目上下文提取）。
 
-输出提示后，**立即进入Step 2**，不等待转换完成。
+> **安全性**：转换脚本只读 PDF → 写 MD 到独立输出目录，不修改任何项目源文件，符合 Red Line 边界。
+
+---
+
+## Step 1.4: 项目上下文提取（强制，Venue 调研前置）
+
+**条件**: venue 确认后，在 Step 1.5 之前强制执行。**不可跳过**。
+
+**目的**: 让 venue 调研子 agent 知道项目研究什么，从而精准筛选目标期刊中与项目研究内容最接近的论文进行深度风格分析。
+
+### 1.4.1 执行方式
+
+**主 Agent 直接执行**（不 dispatch 子 agent），读取以下项目文件提取上下文：
+
+1. 读取 `README.md`（如存在）→ 提取项目名称、研究目标、核心贡献概述
+2. 读取 `config.py` / `config.yaml` / `config.json`（如存在）→ 提取：
+   - 任务类型（classification / regression / segmentation / generation / ...）
+   - 数据集名称
+   - 模型/方法名称或家族
+   - 模态（image / text / tabular / graph / time-series / ...）
+3. 读取代码入口文件（`main.py` / `train.py` / `run.py`，优先匹配存在的）→ 提取：
+   - 核心函数签名
+   - 命令行参数名（推断模块/超参数信息）
+
+**降级策略**（上述文件均不存在时）：
+- 从用户对话历史中提取项目描述（如有）
+- 若仍无法获取 → `project_keywords = []`，`project_description = "项目信息未获取，请在后续步骤中补充"`
+- 输出提示："未能从项目文件中提取上下文，将继续进行 venue 调研（但无法筛选相似论文）"
+
+### 1.4.2 输出格式
+
+提取后**必须**结构化记录以下两项，供 Step 1.5 dispatch 模板使用：
+
+```yaml
+project_keywords:
+  - {task_domain}       # 如 "EEG classification", "brain network analysis"
+  - {method_family}      # 如 "graph neural network", "transformer", "CNN"
+  - {dataset_or_modality} # 如 "RS-fMRI", "time series", "ADNI"
+  - {core_module}        # 如 "dual-branch attention", "spatial-temporal fusion"
+  - ...                   # 共 5-8 个关键词
+
+project_description: "{一句话项目摘要：本项目研究 {任务}，采用 {方法} 对 {数据} 进行 {目标}}"
+```
+
+**示例**：
+```yaml
+project_keywords:
+  - "EEG emotion recognition"
+  - "graph neural network"
+  - "brain connectivity"
+  - "spatial-temporal"
+  - "SEED dataset"
+  - "multi-modal fusion"
+project_description: "本项目研究基于图神经网络的 EEG 情绪识别，采用双分支时空注意力机制对多通道脑电信号进行建模，在 SEED 数据集上验证。"
+```
+
+### 1.4.3 与 Step 2 的区别
+
+- **Step 1.4**：论文级摘要 — 只提取 "这个项目做什么" 的简短描述，供 venue 调研使用。耗时秒级。
+- **Step 2 Phase 1**：代码级盘点 — 扫描全部模块的代码结构、数据产物、配置文件，构建 Evidence Map。耗时需 sub-agent。
 
 ---
 
@@ -156,14 +220,23 @@ Task:
 
     任务: 对目标 venue {venue} 执行完整调研（投稿要求 + 写作风格）
     venue: {venue}
-    local_style_ref_dir: {local_style_ref_dir | null}
+    local_style_md_dir: {local_style_md_dir | null}
     research_type: full
     suggested_output_path: ./docs/paper-drafts/venue-brief.md
+
+    项目上下文:
+    project_keywords: {project_keywords}           # 5-8 个关键词
+    project_description: {project_description}     # 一句话项目摘要
 
     执行步骤:
     1. 读取 skills/academic-venue-research/SKILL.md，按 Step 1-4 执行
     2. 调研投稿要求（使用 webfetch 访问官方页面）
-    3. 调研写作风格（读取本地风格参考文献库或通过其他方式获取论文）
+    3. 调研写作风格：
+       a. 如果 local_style_md_dir 存在，使用 project_keywords 搜索 _index_style.json，
+          筛选与项目研究内容最接近的 3-5 篇论文（详见 style-analysis-guide.md Step 0）
+       b. 如果没有本地风格文献库，通过 webfetch 获取目标期刊最新论文，
+          同样以 project_keywords 筛选相似论文
+       c. 对筛选出的论文执行逐节深度分析
     4. 返回 Venue Brief Markdown 内容与调研摘要；不要直接修改项目文件
 
     约束: 遵循 academic-venue-research SKILL.md 中的 Red Lines。子 Agent 只返回结构化内容，不写文件。
@@ -173,7 +246,9 @@ Task:
 
 **输入**：
 - `venue`：目标 venue 名称
-- `local_style_ref_dir`：本地风格参考文献库路径（可选，来自 Step 1 第5项）
+- `local_style_md_dir`：本地风格参考文献库 MD 输出路径（可选，来自 Step 1 第5项转换后）
+- `project_keywords`：项目核心关键词列表（来自 Step 1.4）
+- `project_description`：一句话项目摘要（来自 Step 1.4）
 - `research_type`：调研类型（full / requirements / style）
 - `suggested_output_path`：建议输出路径（默认 `./docs/paper-drafts/venue-brief.md`，由主 Agent 写入）
 
@@ -303,54 +378,45 @@ Venue Brief 生成后，在后续步骤中**必须参考**：
 
 ---
 
-## Step 1b: Local Literature PDF→MD Conversion
+## Step 1b: Local Literature PDF→MD Conversion（自适应自动执行）
 
-**条件**: 仅在 `local_lit_pdf_dir != null` 且用户愿意进行转换时执行。与 Step 2 等后续步骤并行进行（不阻塞主流程）。
+**条件**: 当 Step 1 第5项或第6项确认有本地文献库时触发。Agent 自动执行转换，用户无需手动操作。
 
-### 1b.1 生成转换脚本（一次性）
+### 1b.1 确定 MD 输出目录
 
-检查 `skills/academic-citation/scripts/convert-pdfs-to-md.py` 是否存在：
-- 不存在 → 使用 Write 工具创建该脚本（写入 `skills/academic-citation/scripts/convert-pdfs-to-md.py`）
-- 已存在 → 跳过
-
-### 1b.2 确定 MD 输出目录
-
-计算 MD 输出目录：
+按约定规则计算两个 MD 输出目录（Step 1 第7项已计算）：
 ```python
-md_output_dir = <local_lit_pdf_dir>/../refs_md/
-# 例: D:\AI\literature\ → D:\AI\refs_md\
-```
-记录为 `local_lit_md_dir`。
-
-### 1b.3 提示用户运行（强制，不可跳过）
-
-**必须**在对话中输出以下提示，**然后立即进入 Step 2**，不等待转换完成。此提示为强制输出，不得因任何原因跳过：
-
-```
-本地文献库已确认: <local_lit_pdf_dir>
-
-请先确保 markitdown 已安装（如未安装）：
-  pip install markitdown
-
-然后从项目根目录运行以下命令：
-  python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_lit_pdf_dir> <local_lit_md_dir>
-
-转换完毕后请告知我，我将从本地文献库中搜索可引用的文献。
-（在此期间我将先进行项目证据审计和联网文献检索）
+local_style_md_dir = <local_style_pdf_dir>/../style_md/
+local_ref_md_dir = <local_ref_pdf_dir>/../refs_md/
 ```
 
-> ⚠️ **以上命令由用户自行运行，Agent 不得代为执行。Agent 只输出提示，不运行脚本。**
+### 1b.2 检测 markitdown 并自动执行转换
 
-### 1b.4 延迟等待
+1. **检测 markitdown**：Agent 运行 `python -c "import markitdown; print('ok')"`
+   - 输出 "ok" → 已安装，继续执行
+   - 报 ImportError → 输出安装提示：`pip install markitdown` → **等待用户安装** → 再次运行 `python -c "import markitdown; print('ok')"` 验证通过后继续
+2. **自动执行转换**：Agent 使用 `bash` 工具调用 `convert-pdfs-to-md.py`。两个库的转换可**并行执行**（两次 `bash` 调用在同一个消息中发出）：
 
-当 Step 3 即将开始（Step 2 完成后），检查 `local_lit_md_dir` 目录是否存在且包含 MD 文件：
-- 存在 → 进入 **Step 3a**（本地优先搜索，使用 MD 文件）
-- 不存在但有 `local_lit_pdf_dir` 且 PDF 可读 → **降级进入 Step 3a**（使用 PDF 直接搜索）
-  - 使用 agent 的文件读取能力逐篇扫描 PDF，提取摘要/开头内容
-  - `source_of_content` 标记为 `pdf_direct`
-  - 后续引用核验时优先建议用户完成 MD 转换
-- 两者皆不可用 → 在对话中提示"请运行转换命令"，然后继续 Step 3b（仅联网搜索）
-- 用户转换完毕后可随时告知 agent，agent 回到 Step 3a 补充 MD 模式搜索
+```bash
+# 风格文献库转换
+python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_style_pdf_dir> <local_style_md_dir> --type style
+
+# 参考文献库转换
+python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_ref_pdf_dir> <local_ref_md_dir> --type ref
+```
+
+> **安全性**：转换脚本输出到独立目录（`style_md/` / `refs_md/`），不修改任何项目源文件。
+
+### 1b.3 转换后验证
+
+两个转换完成后：
+1. 检查 `local_style_md_dir` 是否存在 `_index_style.json`
+2. 检查 `local_ref_md_dir` 是否存在 `_index_ref.json`
+3. 输出转换统计（各库 PDF 总数 → 转换成功数 / 跳过数 / 失败数）
+4. 若任一转换失败 → 输出错误信息，提示用户手动检查该库；成功的库正常使用
+5. 自动进入 Step 1.4（项目上下文提取）→ 然后进入 Step 1.5（若 venue 已知）或 Step 2
+
+**markitdown 未安装时的处理**：Agent 检测到 `pip install markitdown` 需要执行时，提示用户安装后重启流程；Agent 不自行安装 Python 包。
 
 ## Step 2: Evidence Audit
 
@@ -575,22 +641,24 @@ For Method, also audit model data flow, module boundaries, tensor shapes, recove
 
 ### Step 3a: 本地文献库优先搜索
 
-**条件**: 仅在 `local_lit_md_dir != null` 且目录中存在 MD 文件时执行。
+**条件**: 仅在 `local_ref_md_dir != null` 且目录中存在 MD 文件时执行。
 
 #### 3a.1 关键词搜索（强制，不可跳过）
 
-**必须先按关键词搜索 `_index.json`，仅 dispatch 搜索命中的候选文献。禁止直接读取全部 MD 文件。**
+**必须先按关键词搜索 `_index_ref.json`，仅 dispatch 搜索命中的候选文献。禁止直接读取全部 MD 文件。**
 
 1. **提取关键词**：从当前 section 的主题、方法名、任务名、数据集名中提取 3-8 个关键词。例如：
    - Introduction → `{任务领域, 方法家族, 核心问题}`
    - Related Work → `{方法名, 竞争方法, 基线名称, 技术路线}`
    - Method → `{模块名称, 技术组件, 算法类型}`
-2. **搜索索引**：读取 `<local_lit_md_dir>/_index.json`，在每个条目的 `title` 和 `first_500_chars` 字段中匹配关键词。匹配规则：
+2. **搜索索引**：读取 `<local_ref_md_dir>/_index_ref.json`，在每个条目的 `title` 和 `first_500_chars` 字段中匹配关键词。匹配规则：
    - 至少匹配 1 个关键词的条目视为候选
    - 匹配多个关键词的条目优先排序
    - 搜索示例：`["graph neural network", "EEG", "brain connectivity", "spatial-temporal", "transformer"]`
 3. **限制候选数量**：若匹配结果 > 10 篇，按关键词命中数排序，只取前 10 篇。若匹配结果 > 5 篇且均为同一子领域，进一步筛选最相关的 5 篇。
-4. 仅对命中的候选文献使用下方的并行 dispatch 模板
+4. **并行 dispatch 阅读**：仅对命中的候选文献使用下方的并行 dispatch 模板。
+   - **强制并行规则**：候选文献数 N ≥ 3 时，**必须 dispatch ≥3 个 reader agent 并行阅读**。agent 数 M = max(3, ceil(N/3))，确保每个 agent 阅读不超过 3 篇。
+   - 候选文献 < 3 篇时，每篇 1 个 agent 全部并行 dispatch。
 5. 每个 reader 返回 LiteratureReadingReport
 6. 主 agent 综合报告决定是否引用
 
@@ -599,45 +667,53 @@ For Method, also audit model data flow, module boundaries, tensor shapes, recove
 - 若找到候选但所有 `recommendation` 均为 `skip` → 进入 Step 3b 补充
 - 若找到候选且至少部分被采纳 → 采纳的进入 Verified References，不足处继续 Step 3b
 
-**并行阅读 dispatch 模板（N 篇候选同时执行）：**
-```yaml
-# ===== 同时发出以下 N 个 Task，互不等待 =====
+**并行阅读 dispatch 模板（按批次分发，N 篇候选同时执行）：**
 
-{R001}:
-  description: "阅读文献 R001 - {section}"
+候选文献数 N、agent 数 M = max(3, ceil(N/3))，每个 agent 处理 ≤3 篇论文。**必须在同一次消息中发出 M 个 Task，互不等待。**
+
+```yaml
+# ===== 同时发出以下 M 个 Task，互不等待 =====
+# 示例：N=9 → M=3 个 agent，各处理 3 篇
+
+Task A:
+  description: "批量阅读文献 batch-1 - {section}"
   subagent_type: "general"
   prompt: |
     你已加载 literature-reader-agent（skills/academic-citation/agents/literature-reader-agent.md）。
 
-    任务: 阅读并提炼以下论文
-    markdown_content: {从 local_lit_md_dir/R001.md 读取的全文内容}
-    paper_metadata:
-      title: {title}
-      authors: {authors}
-      year: {year}
-      venue: {venue}
-      source: {local MD}
+    任务: 批量阅读以下 3 篇论文，每篇输出独立的 LiteratureReadingReport
+    papers:
+      - markdown_content: {从 local_ref_md_dir/R001.md 读取的全文}
+        title: {title1}, authors: {authors1}, year: {year1}
+      - markdown_content: {从 local_ref_md_dir/R002.md 读取的全文}
+        title: {title2}, authors: {authors2}, year: {year2}
+      - markdown_content: {从 local_ref_md_dir/R003.md 读取的全文}
+        title: {title3}, authors: {authors3}, year: {year3}
     task_context: {当前论文的任务/方法/数据集描述}
 
     执行步骤:
     1. 读取 skills/academic-citation/agents/literature-reader-agent.md
-    2. 遵循 Constraints (Red Lines)，严格区分 `[原文]` 与 `[推断]`
-    3. 按 Reading Guidance 顺序提取信息
-    4. 输出遵循 literature-reading-report.md schema
+    2. 逐篇阅读上述 papers 列表中的每篇论文
+    3. 遵循 Constraints (Red Lines)，严格区分 `[原文]` 与 `[推断]`
+    4. 为每篇论文输出独立的 LiteratureReadingReport
 
     Red Lines:
     1. 只阅读 + 只返回结构化内容，不修改、不创建、不写入、不删除任何文件
     2. 禁止编造论文中不存在的内容
     3. 严格区分原文提取与推断
 
-    返回: 完整 LiteratureReadingReport
+    返回: 每篇论文独立的 LiteratureReadingReport（用标题区分）
 
-{R002}:
-  description: "阅读文献 R002 - {section}"
-  # 同上模板，不同的 markdown_content
+Task B:
+  description: "批量阅读文献 batch-2 - {section}"
+  # 同上，处理下一批 ≤3 篇论文
+
+Task C:
+  description: "批量阅读文献 batch-3 - {section}"
+  # 同上，处理下一批 ≤3 篇论文
 ```
 
-**所有 Task 返回后**，按 `relevance_to_current_work` + `recommendation` 排序，暂存为 `local_reading_reports`。
+**所有 M 个 Task 返回后**，主 agent 合并所有 batch 的结果，按 `relevance_to_current_work` + `recommendation` 排序，暂存为 `local_reading_reports`。
 
 ---
 
@@ -651,7 +727,7 @@ For Method, also audit model data flow, module boundaries, tensor shapes, recove
 - [ ] 输出 Verified References（含 VERIFIED / UNVERIFIED 状态）
 - [ ] 输出 Citation-to-Claim Map（每篇引用→对应主张）
 - [ ] Introduction / Related Work 时额外构建 Exemplar Set
-- [ ] 目标：全篇各节累计达到至少 35 篇引用（当前节尽可能多收集）
+- [ ] 目标：全篇各节累计达到至少 `min_citations` 篇引用（当前节尽可能多收集）
 
 **未完成 checklist 前，不得进入 Step 4。Dispatch `academic-citation` 完成检索：**
 
@@ -664,7 +740,7 @@ Task:
     你已加载 academic-citation 子 Skill（skills/academic-citation/SKILL.md）。
     任务: 为 {section} 执行文献检索与核验
     关键词: {keywords} | 目标 venue: {venue}
-    local_lit_md_dir: {local_lit_md_dir | null}
+    local_ref_md_dir: {local_ref_md_dir | null}
 
     必须完成以下所有产出，缺一不可：
     1. 4 类查询覆盖 + 本地检索（如有）
@@ -678,7 +754,7 @@ Task:
     返回: 完整结构化输出
 ```
 
-Input: current section, research keywords, target venue, local_lit_md_dir.
+Input: current section, research keywords, target venue, local_ref_md_dir.
 Output: Verified References, Exemplar Set (for Intro/RW), Reading Reports, Citation-to-Claim Map.
 
 Constraint: only VERIFIED references enter the draft body.
@@ -729,6 +805,23 @@ For Introduction / Related Work: if retries still produce zero VERIFIED referenc
 **与 Step 8 的区别**：
 - Step 3d = 过程记录，逐节追加，方便用户随时下载
 - Step 8 = 终版核验清单，论文完成后一次性生成，用于确认引用合理性
+
+### Step 3e: 引用数量硬门禁（Gate B）
+
+**条件**：Step 3c 完成后，Step 3d 写入 inventory 文件后，**必须执行此门禁检查，不可跳过**。
+
+1. 统计当前 Verified References 总数（去重后）
+2. 对比 `min_citations`（Step 1 或 Step 1.5 已确定的值）：
+   - Verified References ≥ `min_citations` → Gate B Pass，进入 Step 4
+   - Verified References < `min_citations` → Gate B **Blocked**
+3. **Blocked 时的处理**：
+   - 在对话中输出警告："当前 Verified References 共 {N} 篇，未达到 min_citations ({min_citations}) 要求。需要补充至少 {gap} 篇文献。"
+   - **回退到 Step 3b**，以新的关键词组合继续联网检索
+   - 补充文献后重新执行 Step 3c→3d→3e
+   - 最多回退 2 轮（共 3 轮检索），3 轮后仍不足 → 标记为 `citation_gap = {gap}`，进入 Step 4 但提示用户"引用数量不足，建议后续自行补充"
+4. 每轮回退后，在 cited-reference inventory 文件中记录回退原因和新增引用数
+
+> ⚠️ **此门禁是 Hard Gate B**。在 full-paper-planning 模式下，Gate B 未通过前不得进入 Step 5（Section Plan）。section-drafting 模式下可放宽至该节所需的引用充足即可。
 
 ## Step 4: Experiment Evidence Review
 

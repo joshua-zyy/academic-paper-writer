@@ -10,7 +10,7 @@ section: string                     # [required] 目标章节
 keywords: string[] | null           # [optional] 检索关键词（null 时自动生成）
 target_venue: string | null         # [optional] 目标期刊/会议
 seed_references: string[] | null    # [optional] 用户提供的种子文献列表
-local_lit_md_dir: string | null     # [optional] 本地文献库 MD 目录（refs_md/），不为 null 时优先本地搜索
+local_ref_md_dir: string | null     # [optional] 本地文献库 MD 目录（refs_md/），不为 null 时优先本地搜索
 ```
 
 ### keywords 自动生成策略（用户未提供时）
@@ -112,9 +112,9 @@ query_types:
 
 ### 本地文献库优先搜索
 
-当 `local_lit_md_dir != null` 时，在常规检索**之前**执行：
+当 `local_ref_md_dir != null` 时，在常规检索**之前**执行：
 
-1. 读取 `<local_lit_md_dir>/_index.json`（由 `convert-pdfs-to-md.py` 生成）
+1. 读取 `<local_ref_md_dir>/_index_ref.json`（由 `convert-pdfs-to-md.py` 生成）
 2. 用关键词在索引中搜索（匹配 title、first_500_chars）
 3. 命中的候选文献，使用 `literature-reader-agent` 阅读其 MD 全文
 4. 产出 LiteratureReadingReport，供引用决策

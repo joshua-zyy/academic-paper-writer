@@ -46,7 +46,7 @@ Dispatched by `academic-paper-writer` orchestrator at Step 3. Subagents search a
 |---|---|---|---|
 | Section + keywords | full-citation-pass | 1 (explicit) | Full 6-step workflow |
 | Citation list / seed papers | citation-verification | 1 (explicit) | Metadata only, no extra search |
-| `local_lit_md_dir` provided | local-citation-pass | 2 (path trigger) | Local MD + batch parallel reader agent dispatch |
+| `local_ref_md_dir` provided | local-citation-pass | 2 (path trigger) | Local MD + batch parallel reader agent dispatch |
 | Section only | targeted-citation-search | 3 (single feature) | Auto-keyword, 4-class query |
 | Explicit Exemplar Set request | exemplar-set-only | 1 (explicit) | Exemplar Set only |
 

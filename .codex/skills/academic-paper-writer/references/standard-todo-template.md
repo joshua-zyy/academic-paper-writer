@@ -24,7 +24,7 @@
 [ ] Step 1b: PDF→MD 转换准备（条件执行，提示用户运行后立即进入 Step 2）
 [ ] Step 2: 证据审计（并行 dispatch probe agents）
 [ ] Step 3: 文献检索与核验
-  [ ] 3a: 本地文献库优先搜索（关键词搜索 _index.json）
+  [ ] 3a: 本地文献库优先搜索（关键词搜索 _index_ref.json）
   [ ] 3b: 联网文献检索 + 全文获取与阅读
   [ ] 3c: 聚合 + Citation-to-Claim 映射
   [ ] 3d: 生成引用文献清单文件

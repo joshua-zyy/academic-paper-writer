@@ -2,7 +2,8 @@
 """批量将 PDF 文献转为 Markdown 格式（增量转换）。
 
 用法:
-  python scripts/convert-pdfs-to-md.py <input_dir> <output_dir>
+  参考文献库：python scripts/convert-pdfs-to-md.py <input_dir> <output_dir> --type ref
+  风格文献库：python scripts/convert-pdfs-to-md.py <input_dir> <output_dir> --type style
 
 依赖:
   pip install markitdown
@@ -11,7 +12,7 @@
   1. 递归扫描 input_dir 下所有 *.pdf
   2. 保持相对目录结构写入 output_dir（.pdf → .md）
   3. 若 .md 已存在且不比对应 .pdf 旧 → 跳过（增量）
-  4. 在 output_dir 生成 _index.json 供 agent 快速搜索
+  4. 在 output_dir 生成索引文件（--type ref → _index_ref.json，--type style → _index_style.json）
 """
 
 import argparse
@@ -65,6 +66,8 @@ def main():
     parser = argparse.ArgumentParser(description="PDF → Markdown 批量转换（增量）")
     parser.add_argument("input_dir", help="本地 PDF 文献库目录（递归扫描）")
     parser.add_argument("output_dir", help="输出目录（MD 文件将保持相对路径写入）")
+    parser.add_argument("--type", choices=["ref", "style"], default="ref",
+                        help="文献库类型：ref=参考文献库（_index_ref.json），style=风格文献库（_index_style.json）")
     args = parser.parse_args()
 
     input_path = Path(args.input_dir).resolve()
@@ -122,7 +125,7 @@ def main():
             stats["failed"] += 1
             print(f"  ✗ {rel_path} ({e})")
 
-    index_path = output_path / "_index.json"
+    index_path = output_path / ("_index_ref.json" if args.type == "ref" else "_index_style.json")
     index_path.write_text(json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(f"\n结果: {stats['total']} 总 → {stats['converted']} 新增 + {stats['skipped']} 跳过 + {stats['failed']} 失败")

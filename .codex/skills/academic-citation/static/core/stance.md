@@ -10,7 +10,7 @@
 4. 对 Introduction 或 Related Work，除正文引用外，还必须建立同领域 `Exemplar Set`（3-5 篇 Introduction exemplars + 4-8 篇 Related Work exemplars），用于学习章节组织与论证顺序，而非复制原文措辞。
 5. 每条用于正文的引用必须有对应的 inline citation marker 和 Citation-to-Claim 映射记录。
 6. 参考文献列表只能包含正文中已被引用或以 `[REF_NEEDED: ...]` 声明的条目。
-7. **本地文献库优先**：当提供了 `local_lit_md_dir` 时，必须优先在本地 MD 库中检索和阅读全文，充分搜索后再联网补充。
+7. **本地文献库优先**：当提供了 `local_ref_md_dir` 时，必须优先在本地 MD 库中检索和阅读全文，充分搜索后再联网补充。
 8. **Subagent 阅读只提炼不决策**：`literature-reader-agent` 的输出（LiteratureReadingReport）仅作为主 agent 的参考输入，最终是否引用由主 agent 基于论文整体论证结构决定。
 9. **原文 vs 推断隔离**：`literature-reader-agent` 必须严格区分原文提取和自身推断。主 agent 引用时，只能以 `source: 原文` 的内容作为引用依据。
 
@@ -36,7 +36,7 @@ Follow `../shared/core/non-invention-rules.md` for the general prohibition on in
 ## Execute Constraints
 
 - 独立使用时，开始前必须确认：目标 section（默认 Introduction）、检索关键词（未提供时自动生成）、是否需要 Exemplar Set
-- 若用户未指定 `local_lit_md_dir`，跳过本地优先搜索，直接联网检索
+- 若用户未指定 `local_ref_md_dir`，跳过本地优先搜索，直接联网检索
 - 输出格式与编排器调度时一致：Verified References + Exemplar Set + Citation-to-Claim Map
 - 若用户要求将引用写入正文，提示："本 Skill 只负责检索核验。如需整合到论文正文，请使用 academic-paper-writer 编排器。"
 

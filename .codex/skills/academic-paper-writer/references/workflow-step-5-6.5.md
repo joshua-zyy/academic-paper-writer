@@ -9,6 +9,17 @@
 ## Step 5: Generate Section Plan
 
 - Create a todo list for plan core modules.
+- **引用预检**（强制，不可跳过）：进入 Section Plan 前，确认当前节所需的 Verified References 数量是否充足。
+  - Introduction: 至少 5-8 篇 VERIFIED 引用可用（含 Exemplar Set 的 3-5 篇）
+  - Related Work: 至少 8-15 篇 VERIFIED 引用可用（含 Exemplar Set 的 4-8 篇）
+  - Method: 至少 3-5 篇 VERIFIED 引用可用（方法来源引用）
+  - Experimental Setup: 至少 2-3 篇 VERIFIED 引用可用（数据集、基线来源）
+  - Main Results: 至少 2 篇 VERIFIED 引用可用（基线对比来源）
+  - Ablation: 至少 1 篇 VERIFIED 引用可用（消融对比来源）
+  - Discussion: 至少 3 篇 VERIFIED 引用可用（局限性讨论、机制解释来源）
+  - Conclusion: 至少 1 篇 VERIFIED 引用可用（领域意义文献）
+  - Abstract: 不单独检查（后置于正文完成）
+  - 不足时 → 回退到 Step 3b 补充对应方向的文献
 - Read `references/paper-structure.md` and select structure by paper type and venue.
 - Read `references/section-writing-contracts.md` and create a Section Contract for each planned section: reader state before/after, required moves, evidence hooks, and section-specific failure checks.
 - Generate Evidence Map: section goal, key claims, evidence sources, gaps.
@@ -75,6 +86,10 @@ unresolved. To bridge this gap, we propose a dual-branch Transformer that...
 - **Section Contract Gate**: before writing prose, check the current Section Contract from Step 5. Draft v1 must satisfy the section's required moves or preserve explicit debt placeholders. If the contract is missing, return to Step 5 instead of drafting.
 
 ### Step 6.1: Pre-Draft Deep Probe
+
+- **与 Step 2 探查的区别**：Step 2 Phase 1 是**轻量全量扫描**（盘点"有什么"——module cards、代码结构、配置文件）；Step 6.1 是**深层逐节探查**（搞懂"怎么做/为什么"——公式推导、机制细节、实验深度），直接支撑 Draft v1 起草。
+
+- **强制 sub-agent 规则**：Step 6.1 所有标记为"必须并行"的探查**必须使用 sub-agent dispatch**（Task 工具），不得由主 Agent 直接内化执行。原因：深层探查涉及大量代码/文献阅读，内化执行会导致上下文饱和和不可靠省略。
 
 - **前置检查：是否需要深层探查** — 在起草前检查当前 section 类型，按以下规则决定是否需要 dispatch 深层探查：
   | 当前 section | 需 dispatch 的探查 | 并行策略 |
@@ -152,12 +167,12 @@ Task B:
 
     Role: 文献阅读代理（只读）
     section_type: introduction
-    local_lit_md_dir: <local_lit_md_dir，若无则为 null>
+    local_ref_md_dir: <local_ref_md_dir，若无则为 null>
 
     任务: 从本地文献库中搜索与 Introduction 高度相关的文献，并深度阅读。
 
     执行步骤:
-    1. 扫描 local_lit_md_dir 中的 MD 文件，搜索与项目主题（task/method/domain）相关的论文
+    1. 扫描 local_ref_md_dir 中的 MD 文件，搜索与项目主题（task/method/domain）相关的论文
     2. 选取 3-5 篇最相关的论文进行全文阅读
     3. 按 skills/academic-citation/agents/literature-reader-agent.md 的 schema 输出 LiteratureReadingReport
 
@@ -240,12 +255,12 @@ Task B:
 
     Role: 文献阅读代理（只读）
     section_type: related_work
-    local_lit_md_dir: <local_lit_md_dir，若无则为 null>
+    local_ref_md_dir: <local_ref_md_dir，若无则为 null>
 
     任务: 从本地文献库中搜索与 Related Work 高度相关的文献，并深度阅读。
 
     执行步骤:
-    1. 扫描 local_lit_md_dir 中的 MD 文件，搜索与项目方法相关、baseline 相关、数据集相关的论文
+    1. 扫描 local_ref_md_dir 中的 MD 文件，搜索与项目方法相关、baseline 相关、数据集相关的论文
     2. 选取 4-8 篇最相关的论文进行全文阅读
     3. 按 skills/academic-citation/agents/literature-reader-agent.md 的 schema 输出 LiteratureReadingReport
 
@@ -329,11 +344,53 @@ Body constraints:
 
 Reference list must only contain entries cited in body or declared via `[REF_NEEDED: ...]`.
 
+**引用质量约束**：写完整节 Draft v1 后，统计该节中 VERIFIED 引用数与 `[REF_NEEDED]` 占位符数。若 `[REF_NEEDED]` 占比超过该节总引用数的 20%，**该节视为 Draft v1 未完成**，必须在继续下一步前补充文献（回退到 Step 3b 补充检索、Step 3c 更新映射）。
+
 ### Step 6.3: Write Draft v1 to File
 
 ### 文件写入（强制）
 
 Draft v1 生成后，**必须**立即将正文内容写入 `./docs/paper-drafts/paper_draft.md`。使用 Write 工具（首次）或 Edit 工具（追加/替换）更新文件。
+
+**paper_draft.md 结构要求**（强制）：
+```
+# {Paper Title}
+
+## Abstract
+{若已生成}
+
+## 1. Introduction
+{正文}
+
+## 2. Related Work
+{正文}
+
+## ...
+## References
+[1] ...
+[2] ...
+
+## 待补充清单
+
+> 以下清单汇总正文中所有占位符标记的内容，方便逐项补充。
+> 每完成一项，将其从本清单中移除；新增占位符时同步追加到本清单。
+
+### 引用待补充
+- [ ] [REF_NEEDED: {claim/topic}] — {所在 section}：{简要说明需要引用的方向}
+
+### 图表待补充
+- [ ] [FIGURE_NEEDED: {purpose}] — {所在 section}：{图表用途说明}
+
+### 结果待补充
+- [ ] [RESULT_NEEDED: {experiment/metric/source}] — {所在 section}：{实验说明}
+- [ ] [RESULT_UNVERIFIED: {claim}] — {所在 section}：{验证待办}
+
+### 内容待补充
+- [ ] [METHOD_DETAIL_NEEDED: {description}] — {所在 section}
+- [ ] [DATASET_DETAIL_NEEDED: {description}] — {所在 section}
+- [ ] [RATIONALE_NEEDED: {module}] — {所在 section}
+- [ ] [ABSTRACT_NEEDED] — 待主要证据稳定后撰写
+```
 
 **禁止在对话中输出完整 Draft 正文。** 对话中仅输出简短进度摘要：
 
@@ -371,7 +428,7 @@ Draft v1 生成后，**必须**立即将正文内容写入 `./docs/paper-drafts/
 - [ ] **6.4b** 主动补入遗漏的图表占位符（不可跳过，即使无遗漏也要确认）
 - [ ] **6.4c** 为每个 `[FIGURE_NEEDED]` 建立 Figure Contract
 - [ ] **6.4d** 双路径图表处理（architecture → prompts，data → code）
-- [ ] **6.4e** 追加待补项清单到 Draft 末尾
+- [ ] **6.4e** 更新待补充清单：将 6.4a 扫描到的占位符按类型更新到 paper_draft.md 末尾的「待补充清单」中（格式见 Step 6.3）
 - [ ] **6.4f** 报告审计结果（`placeholder_stats`）
 - [ ] **6.4g** Dispatch 架构图子代理（对每个架构图类占位符）
 - [ ] **6.4h** Dispatch 数据图子代理（对每个数据图类占位符）
@@ -424,25 +481,17 @@ After Draft v1, **必须**自动执行以下子步骤：
 - 正文保留占位符，记入待补项列表
 - **不自动执行绘图代码**（全文完成后 Step 9 统一批量执行）
 
-### 6.4e. 追加待补项清单（**必须，不可省略**）
-在 Draft v1 末尾（参考文献之后）**必须**追加以下内容。即使某类占位符不存在也要列出（标记为「无'）：
+### 6.4e. 更新待补充清单（**必须，不可省略**）
 
-```markdown
----
+**不再创建独立的清单格式。** 使用 Step 6.3 定义的「## 待补充清单」格式（已在 `paper_draft.md` 中）。
 
-## 附：待补项清单
-
-*以下内容不作为正式正文，仅作为草稿状态内部记录。*
-
-### 仍待补项
-
-1. [FIGURE_NEEDED] <汇总所有数据图类占位符，逐项列出用途>
-2. [TABLE_NEEDED] <汇总所有表格类占位符，逐项列出用途>
-3. [RESULT_NEEDED] <汇总所有结果类占位符，逐项列出>
-4. [REF_NEEDED] <汇总所有文献类占位符，逐项列出方向>
-5. [METHOD_DETAIL_NEEDED] / [DATASET_DETAIL_NEEDED] / [RATIONALE_NEEDED] <如有>
-6. （预处理细节补充、多随机种子/交叉验证、英文翻译等其他已知待补项）
-```
+1. 将 6.4a 扫描到的所有占位符按以下类别更新到 paper_draft.md 末尾的「待补充清单」：
+   - **引用待补充**：所有 `[REF_NEEDED]` 占位符，逐项写为 `- [ ] [REF_NEEDED: {claim/topic}] — {所在 section}`
+   - **图表待补充**：所有 `[FIGURE_NEEDED]` + `[TABLE_NEEDED]` 占位符
+   - **结果待补充**：所有 `[RESULT_NEEDED]` + `[RESULT_UNVERIFIED]` 占位符
+   - **内容待补充**：所有 `[METHOD_DETAIL_NEEDED]` / `[DATASET_DETAIL_NEEDED]` / `[RATIONALE_NEEDED]` 占位符
+2. 已填充的占位符（不再存在于正文中的），将其 checkbox 从 `- [ ]` 改为 `- [x]`
+3. 即使某类占位符不存在，也在清单中保留该类标题并标注「（无）」
 
 ### 6.4f. 报告审计结果
 将占位符统计信息（`placeholder_stats`）纳入 Section Critique，供 Step 6.8 Verification 引用。

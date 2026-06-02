@@ -4,7 +4,7 @@ The orchestrator owns writes under `./docs/paper-drafts/` during full-paper gene
 
 ## Default Files
 
-- `paper_draft.md`: paper body, references, and pending items
+- `paper_draft.md`: paper body, references, and pending items (末尾必须包含「待补充清单」，汇总所有占位符)
 - `section_blueprint.md`: current Section Blueprint and Section Contract
 - `venue-brief.md`: target venue requirements and style notes
 - `figures/`: figure outputs and `figure_prompts.md`

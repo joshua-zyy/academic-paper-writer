@@ -14,7 +14,7 @@
 
 | 阶段 | Steps | 文件 | 核心任务 |
 |------|-------|------|---------|
-| 准备 | 0–4（含 1.5, 1b） | `workflow-step-0-4.md` | 判定模式、确认 venue、**Venue Requirements Research**、本地文献库、PDF→MD 转换准备、**并行**证据审计、文献检索、实验复核 |
+| 准备 | 0–4（含 1.4, 1.5, 1b） | `workflow-step-0-4.md` | 判定模式、确认 venue、**项目上下文提取**、**Venue Requirements Research**、本地文献库、PDF→MD 转换准备、**并行**证据审计、文献检索（含引用数量硬门禁 Gate B）、实验复核 |
 | 起草与初步审查 | 5–6（含 6.0–6.5） | `workflow-step-5-6.5.md` | Section Plan、Draft v1、占位符审计与图表、证据合规审查 |
 | 审查与整合 | 6.6–9 | `workflow-step-6.6-9.md` | Prose Gate、Expansion、Verification、Section Loop、引用清单、图片批量生成 |
 
@@ -30,21 +30,22 @@
 
 ## 步骤概要
 
-| Step | 动作 | 委托方式 | 触发方式 | DP |
-|------|------|---------|---------|-----|
-| 0 | 判定 mode、scope、当前 section | — | 自动 | — |
-| 1 | 确认 venue / 语言 / min_citations（可选）+ 本地文献库（Blocking Gate，**不含** venue 调研） | — | 自动 | — |
-| 1.5 | **Venue Requirements Research**（强制）— webfetch 访问官方页面，生成 venue-brief.md | — | 自动 | DP-1 |
-| 1b | 可选: PDF→MD 转换准备（生成脚本，提示用户运行，不阻塞） | — | 自动（条件执行） | — |
-| 2 | 证据审计（并行 dispatch probe agents） | — | 自动，涉及多 probe 时**必须并行** | — |
-| 3 | 文献检索与核验（3a 本地优先 + 3b 联网 + 3c 聚合 + 3d 过程记录） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 | — |
-| 4 | 实验事实复核 | `academic-experiments`（dispatch 子 Agent） | 自动 | — |
-| 5 | 生成 Section Contract + Section / Method Blueprint | — | 自动 | DP-2 |
-| 6 | **Section Complete Loop** ⚠️ **每节必执行全流程，6.4–6.9 不可跳过。Draft v1 ≠ 初稿完成。** | 混合：见图表/审查/验证 dispatch | 自动 | DP-3, DP-4 |
-|   | ├ 6.0 核对 Section Contract | — | 自动 | — |
-|   | ├ 6.1 前置探查（按 section 类型 dispatch） | probe-agent / citation-agent / literature-reader-agent（并行） | 自动 | — |
-|   | ├ 6.2 Draft v1（含占位符 + 待补项清单） | — | 自动 | DP-3 |
-|   | ├ 6.3 写入 paper_draft.md | — | 自动 | — |
+| Step | 动作 | 委托方式 | 触发方式 | DP | 探查目的 |
+|------|------|---------|---------|-----|---------|
+| 0 | 判定 mode、scope、当前 section | — | 自动 | — | — |
+| 1 | 确认 venue / 语言 / min_citations（可选）+ 本地风格库 + 本地参考文献库（Blocking Gate） | — | 自动 | — | — |
+| 1b | 自动: PDF→MD 转换（Agent 自动执行 convert-pdfs-to-md.py，两个库可并行） | — | 自动（条件执行） | — | — |
+| 1.4 | **项目上下文提取**（强制）— 读取项目文件，输出 project_keywords + project_description | — | 自动 | — | — |
+| 1.5 | **Venue Requirements Research**（强制）— webfetch 访问官方页面，按 project_keywords 筛选相似论文分析风格，生成 venue-brief.md | — | 自动 | DP-1 | — |
+| 2 | 证据审计 — **Phase 1 轻量全量探查**：盘点"有什么"（module cards、现有材料、代码结构） | probe-agent（dispatch） | 自动，涉及多 probe 时**必须并行** | — | **轻量全量**：快速盘点所有模块的代码结构、数据产物、配置文件 |
+| 3 | 文献检索与核验（3a 本地优先 + 3b 联网 + 3c 聚合 + 3d 过程记录 + **3e 引用数量硬门禁 Gate B**） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 | — | — |
+| 4 | 实验事实复核 | `academic-experiments`（dispatch 子 Agent） | 自动 | — | — |
+| 5 | 生成 Section Contract + Section / Method Blueprint | — | 自动 | DP-2 | — |
+| 6 | **Section Complete Loop** ⚠️ **每节必执行全流程，6.4–6.9 不可跳过。Draft v1 ≠ 初稿完成。** | 混合：见图表/审查/验证 dispatch | 自动 | DP-3, DP-4 | — |
+|   | ├ 6.0 核对 Section Contract | — | 自动 | — | — |
+|   | ├ 6.1 前置探查 — **Phase 2 深层逐节探查**：搞懂"怎么做/为什么"（公式推导、机制细节、实验深度）**MUST use sub-agents for multi-probe sections** | probe-agent / citation-agent / literature-reader-agent（并行） | 自动 | — | **深层逐节**：针对当前 section 做深入代码级/文献级探查，直接支撑起草 |
+|   | ├ 6.2 Draft v1（含占位符 + 待补项清单） | — | 自动 | DP-3 | — |
+|   | ├ 6.3 写入 paper_draft.md | — | 自动 | — | — |
 |   | ├ 6.4 占位符审计 + 图表生成（⚠️ **强制执行，不可跳过**） | `academic-figure`（dispatch） | 自动 | — |
 |   | ├ 6.5 证据合规审查（⚠️ **强制，Review Phase 1**） | `academic-reviser`（dispatch） | 自动 | — |
 |   | ├ 6.6 Prose Quality Gate（⚠️ **强制，Review Phase 2**） | `academic-polishing`（**内化调用**） | 自动 | — |
