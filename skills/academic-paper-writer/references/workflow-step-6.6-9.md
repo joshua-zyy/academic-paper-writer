@@ -142,7 +142,7 @@ Task:
 ```
 
 Input: Expanded Draft, Evidence Map, prior step states (`prose_debt`, `thin_draft`, `frozen_claims`, etc.).
-Output: Self-Review, Revised Draft vN (must absorb fixes), Section Critique, Verification Status (`passed`/`failed`/`blocked`) per `academic-reviser/references/schemas/verification-report.md`.
+Output: Self-Review, Revised Draft vN (must absorb fixes), Section Critique, Verification Status (`passed`/`failed`/`blocked`) per `academic-reviser/../shared/schemas/verification-report.md`.
 
 If `blocked`, must include `safe_to_continue` and `frozen_claims`. Only advance if `safe_to_continue = yes`.
 

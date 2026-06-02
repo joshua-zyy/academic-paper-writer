@@ -5,78 +5,41 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers usin
 
 # Academic Figure
 
-This skill is the CS/AI/ML academic-figure router. It is Python-only for data plots: use Python scripts and matplotlib/seaborn-style outputs for drawing, previewing, exporting, and QA of quantitative figures.
+CS/AI/ML academic-figure router. Python-only for data plots: use Python scripts and matplotlib/seaborn-style outputs.
 
-## Routing Protocol
+## Router Protocol
 
-1. Read `manifest.yaml`.
-2. Read every file in `always_load`: `static/core/stance.md` and `static/core/output-contract.md`.
-3. Select exactly one `mode` from the manifest unless the user explicitly asks for a multi-step package.
-4. Read only the selected mode fragment under `static/fragments/mode/`.
-5. Reach for `references/` only when the selected fragment says the deeper detail is needed.
+1. Read `manifest.yaml`. It declares `always_load` files, `axes`, and `references.on_demand`.
+2. Read every file listed under `always_load`. These are the skill's binding rules — not reference material.
+3. Apply the loaded material as constraints:
+   - `stance.md` defines Python-only plotting, figure contract, visual policy, and scope.
+   - `red-lines.md` defines absolute prohibitions. Do not negotiate these.
+   - `output-contract.md` defines deliverables per mode.
+   - `anti-patterns.md` defines known failure modes and their correct alternatives.
+4. Select exactly one `mode` from the manifest. If ambiguous, ask one concise clarification only when data source, architecture evidence, or target use is missing.
+5. Echo the selected mode to the user before executing.
+6. Reach for `references/` only when the manifest's `references.on_demand` condition is satisfied.
 
 ## Modes
 
 | Mode | Use when |
 |---|---|
-| `chart-from-data` | The user provides data files or numeric results and needs a publication plot. |
-| `architecture-image` | The user provides model structure and wants a framework/overview/module image. |
-| `arch-prompt` | The user wants a tool-agnostic architecture image prompt. |
-| `figure-blueprint` | The user wants figure suggestions for a paper section. |
-| `figure-audit` | The user wants an existing figure reviewed for publication readiness. |
-| `figure-revision` | The user wants an existing figure revised. |
+| `chart-from-data` | Data files or numeric results, needs publication plot |
+| `architecture-image` | Model structure, wants framework/overview/module image |
+| `arch-prompt` | Wants tool-agnostic architecture image prompt |
+| `figure-blueprint` | Wants figure suggestions for a paper section |
+| `figure-audit` | Existing figure reviewed for publication readiness |
+| `figure-revision` | Existing figure needs revision |
 
-If the request is ambiguous, choose the smallest mode that satisfies the user request and ask one concise clarification only when data source, architecture evidence, or target use is missing.
+## Agent Dispatch
 
-## Red Lines
-
-1. Do not invent data, experiment results, model modules, architecture connections, losses, datasets, or training flows.
-2. Do not use high-saturation rainbow-style palettes or visual effects that imply certainty without statistics.
-3. Do not deliver data plots without an editable vector output, preferably SVG.
-4. Do not treat image-generated architecture figures as factual final figures without an Architecture Contract and human-verifiable checklist.
-5. Do not overwrite source data or project code. Create new scripts or output files only for figure delivery.
-
-## Reference Loading
-
-| Reference | Open when |
-|---|---|
-| `references/figure-contract.md` | Building Figure Contract or Architecture Contract. |
-| `references/workflow-chart-from-data.md` | Executing `chart-from-data`. |
-| `references/workflow-architecture-image.md` | Executing `architecture-image`. |
-| `references/workflow-arch-prompt.md` | Executing `arch-prompt`. |
-| `references/qa-contract.md` | Before final delivery, audit, or revision. |
-| `references/api.md` | Writing Python plotting code. |
-| `references/chart-types.md` | Choosing chart type. |
-| `references/design-theory.md` | Color, layout, typography, and export rationale. |
-| `references/nature-style-chart-patterns.md` | Dense, high-impact multi-panel plot patterns. |
-| `references/architecture-prompting.md` | Architecture prompt wording. |
-| `references/tutorials.md` | End-to-end examples are needed. |
-
-## Agent Resource
-
-`agents/figure_agent.md` contains the delegated figure-agent contract. In orchestrated use, the agent returns figure artifacts, scripts, prompts, and reports; it must not independently edit project source code or experimental data.
+`agents/figure_agent.md` is dispatched by the orchestrator at Step 6.4. The agent returns figure artifacts, scripts, prompts, and reports; it must not independently edit project source code or experimental data.
 
 ## Completion Criteria
 
-- `chart-from-data`: QA passes, Figure Contract, Python script, source data, editable SVG, and QA report are delivered.
-- `architecture-image`: Architecture Contract, prompt spec, generated image path or prompt fallback, caption draft, and verification checklist are delivered.
-- `arch-prompt`: Tool-agnostic prompt covers components, data flow, labels, visual hierarchy, and unconfirmed items.
+- `chart-from-data`: Figure Contract, Python script, source data, editable SVG, QA report — all pass.
+- `architecture-image`: Architecture Contract, prompt spec, generated image, caption draft, verification checklist.
+- `arch-prompt`: Tool-agnostic prompt covers components, data flow, labels, visual hierarchy, unconfirmed items.
 - `figure-audit`: Every QA item has pass/fail status and concrete remediation.
 - `figure-blueprint`: Every suggested figure maps to a paper claim and data/evidence source.
-- `figure-revision`: Revised artifact or revised instructions, QA report, and unchanged evidence traceability.
-
-## Anti-Patterns
-
-| Pattern | Problem | Correct |
-|---|---|---|
-| Aesthetics first | Using rainbow/jet palettes to make charts "look good" | Grayscale-safe restrained academic palette |
-| No QA delivery | Code runs → delivery without review | QA Contract required: readability, data consistency, format compliance |
-| Invented architecture | Prompts include non-existent module connections | Architecture from code/paper evidence only; unconfirmed items marked |
-| Delivering unchecked generated images | Image looks professional but modules/arrows may be wrong | Contract first, verify module-by-module after generation |
-
-## Out of Scope
-
-- Non-academic commercial charts
-- Interactive plotting (Plotly, Bokeh, D3.js)
-- Adobe Illustrator / TikZ completed figures that need no modification
-- EDA-only statistics reporting without publication target
+- `figure-revision`: Revised artifact or instructions, QA report, unchanged evidence traceability.

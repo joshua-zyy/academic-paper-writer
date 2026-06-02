@@ -4,8 +4,10 @@ description: >
   analysis, and combined Venue Brief generation.
 
 always_load:
-  - references/venue-research-workflow.md
-  - references/venue-brief-template.md
+  - static/core/stance.md
+  - static/core/red-lines.md
+  - static/core/output-contract.md
+  - static/core/anti-patterns.md
 
 axes:
   mode:

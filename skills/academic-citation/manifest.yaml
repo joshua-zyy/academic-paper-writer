@@ -4,7 +4,11 @@ description: >
   literature reading, exemplar construction, and citation-to-claim mapping.
 
 always_load:
-  - references/workflow-citation-pass.md
+  - static/core/stance.md
+  - static/core/red-lines.md
+  - static/core/output-contract.md
+  - static/core/anti-patterns.md
+  - ../shared/core/non-invention-rules.md
 
 axes:
   workflow:
@@ -33,8 +37,8 @@ references:
     - condition: citation-to-claim map construction
       path: references/citation-mapping.md
     - condition: verified references schema
-      path: references/schemas/verified-references.md
+      path: ../shared/schemas/verified-references.md
     - condition: literature reading schema
-      path: references/schemas/literature-reading-report.md
+      path: ../shared/schemas/literature-reading-report.md
     - condition: literature reader agent dispatch
       path: agents/literature-reader-agent.md

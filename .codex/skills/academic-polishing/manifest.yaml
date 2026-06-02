@@ -1,12 +1,14 @@
 name: academic-polishing
 description: >
-  Declarative routing manifest for academic prose polishing modes. SKILL.md
-  loads the shared stance and output contract, then reaches for detailed
-  references only for the selected mode.
+  Declarative routing manifest for academic prose polishing modes.
 
 always_load:
   - static/core/stance.md
+  - static/core/red-lines.md
   - static/core/output-contract.md
+  - static/core/anti-patterns.md
+  - ../shared/core/evidence-policy.md
+  - ../shared/core/non-invention-rules.md
 
 axes:
   mode:

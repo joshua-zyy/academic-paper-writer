@@ -35,7 +35,7 @@ preceding_status:
 
 ## Output Schema
 
-遵循 `references/schemas/verification-report.md` 中定义的 Verification Report Schema：
+遵循 `../shared/schemas/verification-report.md` 中定义的 Verification Report Schema：
 
 ```yaml
 verification_report:

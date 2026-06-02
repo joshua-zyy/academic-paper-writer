@@ -5,8 +5,13 @@ description: >
   reviewer packages.
 
 always_load:
-  - references/revision-checklist.md
-  - references/verification-status.md
+  - static/core/stance.md
+  - static/core/red-lines.md
+  - static/core/output-contract.md
+  - static/core/anti-patterns.md
+  - ../shared/core/evidence-policy.md
+  - ../shared/core/non-invention-rules.md
+  - ../shared/core/output-boundaries.md
 
 axes:
   mode:
@@ -34,7 +39,7 @@ references:
     - condition: section critique output formatting
       path: references/templates/section-critique.md
     - condition: verification report schema
-      path: references/schemas/verification-report.md
+      path: ../shared/schemas/verification-report.md
     - condition: self-deception and common review pitfalls
       path: references/common-pitfalls.md
     - condition: optional mock reviewer package

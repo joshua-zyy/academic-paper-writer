@@ -4,7 +4,10 @@ description: >
   inspection, and minimal reproducible runs.
 
 always_load:
-  - references/evidence-inventory.md
+  - static/core/stance.md
+  - static/core/red-lines.md
+  - static/core/output-contract.md
+  - static/core/anti-patterns.md
   - ../shared/core/evidence-policy.md
 
 axes:
@@ -29,4 +32,4 @@ references:
     - condition: protocol risk assessment
       path: references/protocol-risks.md
     - condition: evidence inventory schema
-      path: references/schemas/evidence-inventory.md
+      path: ../shared/schemas/evidence-inventory.md

@@ -7,8 +7,14 @@ description: >
 
 always_load:
   - static/core/stance.md
-  - static/core/workflow.md
+  - static/core/red-lines.md
   - static/core/output-contract.md
+  - static/core/anti-patterns.md
+  - static/core/workflow.md
+  - static/core/orchestration.md
+  - ../shared/core/evidence-policy.md
+  - ../shared/core/non-invention-rules.md
+  - ../shared/core/output-boundaries.md
 
 axes:
   mode:
@@ -75,3 +81,13 @@ references:
       path: references/placeholder-guide.md
     - condition: evidence type semantics
       path: ../shared/core/evidence-policy.md
+    - condition: figure generation rules
+      path: references/figure-generation-guide.md
+    - condition: iteration control and max rounds
+      path: references/iteration-control.md
+    - condition: standardized todo template
+      path: references/standard-todo-template.md
+    - condition: content density (thin draft) check
+      path: references/content-density.md
+    - condition: end-to-end examples
+      path: references/examples/example-usage.md

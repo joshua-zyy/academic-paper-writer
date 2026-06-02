@@ -769,6 +769,6 @@ Task:
 ```
 
 Input: repo path, current section.
-Output: Experiment Evidence, Protocol Risks, Remaining Blockers per `academic-experiments/references/schemas/evidence-inventory.md`.
+Output: Experiment Evidence, Protocol Risks, Remaining Blockers per `academic-experiments/../shared/schemas/evidence-inventory.md`.
 
 Introduction / Related Work do not block on this step.

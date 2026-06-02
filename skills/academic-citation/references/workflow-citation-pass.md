@@ -93,7 +93,7 @@
 
 ## Step 6: 输出
 
-按 `references/schemas/verified-references.md` 中定义的数据结构输出。
+按 `../shared/schemas/verified-references.md` 中定义的数据结构输出。
 
 输出至少包含：
 

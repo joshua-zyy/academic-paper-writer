@@ -1,6 +1,6 @@
 # Polishing Output Contract
 
-Return:
+## Deliverable Format
 
 ```markdown
 ## Prose Quality Gate Result
@@ -17,5 +17,11 @@ Return:
 - Revised: ...
 - Reason: ...
 ```
+
+## Completion Criteria
+
+- **prose-quality-gate / de-ai-pass**: Max 2 rewrite rounds. After 2 rounds, deliver with prose_debt status.
+- **method-prose-rewrite**: 问题 → 设计 → 机制 → 收益/边界 narrative established.
+- **claim-strength-audit**: All zero-tolerance trigger words checked. All mismatched claims downgraded.
 
 If structural or evidence_debt prevents safe polishing, return the diagnosis and the smallest safe text repair instead of rewriting the whole section.

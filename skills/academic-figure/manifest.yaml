@@ -1,12 +1,15 @@
 name: academic-figure
 description: >
   Declarative routing manifest for Python-only academic figure work. SKILL.md
-  uses this file to load the shared figure stance, output contract, one mode
-  fragment, and deeper references only when needed.
+  uses this file to load the shared figure stance, output contract, mode
+  reference, and deeper references only when needed.
 
 always_load:
   - static/core/stance.md
+  - static/core/red-lines.md
   - static/core/output-contract.md
+  - static/core/anti-patterns.md
+  - ../shared/core/non-invention-rules.md
 
 axes:
   mode:
@@ -19,12 +22,12 @@ axes:
       plus requested edits imply figure-revision. Section-level figure planning
       implies figure-blueprint.
     values:
-      chart-from-data: static/fragments/mode/chart-from-data.md
-      architecture-image: static/fragments/mode/architecture-image.md
-      arch-prompt: static/fragments/mode/arch-prompt.md
-      figure-blueprint: static/fragments/mode/figure-blueprint.md
-      figure-audit: static/fragments/mode/figure-audit.md
-      figure-revision: static/fragments/mode/figure-revision.md
+      chart-from-data: references/workflow-chart-from-data.md
+      architecture-image: references/workflow-architecture-image.md
+      arch-prompt: references/workflow-arch-prompt.md
+      figure-blueprint: references/figure-contract.md
+      figure-audit: references/qa-contract.md
+      figure-revision: references/qa-contract.md
     multi: false
 
 references:

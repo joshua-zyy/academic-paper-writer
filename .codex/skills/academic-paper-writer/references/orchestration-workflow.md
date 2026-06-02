@@ -62,7 +62,7 @@
 Cross-skill data contracts, shared concept references, and reference-loading guidance are maintained in `skills/academic-paper-writer/SKILL.md` as the high-level orchestrator index.
 
 When executing a concrete step in this file:
-- read the referenced schema under the relevant sub-skill's `references/schemas/` if the step consumes or produces structured cross-skill data
+- read the referenced schema under `skills/shared/schemas/` if the step consumes or produces structured cross-skill data
 - read the referenced file under `references/` when that step explicitly calls for it
 
 ---

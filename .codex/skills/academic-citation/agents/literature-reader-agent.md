@@ -28,7 +28,7 @@ task_context: string               # [required] 当前论文的任务/方法/数
 
 ## Output Schema
 
-遵循 `references/schemas/literature-reading-report.md` 中定义的 LiteratureReadingReport 结构。
+遵循 `../shared/schemas/literature-reading-report.md` 中定义的 LiteratureReadingReport 结构。
 
 ## Execution
 

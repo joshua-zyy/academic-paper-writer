@@ -16,3 +16,19 @@ This file defines cross-skill evidence semantics for the academic skill suite.
 2. Treat `user_claim` as context for investigation, not as verified evidence.
 3. Weaken, freeze, or mark unsupported claims instead of making them sound more certain.
 4. Preserve placeholders when evidence is missing; do not delete placeholders unless real evidence replaces them.
+
+## Placeholder System
+
+When evidence is missing, use explicit placeholders rather than inventing content or deleting the gap:
+
+| Placeholder | Purpose |
+|---|---|
+| `[REF_NEEDED: claim/topic]` | Missing literature support |
+| `[FIGURE_NEEDED: purpose \| placement \| why]` | Missing figure |
+| `[TABLE_NEEDED: purpose \| columns \| why]` | Missing table |
+| `[RESULT_NEEDED: experiment/metric/source]` | Missing experiment results |
+| `[RESULT_UNVERIFIED: claim \| why]` | Unverified results |
+| `[METHOD_DETAIL_NEEDED: description]` | Missing method details |
+| `[RATIONALE_NEEDED: module \| missing]` | Missing design rationale |
+| `[DATASET_DETAIL_NEEDED: description]` | Missing dataset details |
+| `[ABSTRACT_NEEDED: reason]` | Abstract deferred |
