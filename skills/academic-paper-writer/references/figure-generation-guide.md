@@ -13,7 +13,7 @@
 
 | 图类型 | 遇到占位符时 | 输出 |
 |--------|:---:|------|
-| 架构图/框架图 | 自动生成提示词 | 写入 `./docs/paper-drafts/figures/figure_prompts.md`，正文占位符替换为图编号引用 |
+| 架构图/框架图/流程图/机制图 | 自动生成 Python 矢量绘图脚本并生成 SVG | 脚本写入 `./docs/paper-drafts/figures/codes/draw_fig{N}_arch.py`，SVG 写入 `./docs/paper-drafts/figures/fig{N}_arch.svg`，正文占位符替换为图编号引用 |
 | 数据结果图 | 自动生成 Python 绘图代码 | 代码写入 `./docs/paper-drafts/figures/codes/plot_{figure_id}.py`，正文保留占位符，**不自动执行** |
 
 > 注：数据图代码在 Step 6.4 阶段不自动执行，留待 Step 9 全文完成后统一批量执行。
@@ -43,11 +43,11 @@
 2. 对每个脚本：检查 Python 环境 → 执行脚本 → 验证 SVG 输出 → 快速 QA
 3. 执行失败不阻塞整体流程，记录为「待手动修复」
 
-### 架构图批量生成
+### 架构图 SVG 批量生成
 
-1. 读取 `./docs/paper-drafts/figures/figure_prompts.md` 中所有未生成图片的提示词
-2. 若环境支持 image generation：按 architecture-image 模式逐张生成 → 保存为 `./docs/paper-drafts/figures/fig{N}_arch.png`
-3. 若环境不支持：在对话中列出所有待手动生成的提示词
+1. 扫描 `./docs/paper-drafts/figures/codes/` 下所有 `draw_fig*_arch.py`
+2. 对每个脚本：检查 Python 与 matplotlib → 执行脚本 → 验证 SVG 输出 → 核对 Architecture Contract
+3. 执行失败不以 prompt 替代最终图；失败原因写入「待补充清单」
 
 ### 生成后验证清单
 
@@ -57,5 +57,5 @@
 | 配色为学术色板（非 rainbow/jet） | ✅ | ✅ |
 | 坐标轴标签可读、无乱码 | ✅ | — |
 | 模块/连接与代码/论文描述一致 | — | ✅ |
-| 输出矢量格式（SVG） | ✅ | — |
+| 输出矢量格式（SVG） | ✅ | ✅ |
 | 灰度打印可辨识 | ✅ | ✅ |

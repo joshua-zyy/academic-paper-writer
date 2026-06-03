@@ -49,7 +49,7 @@ Abstract 为后置章节，不在初始队列中。默认顺序：Introduction �
 |----|------|-----------|
 | DP-1 | Step 1.5 完成后 | Venue Brief 摘要（venue、语言、min_citations） |
 | DP-2 | Step 5 Blueprint 完成后 | Section Blueprint（章节结构、每节要点、证据来源） |
-| DP-3 | Step 6.2 Draft v1 完成后 | Draft 摘要（当前节、段落数、待补项清单） |
+| DP-3 | Step 6.2 Draft v1 完成后 | Draft 摘要（当前节、段落数、待补充清单） |
 | DP-4 | Step 6.8 Verification 完成后 | Verification Status（verdict、未闭合问题） |
 
 ## File Output Rules
@@ -57,7 +57,7 @@ Abstract 为后置章节，不在初始队列中。默认顺序：Introduction �
 1. **输出目录**：`./docs/paper-drafts/`
 2. **论文文件**：`paper_draft.md` — 正文 + 参考文献 + 待补项，逐步追加
 3. **Blueprint文件**：`section_blueprint.md` — 每节更新
-4. **图片目录**：`figures/` — SVG + `figure_prompts.md`；`figures/codes/` — `plot_*.py`
+4. **图片目录**：`figures/` — SVG 图表输出；`figures/codes/` — `plot_*.py` 与 `draw_fig*_arch.py`
 5. **对话输出限制**：禁止在对话中输出完整论文正文，仅显示简短进度摘要
 6. **写入时机**：每节 Draft 生成后、Verification 完成后使用 Write/Edit 更新 `paper_draft.md`
 7. **中间状态**：Evidence Inventory、Verified References、Revision Queue 等在 agent 上下文中维护

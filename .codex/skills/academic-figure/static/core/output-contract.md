@@ -1,4 +1,4 @@
-# Figure Output Contract
+# 图表输出契约（Figure Output Contract）
 
 ## `chart-from-data`
 
@@ -9,22 +9,23 @@
 - Optional PDF and TIFF/PNG submission exports
 - QA report referencing `references/qa-contract.md`
 
-## `architecture-image`
+## `architecture-svg`
 
 - Architecture Contract
-- Image Prompt Spec
-- Generated image path or prompt fallback
+- Python vector drawing script
+- Editable SVG as primary output
 - Caption draft
 - Human-verifiable architecture checklist
 - Unconfirmed items marked with `[VERIFY_ARCH: ...]`
 
-## `arch-prompt`
+## `arch-prompt`（仅限用户明确要求）
 
 - Architecture analysis
 - Tool-agnostic prompt text
 - Component list
 - Data-flow and connection notes
 - Explicit unconfirmed items
+- Must state that this is not the default drawing path
 
 ## `figure-blueprint`
 

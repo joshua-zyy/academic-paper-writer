@@ -14,3 +14,9 @@
 ## exemplar-set-only
 
 - Exemplar Set（不强制输出完整引用列表）
+
+## final-reference-section support
+
+- 每条 Verified Reference 必须保留可写入最终 `## References` 的完整条目字段。
+- 每条正文 inline citation marker 必须映射到一条 Verified Reference 或明确的 `[REF_NEEDED: ...]`。
+- 输出不得鼓励按章节拆分参考文献列表；最终由 `academic-paper-writer` 汇总为一份全稿 References。

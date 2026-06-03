@@ -1,10 +1,10 @@
-# Mock Reviewer Package
+# 模拟审稿人包（Mock Reviewer Package）
 
-Use this reference only for `mock-reviewer-package` mode. This mode produces reviewer-style assessment for pre-submission risk discovery. It does not replace `Verification Status` and must not act as an editor decision letter.
+仅在 `mock-reviewer-package` mode 下使用本参考。该模式用于投稿前发现审稿风险，生成 reviewer-style assessment。它不能替代 `Verification Status`，也不得写成编辑部决定信。
 
-## Required Setup
+## 必要设置
 
-Start with:
+输出必须先包含以下结构：
 
 ```markdown
 ## Review Setup
@@ -15,9 +15,11 @@ Start with:
 - Missing materials affecting confidence:
 ```
 
-If the input is partial, continue with a bounded review and mark non-assessable items explicitly.
+如果输入只是局部草稿，继续做有边界的 review，并明确标记不可评估项。
 
-## Output Structure
+## 输出结构
+
+以下标题和字段作为结构化输出契约保留英文：
 
 ```markdown
 ## Reviewer 1
@@ -54,13 +56,13 @@ If the input is partial, continue with a bounded review and mark non-assessable 
 - [specific unsupported or not-assessable item]
 ```
 
-## Non-Invention Rules
+## 不得编造规则（Non-Invention Rules）
 
-- Do not invent reviewer identities, institutions, seniority, specialties, or hidden expertise.
-- Do not invent experiments, controls, datasets, citations, figure panels, line numbers, or prior-work distinctions.
-- Do not state an editorial decision or claim certainty about venue acceptance.
-- Reviewer differences may reflect emphasis only, not access to different facts.
+- 不得编造 reviewer identities、institutions、seniority、specialties 或 hidden expertise。
+- 不得编造 experiments、controls、datasets、citations、figure panels、line numbers 或 prior-work distinctions。
+- 不得陈述 editorial decision，也不得声称可以确定 venue acceptance。
+- 不同 reviewer 只能体现关注重点差异，不能假装他们掌握不同事实。
 
-## Relation to Verification
+## 与 Verification 的关系
 
-After the reviewer package, still provide or preserve the normal `Verification Status` if the orchestrator expects it. Reviewer reports are diagnostic; `Verification Status` remains the machine-consumable gate output.
+生成 reviewer package 后，如果编排器需要，仍必须提供或保留正常的 `Verification Status`。Reviewer reports 是诊断性输出；`Verification Status` 才是机器可消费的门控输出。

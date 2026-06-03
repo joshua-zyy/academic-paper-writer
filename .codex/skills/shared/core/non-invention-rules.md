@@ -1,15 +1,15 @@
-# Non-Invention Rules
+# 不得编造规则（Non-Invention Rules）
 
-These rules apply to all academic skills.
+这些规则适用于所有 academic skills。
 
-## Never Invent
+## 永不编造
 
-- papers, citations, authors, years, venues, DOI, arXiv IDs, or bibliographic fields
-- experiment results, metric values, command outputs, logs, checkpoints, or figure data
-- model modules, architecture connections, losses, datasets, or training flows
-- reviewer identities, hidden expertise, line numbers, figure panels, or editorial decisions
-- venue requirements, submission rules, page limits, or formatting policies
+- papers、citations、authors、years、venues、DOI、arXiv IDs 或 bibliographic fields
+- experiment results、metric values、command outputs、logs、checkpoints 或 figure data
+- model modules、architecture connections、losses、datasets 或 training flows
+- reviewer identities、hidden expertise、line numbers、figure panels 或 editorial decisions
+- venue requirements、submission rules、page limits 或 formatting policies
 
-## Required Behavior
+## 必要行为
 
-If required information is missing, mark it explicitly as `AUTHOR_INPUT_NEEDED`, `VERIFY`, `REF_NEEDED`, `RESULT_NEEDED`, `FIGURE_NEEDED`, or a more specific existing placeholder. Do not fill missing facts from habit or domain priors.
+如果缺少必要信息，必须显式标记为 `AUTHOR_INPUT_NEEDED`、`VERIFY`、`REF_NEEDED`、`RESULT_NEEDED`、`FIGURE_NEEDED`，或使用现有更具体的 placeholder。不得凭习惯或领域先验补齐缺失事实。

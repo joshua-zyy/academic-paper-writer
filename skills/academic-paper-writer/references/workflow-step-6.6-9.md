@@ -234,9 +234,14 @@ When generating Abstract:
 
 ---
 
-## Step 8: External Citation Checklist Generation（**强制**，全文完成后执行）
+## Step 8: 生成正式 References 与外部引用清单（**强制**，全文完成后执行）
 
-Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**生成引用文献清单。未生成清单不得输出最终稿。
+Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**生成两类引用产物：
+
+1. 写回 `paper_draft.md` 的正式 `## References` section。
+2. 写入 `referenced-literature-checklist.md` 的人工下载与确认清单。
+
+`referenced-literature-checklist.md` 不能替代 `paper_draft.md` 中的 `## References`。未生成正式 References 不得输出最终稿。
 
 **触发条件**：
 - Abstract 已生成（隐含所有 core sections Verification = passed）
@@ -244,11 +249,15 @@ Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**生成引�
 
 **执行流程**：
 
-1. 从 Cumulative Draft 中提取所有引用的外部文献条目（去重）
-2. 统计去重后引用总数
-3. 若总数 < `min_citations`，在对话中提示用户："当前引用 X 篇，未达到本轮配置的 min_citations={min_citations}。建议补充以下方向的文献检索：[...]"。用户确认后可继续，但 `referenced-literature-checklist.md` 顶部标注 `⚠️ 引用数未达标：X/{min_citations}`。
-4. 为每篇文献记录：标题、作者、venue、引用章节、引用目的
-5. **必须**写入 `./docs/paper-drafts/referenced-literature-checklist.md`
+1. 从 Cumulative Draft 提取所有 inline citation marker。
+2. 用 Verified References / Citation-to-Claim Map 建立 marker → reference entry 映射。
+3. 去重并按正文编号顺序生成正式 `## References`。
+4. 使用 Edit 工具替换或创建 `paper_draft.md` 中唯一的 `## References` section。
+5. 检查各章节末尾没有“引用说明”“本节引用”“Reference notes”等章节级引用块。
+6. 统计去重后引用总数。
+7. 若总数 < `min_citations`，在对话中提示用户："当前引用 X 篇，未达到本轮配置的 min_citations={min_citations}。建议补充以下方向的文献检索：[...]"。用户确认后可继续，但 `referenced-literature-checklist.md` 顶部标注 `⚠️ 引用数未达标：X/{min_citations}`。
+8. 为每篇文献记录：标题、作者、venue、引用章节、引用目的。
+9. **必须**写入 `./docs/paper-drafts/referenced-literature-checklist.md`。
 
 **输出模板**：
 ```markdown
@@ -292,13 +301,13 @@ Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**执行图�
 ### 触发条件
 
 - Abstract 已生成（隐含所有 core sections Verification = passed）
-- `./docs/paper-drafts/figures/figure_prompts.md` 或 `./docs/paper-drafts/figures/codes/plot_*.py` 存在
+- `./docs/paper-drafts/figures/codes/plot_*.py` 或 `./docs/paper-drafts/figures/codes/draw_fig*_arch.py` 存在
 
 ### 9a. 扫描图片产出物
 
-1. 检查 `./docs/paper-drafts/figures/figure_prompts.md` 是否存在且包含未生成的架构图提示词
-2. 检查 `./docs/paper-drafts/figures/codes/` 目录下是否存在 `plot_fig*.py` 且对应图片尚未生成
-3. 统计：已生成图片数 / 提示词待生成数 / 代码待执行数
+1. 检查 `./docs/paper-drafts/figures/codes/` 目录下是否存在 `plot_fig*.py` 且对应 SVG 尚未生成
+2. 检查 `./docs/paper-drafts/figures/codes/` 目录下是否存在 `draw_fig*_arch.py` 且对应 SVG 尚未生成
+3. 统计：已生成 SVG 数 / 数据图代码待执行数 / 架构图 SVG 代码待执行数
 
 ### 9b. 数据图批量执行
 
@@ -323,46 +332,15 @@ if (Test-Path $scriptPath) {
 }
 ```
 
-### 9c. 架构图批量生成
+### 9c. 架构图 SVG 批量执行
 
-对 `./docs/paper-drafts/figures/figure_prompts.md` 中每个架构图提示词：
+对 `./docs/paper-drafts/figures/codes/draw_fig*_arch.py`：
 
-1. 提取各图的 prompt 文本
-2. 对每个 prompt，**按以下优先级尝试生成**：
-   - 若当前环境支持直接调用 image generation（如 DALL-E / Stable Diffusion / Codex image），则 dispatch `academic-figure`（architecture-image 模式）生成实际图片
-   - 否则，在对话中输出提示："以下架构图提示词待手动在外部工具中生成：`<prompt>`"
-3. 生成后的图片保存到 `./docs/paper-drafts/figures/fig{N}_arch.png`
-4. 正文中的图编号引用保持不变
-
-**Dispatch 模板（architecture-image 模式）**：
-```yaml
-Task:
-  description: "生成架构图 - Figure {N}"
-  subagent_type: "general"
-  prompt: |
-    你已加载 academic-figure 子 Skill（skills/academic-figure/SKILL.md）。
-
-    任务: 以 architecture-image 模式生成架构图
-    图编号: Figure {N}
-    图用途: {从 figure_prompts.md 中提取的描述}
-
-    架构图提示词（来自 figure_prompts.md）:
-    {完整的 prompt 文本}
-
-    执行步骤:
-    1. 读取 skills/academic-figure/SKILL.md，按 architecture-image 模式执行
-    2. 读取 skills/academic-figure/references/workflow-architecture-image.md
-    3. 使用提示词调用 image generation 生成图片
-    4. 保存图片为 ./docs/paper-drafts/figures/fig{N}_arch.png
-    5. 输出事实核对清单（模块/连接/文字是否与原文一致）
-
-    约束:
-    - 遵循 academic-figure SKILL.md 中的 Red Lines
-    - 不得编造不存在的模块或连接
-    - 若 image generation 不可用，明确报告"不可用"并返回 prompt 文本
-
-    返回: 生成结果（成功/失败 + 图片路径 或 错误说明）
-```
+1. 检查 Python 环境与 matplotlib 是否可用。
+2. 执行脚本生成 SVG。
+3. 验证 SVG 文件存在且包含可编辑文本节点。
+4. 核对模块、箭头、标签均来自 Architecture Contract。
+5. 失败时记录到「待补充清单」，不输出 prompt 作为替代最终图。
 
 ### 9d. 输出图片生成报告
 
@@ -373,15 +351,15 @@ Task:
 
 | 图片 | 类型 | 状态 | 路径/说明 |
 |------|------|------|----------|
-| Figure 1 | 架构图 | ✅ 已生成 | ./docs/paper-drafts/figures/fig1_arch.png |
+| Figure 1 | 架构图 | ✅ 已生成 | ./docs/paper-drafts/figures/fig1_arch.svg |
 | Figure 2 | 数据图 | ❌ 待生成 | ./docs/paper-drafts/figures/codes/plot_fig2.py 执行失败 |
-| Figure 3 | 架构图 | ⚠️ 待手动 | 需用户自行使用 prompt 生成 |
+| Figure 3 | 架构图 | ⚠️ 待修复 | ./docs/paper-drafts/figures/codes/draw_fig3_arch.py 执行失败 |
 | Figure 4 | 数据图 | ✅ 已生成 | ./docs/paper-drafts/figures/fig4.svg |
 ```
 
 ### 9e. 更新 Cumulative Draft
 
-将图片生成报告追加到 `./docs/paper-drafts/paper_draft.md` 末尾（作为内部记录，非正式正文）。
+将图片生成报告写入 `./docs/paper-drafts/figures/figure-generation-report.md`。不得将报告追加到 `paper_draft.md` 末尾；`paper_draft.md` 必须继续以同步后的 `## 待补充清单` 作为末尾结构。
 
 **执行顺序约束**：
 - Step 8（引用清单）→ Step 9（图片批量生成）→ 输出最终稿

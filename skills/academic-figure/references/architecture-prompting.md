@@ -1,5 +1,7 @@
 # Architecture Prompting: 模型架构图生图提示词
 
+本参考仅用于用户明确要求 `arch-prompt` 或外部生图工具提示词时。默认论文架构图应使用 `architecture-svg` 直接生成可编辑 SVG。
+
 `arch-prompt` 模式中生成结构化生图提示词的参考。提示词为工具无关的描述式模板，用户可适配到任意生图工具。
 
 ## 提示词编写原则

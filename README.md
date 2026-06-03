@@ -388,7 +388,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 │    ↓                                                                    │
 │   🧩 Step 5  Section Blueprint / Method Blueprint                        │
 │    ↓                                                                    │
-│   ✏️ Step 6  Draft v1（前置深度探查检查 + 占位符系统 + 待补项清单）       │
+│   ✏️ Step 6  Draft v1（前置深度探查检查 + 占位符系统 + 待补充清单）       │
 │    ↓                                                                    │
 │   📌 Step 6.4  占位符审计 + 图表生成                                       │
 │    ↓                                                                    │
@@ -407,7 +407,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 │   📌 Abstract 后置 — 所有核心章节全部 passed 后才允许生成                  │
 │   📋 Step 8  引用清单生成（**强制**，核验 >= `min_citations` 篇引用，默认 35）                │
 │    ↓                                                                    │
-│   🖼️ Step 9  图片批量生成（**强制**，执行绘图代码 + 架构图 image generation）                 │
+│   🖼️ Step 9  图片批量生成（**强制**，执行数据图代码 + 架构图 SVG 脚本）                 │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 

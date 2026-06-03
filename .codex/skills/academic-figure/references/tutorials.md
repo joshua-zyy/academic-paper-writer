@@ -122,7 +122,9 @@ finalize_figure(fig, "confusion_matrix")
 
 ---
 
-## 教程 4：模型架构图（arch-prompt）
+## 教程 4：外部生图提示词兼容路径（arch-prompt，非默认）
+
+默认模型架构图应使用 `architecture-svg` 直接生成可编辑 SVG。本教程仅适用于用户明确要求“生图提示词”或外部工具 prompt 的场景。
 
 ### 用户输入
 "帮我生成一个 Vision Transformer 架构图的生图提示词，用在论文 Model 部分。"

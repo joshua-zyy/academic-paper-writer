@@ -23,12 +23,28 @@ import time
 from pathlib import Path
 from typing import Optional
 
+
+MIN_PYTHON = (3, 12)
+
+
+def ensure_supported_python() -> None:
+    if sys.version_info < MIN_PYTHON:
+        current = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+        required = ".".join(str(part) for part in MIN_PYTHON)
+        print(f"错误: markitdown 需要 Python {required}+，当前环境为 Python {current}。")
+        print("请切换到 Python 3.12+ 环境后再执行 PDF 转 Markdown。")
+        print("示例: py -3.12 -m pip install markitdown")
+        sys.exit(1)
+
+
+ensure_supported_python()
+
 try:
     from markitdown import MarkItDown
 except ImportError:
-    print("错误: 需要 markitdown 库。请在当前 Python 环境中运行:")
-    print("  pip install markitdown")
-    print("  (如果使用 conda 环境: conda activate <环境名> && pip install markitdown)")
+    print("错误: 需要 markitdown 库。请在当前 Python 3.12+ 环境中运行:")
+    print("  python -m pip install markitdown")
+    print("  (如果使用 conda 环境: conda activate <环境名> && python -m pip install markitdown)")
     print("  注意: markitdown 只能通过 pip 安装，conda install 不支持")
     sys.exit(1)
 

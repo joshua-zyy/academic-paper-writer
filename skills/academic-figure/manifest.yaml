@@ -16,14 +16,14 @@ axes:
     detect: |
       Select the smallest mode that satisfies the request. Use an explicit user
       mode if provided. Data files or numeric results imply chart-from-data.
-      Model structure plus a request to draw implies architecture-image.
+      Model structure plus a request to draw implies architecture-svg.
       A request for an external image prompt implies arch-prompt. Existing
       figure files plus critique language imply figure-audit; existing figures
       plus requested edits imply figure-revision. Section-level figure planning
       implies figure-blueprint.
     values:
       chart-from-data: references/workflow-chart-from-data.md
-      architecture-image: references/workflow-architecture-image.md
+      architecture-svg: references/workflow-architecture-svg.md
       arch-prompt: references/workflow-arch-prompt.md
       figure-blueprint: references/figure-contract.md
       figure-audit: references/qa-contract.md
@@ -36,9 +36,9 @@ references:
       path: references/figure-contract.md
     - condition: execute Python data plotting workflow
       path: references/workflow-chart-from-data.md
-    - condition: generate or verify model architecture image workflow
-      path: references/workflow-architecture-image.md
-    - condition: generate tool-agnostic architecture prompt
+    - condition: generate or verify model architecture SVG workflow
+      path: references/workflow-architecture-svg.md
+    - condition: user explicitly requests a tool-agnostic architecture prompt
       path: references/workflow-arch-prompt.md
     - condition: write Python plotting code
       path: references/api.md

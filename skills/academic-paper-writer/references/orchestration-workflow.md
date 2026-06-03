@@ -44,7 +44,7 @@
 | 6 | **Section Complete Loop** ⚠️ **每节必执行全流程，6.4–6.9 不可跳过。Draft v1 ≠ 初稿完成。** | 混合：见图表/审查/验证 dispatch | 自动 | DP-3, DP-4 | — |
 |   | ├ 6.0 核对 Section Contract | — | 自动 | — | — |
 |   | ├ 6.1 前置探查 — **Phase 2 深层逐节探查**：搞懂"怎么做/为什么"（公式推导、机制细节、实验深度）**MUST use sub-agents for multi-probe sections** | probe-agent / citation-agent / literature-reader-agent（并行） | 自动 | — | **深层逐节**：针对当前 section 做深入代码级/文献级探查，直接支撑起草 |
-|   | ├ 6.2 Draft v1（含占位符 + 待补项清单） | — | 自动 | DP-3 | — |
+|   | ├ 6.2 Draft v1（含占位符 + 待补充清单） | — | 自动 | DP-3 | — |
 |   | ├ 6.3 写入 paper_draft.md | — | 自动 | — | — |
 |   | ├ 6.4 占位符审计 + 图表生成（⚠️ **强制执行，不可跳过**） | `academic-figure`（dispatch） | 自动 | — |
 |   | ├ 6.5 证据合规审查（⚠️ **强制，Review Phase 1**） | `academic-reviser`（dispatch） | 自动 | — |
@@ -54,7 +54,7 @@
 |   | └ 6.9 更新 Cumulative Draft → 推进下一节 | — | 自动 | — |
 | 7 | 整合 & 依赖感知 section loop | — | 自动 | — |
 | 8 | **引用清单生成**（强制，全文完成后执行） | — | 自动 | — |
-| 9 | **图片批量生成**（强制，全文完成后执行） | `academic-figure`（dispatch，chart-from-data / architecture-image） | 自动 | — |
+| 9 | **图片批量生成**（强制，全文完成后执行） | `academic-figure`（dispatch，chart-from-data / architecture-svg） | 自动 | — |
 
 ---
 

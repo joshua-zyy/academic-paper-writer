@@ -352,6 +352,8 @@ Reference list must only contain entries cited in body or declared via `[REF_NEE
 
 Draft v1 生成后，**必须**立即将正文内容写入 `./docs/paper-drafts/paper_draft.md`。使用 Write 工具（首次）或 Edit 工具（追加/替换）更新文件。
 
+**References 位置规则（强制）**：`## References` 是全稿唯一正式参考文献列表，只能出现在 `paper_draft.md` 末尾的统一位置。任何章节 Draft v1 不得在章节末尾单独输出“引用说明”“本节参考文献”或类似块。
+
 **paper_draft.md 结构要求**（强制）：
 ```
 # {Paper Title}
@@ -427,7 +429,7 @@ Draft v1 生成后，**必须**立即将正文内容写入 `./docs/paper-drafts/
 - [ ] **6.4a** 扫描全文占位符（统计 + 分类）
 - [ ] **6.4b** 主动补入遗漏的图表占位符（不可跳过，即使无遗漏也要确认）
 - [ ] **6.4c** 为每个 `[FIGURE_NEEDED]` 建立 Figure Contract
-- [ ] **6.4d** 双路径图表处理（architecture → prompts，data → code）
+- [ ] **6.4d** 双路径图表处理（architecture → SVG script，data → code）
 - [ ] **6.4e** 更新待补充清单：将 6.4a 扫描到的占位符按类型更新到 paper_draft.md 末尾的「待补充清单」中（格式见 Step 6.3）
 - [ ] **6.4f** 报告审计结果（`placeholder_stats`）
 - [ ] **6.4g** Dispatch 架构图子代理（对每个架构图类占位符）
@@ -458,7 +460,7 @@ After Draft v1, **必须**自动执行以下子步骤：
 
 ### 6.4c. Figure Contract（前置步骤，在生成任何图表之前**必须**完成）
 
-对每个 `[FIGURE_NEEDED]` 占位符，在生成提示词或代码之前，**必须**先完成 Figure Contract：
+对每个 `[FIGURE_NEEDED]` 占位符，在生成 SVG 脚本或数据图代码之前，**必须**先完成 Figure Contract：
 
 1. **Core conclusion**：用一句话陈述该图必须捍卫的论点
 2. **Evidence chain**：将每个计划面板映射到该论点，删除不承载独立证据的面板
@@ -469,11 +471,11 @@ After Draft v1, **必须**自动执行以下子步骤：
 
 对每个 `[FIGURE_NEEDED]` 按 Figure Contract 的分类结果进行双路径处理：
 
-**arch-prompt 模式 — 架构图提示词**（purpose 含 architecture / structure / pipeline / diagram / network / flow / 架构 / 模块图 / framework / overview 等）：
-- 按下文 Step 6.4g 的 dispatch 模板委托 `academic-figure` 的 arch-prompt 模式
-- 生成的提示词写入 `./docs/paper-drafts/figures/figure_prompts.md`（按图编号分节）
-- 正文中的占位符替换为图编号引用（如 `Figure X` 或 `图X`）
-- 若 `./docs/paper-drafts/figures/figure_prompts.md` 不存在，使用 Write 工具创建；若已存在，使用 Edit 工具追加
+**architecture-svg 模式 — 架构图/流程图/机制图 SVG**（purpose 含 architecture / structure / pipeline / diagram / network / flow / 架构 / 模块图 / framework / overview 等）：
+- 按下文 Step 6.4g 的 dispatch 模板委托 `academic-figure` 的 `architecture-svg` 模式
+- 生成 Python 绘图脚本到 `./docs/paper-drafts/figures/codes/draw_fig{N}_arch.py`
+- 生成或计划生成 SVG 到 `./docs/paper-drafts/figures/fig{N}_arch.svg`
+- 正文中的占位符替换为图编号引用（如 `Figure X` 或 `图X`）；待补清单记录 SVG 是否已生成和是否通过 QA
 
 **chart-from-data 模式 — 数据图绘图代码**（purpose 含 curve / comparison / ablation / result / 曲线 / 对比 / 消融 / 结果 / plot / chart / bar 等）：
 - 按下文 Step 6.4h 的 dispatch 模板生成 Python 绘图代码
@@ -496,19 +498,19 @@ After Draft v1, **必须**自动执行以下子步骤：
 ### 6.4f. 报告审计结果
 将占位符统计信息（`placeholder_stats`）纳入 Section Critique，供 Step 6.8 Verification 引用。
 
-### 6.4g. 架构图 dispatch 模板（arch-prompt 模式）
+### 6.4g. 架构图 dispatch 模板（architecture-svg 模式）
 对架构图类的 `[FIGURE_NEEDED]`，按此模板 dispatch：
 
 ```yaml
 Task:
-  description: "生成架构图提示词 - {module_name}"
+  description: "生成架构图 SVG - {module_name}"
   subagent_type: "general"
   prompt: |
     你已加载 academic-figure 子 Skill（skills/academic-figure/SKILL.md）。
 
-    任务: 以 arch-prompt 模式生成架构图生图提示词
+    任务: 以 architecture-svg 模式生成架构图/流程图/机制图 SVG
     图用途: {从 [FIGURE_NEEDED] 的 purpose 字段提取}
-    mode: arch-prompt
+    mode: architecture-svg
 
      Figure Contract:
     - Core conclusion: {Step 6.4c 中定义的论点}
@@ -516,33 +518,34 @@ Task:
     - Archetype: {图分类}
     - Export contract: {尺寸、格式等}
 
-    风格要求：参考 NeurIPS / CVPR / AAAI / ICLR 等顶会论文插图风格。
-    详见 skills/academic-figure/references/architecture-prompting.md 的「顶会风格参考」。
-    确保最终输出达到发表级质量。
+    风格要求：低饱和学术配色、短标签、清晰箭头、可编辑 SVG 文本。
 
     执行步骤:
-    1. 读取 skills/academic-figure/SKILL.md，按 arch-prompt 模式执行
+    1. 读取 skills/academic-figure/SKILL.md，按 architecture-svg 模式执行
     2. 确认模型结构：核心组件列表、数据流方向、关键连接方式（残差/跨层注意力等）
-    3. 按 skills/academic-figure/agents/figure_agent.md 中 arch-prompt 模式的 Output Schema 输出结构化结果
+    3. 生成 Python 矢量绘图脚本，保存到 ./docs/paper-drafts/figures/codes/draw_fig{N}_arch.py
+    4. 生成或计划生成 SVG，目标路径为 ./docs/paper-drafts/figures/fig{N}_arch.svg
+    5. 按 skills/academic-figure/agents/figure_agent.md 中 architecture-svg 模式的 Output Schema 输出结构化结果
 
-    Output Schema (arch-prompt 模式):
+    Output Schema (architecture-svg 模式):
     ```yaml
-    prompt: string              # 生图提示词（完整可执行的提示词文本，不得包含引用、占位符或 `[见...]` 类标记）
-    figure_description:
-      components: string[]      # 核心组件列表
-      data_flow: string         # 数据流方向说明
-      connections: string[]     # 关键连接方式
-      annotations: string[]     # 标注要求
+    architecture_contract: object
+    python_code: string
+    output_format: "SVG"
+    svg_path: string
+    caption_draft: string
+    verification_report: object
     ```
 
     约束:
     - 遵循 academic-figure SKILL.md 中的 Red Lines
-    - `prompt` 字段必须包含完整可执行的提示词文本，不得使用引用或占位符替代
+    - 不得只交付 prompt；默认交付 Python 脚本 + 可编辑 SVG
+    - 未确认模块或连接必须标记为 `[VERIFY_ARCH: ...]`
 
     返回: 严格按上述 YAML 格式输出，不附加任何额外文本
 ```
 
-dispatch 返回后，从子代理返回的结构化输出中提取 `prompt` 字段的完整文本内容，原样写入 `./docs/paper-drafts/figures/figure_prompts.md`。**禁止**使用引用、指针或 `[见...]` 类占位符替代实际提示词文本。同时将正文中的占位符替换为图编号引用。
+dispatch 返回后，将 `python_code` 写入 `./docs/paper-drafts/figures/codes/draw_fig{N}_arch.py`，将 `svg_path` 记录到待补充清单和正文图编号引用中。**禁止**用 prompt 替代默认 SVG 交付。
 
 ### 6.4h. 数据图绘图代码 dispatch 模板（chart-from-data 模式）
 对数据图类的 `[FIGURE_NEEDED]`，按此模板 dispatch：

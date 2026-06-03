@@ -98,7 +98,7 @@ def check_reference_files_exist(skills_root: Path) -> list:
 def check_figure_dispatch_modes(skills_root: Path) -> list:
     issues = []
     stale_paths = []
-    required_modes = ["arch-prompt", "chart-from-data", "architecture-image"]
+    required_modes = ["arch-prompt", "chart-from-data", "architecture-svg"]
 
     orchestrator_refs = skills_root / "academic-paper-writer" / "references"
     if orchestrator_refs.exists():
@@ -245,7 +245,7 @@ def check_codex_mirror_drift(skills_root: Path) -> list:
         mirror = codex_root / rel
         if not mirror.exists():
             missing.append(str(rel))
-        elif source.read_bytes() != mirror.read_bytes():
+        elif source.read_text(encoding="utf-8").replace("\r\n", "\n") != mirror.read_text(encoding="utf-8").replace("\r\n", "\n"):
             drift.append(str(rel))
     for mirror in sorted(codex_root.rglob("*")):
         if not mirror.is_file():
@@ -348,7 +348,7 @@ def check_figure_agent_mode_names(skills_root: Path) -> list:
         skills_root / "academic-figure" / "agents" / "figure_agent.md",
         skills_root / "academic-figure" / "references" / "workflow-chart-from-data.md",
         skills_root / "academic-figure" / "references" / "workflow-arch-prompt.md",
-        skills_root / "academic-figure" / "references" / "workflow-architecture-image.md",
+        skills_root / "academic-figure" / "references" / "workflow-architecture-svg.md",
     ]
     stale_patterns = [
         r'A\s*路径', r'B\s*路径', r'C\s*路径',

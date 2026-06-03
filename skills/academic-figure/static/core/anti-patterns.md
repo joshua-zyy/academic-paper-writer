@@ -1,9 +1,9 @@
-# Figure Anti-Patterns
+# 图表反模式（Figure Anti-Patterns）
 
-| Pattern | Problem | Correct |
+| 模式 | 问题 | 正确做法 |
 |---|---|---|
-| Aesthetics first | Using rainbow/jet palettes to make charts "look good" | Grayscale-safe restrained academic palette |
-| No QA delivery | Code runs → delivery without review | QA Contract required: readability, data consistency, format compliance |
-| Invented architecture | Prompts include non-existent module connections | Architecture from code/paper evidence only; unconfirmed items marked |
-| Hardcoded paths | File paths hardcoded to developer local paths | Use relative paths or parameterized configuration |
-| Delivering unchecked generated images | Image looks professional but modules/arrows may be wrong | Contract first, verify module-by-module after generation |
+| 美观优先 | 使用 rainbow/jet 色板让图“好看” | 使用灰度安全、克制的学术色板 |
+| 无 QA 交付 | 代码跑通就直接交付 | 必须执行 QA Contract：可读性、数据一致性、格式合规 |
+| 虚构架构 | SVG 或 prompt 包含不存在的模块连接 | 架构只能来自代码/论文证据；未确认项必须标记 |
+| 硬编码路径 | 文件路径写死为开发者本地路径 | 使用相对路径或参数化配置 |
+| 只交付 prompt | 用户要求绘图时只给外部生图提示词 | 默认交付 Python 脚本 + 可编辑 SVG；prompt 仅限用户明确要求 |

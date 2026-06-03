@@ -1,28 +1,31 @@
-# Orchestrator Output Contract
+# 编排器输出契约（Orchestrator Output Contract）
 
-The orchestrator owns writes under `./docs/paper-drafts/` during full-paper generation.
+完整论文生成期间，`academic-paper-writer` 编排器负责写入 `./docs/paper-drafts/` 下的最终产物。
 
-## Default Files
+## 默认文件
 
-- `paper_draft.md`: paper body, references, and pending items (末尾必须包含「待补充清单」，汇总所有占位符)
-- `section_blueprint.md`: current Section Blueprint and Section Contract
-- `venue-brief.md`: target venue requirements and style notes
-- `figures/`: figure outputs and `figure_prompts.md`
-- `figures/codes/`: generated Python plotting scripts
+- `paper_draft.md`: 论文正文、唯一正式 `## References`、以及末尾统一「待补充清单」。正文只能使用 inline citation marker；各节不得单独列出引用说明或章节级参考文献。
+- `section_blueprint.md`: 当前 Section Blueprint 与 Section Contract
+- `venue-brief.md`: 目标 venue 要求与风格说明
+- `figures/`: 图表输出，默认交付 SVG
+- `figures/codes/`: 生成的 Python 绘图脚本
 
-## Write Boundary
+## 写入边界
 
-Sub-skills return structured content and suggested paths. The orchestrator performs final writes when running the complete paper workflow.
+子 skill 返回结构化内容和建议路径。完整论文 workflow 运行时，由编排器执行最终写入。
 
-## Default Deliverables
+## 默认交付物
 
 - **full-paper-planning**: paper_draft.md (complete), section_blueprint.md, venue-brief.md, figures/, Verified References + Citation-to-Claim Map
 - **section-drafting**: Updated paper_draft.md (single section)
 - **section-revision**: Revised section text or revised section blueprint
 
-## Completion Criteria
+## 完成标准
 
 - All Hard Gates (A-E) passed
 - Thin draft resolved (content density check)
 - Final verification passed (all hard debts closed)
 - Citations >= min_citations (Gate D)
+- `paper_draft.md` contains exactly one formal `## References` section.
+- `paper_draft.md` ends with a synchronized `## 待补充清单`.
+- No section-level citation explanation blocks remain after individual sections.

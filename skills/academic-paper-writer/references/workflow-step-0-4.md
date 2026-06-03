@@ -55,10 +55,14 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
   - 有 → 记录路径为 `local_ref_pdf_dir`
   - 没有 → `local_ref_pdf_dir = null`，跳过本地文献流程
 - 如果有，告知将在其同级创建 `refs_md/` 目录存放转换后的 MD 文档
-- **必须检查 `markitdown` 是否已安装**，未安装时提供命令：
+- **必须先检查 Python 版本，再检查 `markitdown`**：
+  ```bash
+  python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')"
+  python -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 12) else 1)"
+  python -c "import markitdown; print('ok')"
   ```
-  pip install markitdown
-  ```
+- Python `< 3.12` → 停止 PDF→MD 转换，提示用户切换到 Python 3.12+ 环境并安装 `markitdown`
+- Python `>= 3.12` 但 `markitdown` 未安装 → 输出 `python -m pip install markitdown` 安装提示，等待用户安装后重新验证
 - 接下来进入 **Step 1b** 的 PDF→MD 转换准备
 - 若用户明确没有本地文献库或跳过转换：`local_ref_md_dir = null`，跳过 Step 1b
 
@@ -102,9 +106,10 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
 
 - [ ] 7. **本地文献库自动转换**（仅当第5项或第6项为"有"时）
        - 计算两个 MD 输出目录（见 Step 1b）
-       - **检测 markitdown**：执行 `python -c "import markitdown; print('ok')"` 检测是否已安装
-       - 未安装 → 输出 `pip install markitdown` 安装提示 → 等待用户安装完毕后，再次运行 `python -c "import markitdown; print('ok')"` 验证 → 通过后自动继续执行转换
-       - 已安装 → **自动执行转换**（Agent 自行调用 `bash` 工具，两个库可并行执行）
+       - 检查 Python 版本：必须 `>= 3.12`
+       - 检查 `markitdown`：必须安装在同一个 Python 环境中
+       - 任一检查失败 → 停止转换并提示用户配置环境；不得继续执行转换脚本
+       - 两项检查通过 → **自动执行转换**（Agent 自行调用 `bash` 工具，两个库可并行执行）
        - 转换完成后自动进入第8项（Step 1.4），无需用户介入
 
 - [ ] 8. **项目上下文提取**（强制 — 必须在 venue 调研前执行）
@@ -123,6 +128,15 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
 ### Step 1 自动转换执行规则（第7项使用）
 
 当用户提供了本地风格参考文献库或本地参考文献库路径后，**Agent 自动执行转换，无需用户介入**。两个库可并行执行：
+
+执行转换前必须完成 Python 与 `markitdown` 双门禁：
+
+```bash
+python -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 12) else 1)"
+python -c "import markitdown; print('ok')"
+```
+
+任一门禁失败时，停止转换并提示用户配置 Python 3.12+ 与 `markitdown`，不得继续执行以下转换命令。
 
 ```
 {当 local_style_pdf_dir 不空时:}
@@ -390,12 +404,15 @@ local_style_md_dir = <local_style_pdf_dir>/../style_md/
 local_ref_md_dir = <local_ref_pdf_dir>/../refs_md/
 ```
 
-### 1b.2 检测 markitdown 并自动执行转换
+### 1b.2 检查 Python 与 `markitdown` 后自动执行转换
 
-1. **检测 markitdown**：Agent 运行 `python -c "import markitdown; print('ok')"`
-   - 输出 "ok" → 已安装，继续执行
-   - 报 ImportError → 输出安装提示：`pip install markitdown` → **等待用户安装** → 再次运行 `python -c "import markitdown; print('ok')"` 验证通过后继续
-2. **自动执行转换**：Agent 使用 `bash` 工具调用 `convert-pdfs-to-md.py`。两个库的转换可**并行执行**（两次 `bash` 调用在同一个消息中发出）：
+1. **检查 Python 版本**：Agent 运行 `python -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 12) else 1)"`。
+   - 退出码 0 → Python 版本满足 `markitdown` 要求，继续检查依赖。
+   - 非 0 → 输出环境提示并停止转换：`markitdown` 需要 Python 3.12+，请切换环境后重试。
+2. **检查 `markitdown`**：Agent 运行 `python -c "import markitdown; print('ok')"`。
+   - 输出 `ok` → 已安装，继续执行。
+   - 报 ImportError → 输出安装提示：`python -m pip install markitdown`，等待用户安装后重新验证。
+3. **自动执行转换**：只有 Python 版本和 `markitdown` 检查均通过时，Agent 才能调用 `convert-pdfs-to-md.py`。两个库的转换可**并行执行**（两次 `bash` 调用在同一个消息中发出）：
 
 ```bash
 # 风格文献库转换
@@ -416,7 +433,7 @@ python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_ref_pdf_dir
 4. 若任一转换失败 → 输出错误信息，提示用户手动检查该库；成功的库正常使用
 5. 自动进入 Step 1.4（项目上下文提取）→ 然后进入 Step 1.5（若 venue 已知）或 Step 2
 
-**markitdown 未安装时的处理**：Agent 检测到 `pip install markitdown` 需要执行时，提示用户安装后重启流程；Agent 不自行安装 Python 包。
+**Python 或 `markitdown` 检查失败时的处理**：Agent 只提示用户配置 Python 3.12+ 与 `python -m pip install markitdown`，不得自行安装 Python 包，也不得继续执行转换脚本。
 
 ## Step 2: Evidence Audit
 
