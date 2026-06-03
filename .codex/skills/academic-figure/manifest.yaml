@@ -56,7 +56,7 @@ references:
       path: references/design-theory.md
     - condition: CS/AI/ML chart design pattern, dense multi-panel layout, benchmark, ablation, training, robustness, or efficiency figure
       path: references/cs-ai-chart-design-patterns.md
-    - condition: architecture prompt wording details
+    - condition: architecture prompt wording details, visual director planning, or paper-figure quality controls
       path: references/architecture-prompting.md
     - condition: user needs an end-to-end example
       path: references/tutorials.md

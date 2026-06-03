@@ -4,6 +4,46 @@
 
 提示词为工具无关的描述式模板，必须受 Architecture Contract 约束；不得加入未被证据支持的模块、连接、数据集、损失或性能 claim。
 
+## 从 Visual Director Brief 到 Prompt
+
+生成 prompt 前必须已经有 Architecture Contract 和 Visual Director Brief。prompt 不是“高级顶会风格”的形容词堆砌，而是可执行的画面说明。
+
+通用结构：
+
+```text
+Create a publication-quality CS/AI/ML model architecture figure.
+
+Purpose:
+[This figure's single claim from Architecture Contract.]
+
+Style:
+White or near-white background, clean scientific paper figure, flat 2D vector-like modules,
+precise arrows, restrained academic palette, readable sans-serif labels.
+
+Composition:
+[Reading path and layout zones from Visual Director Brief. Mention left/right/top/bottom/center,
+main visual size, group boundaries, and zoom-in/inset placement.]
+
+Evidence-bound content:
+- [C1 label]: [role and visual form]
+- [C2 label]: [role and visual form]
+- [C1] -> [C2]: [arrow style and meaning]
+
+Visual details:
+- Main architecture diagram occupies about 70-85% of the canvas.
+- Use [short labels / numbered callouts / external legend].
+- Include only specified tensor shapes, matrices, token examples, graph snippets, attention maps, or result insets.
+
+Text policy:
+Use only exact short labels from the contract. Put long explanations in caption or overlay, not inside the image.
+
+Negative constraints:
+No unsupported modules, fake datasets, invented losses, performance numbers, fake UI, watermark,
+decorative 3D, glossy stock illustration, unreadable microtext, or long paragraphs.
+```
+
+对中文图尤其要减少图内文字：模块名和短标签优先，长解释进入 caption 或可编辑 overlay。
+
 ## 提示词编写原则
 
 ### 风格控制

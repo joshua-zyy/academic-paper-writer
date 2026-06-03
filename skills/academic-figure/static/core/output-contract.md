@@ -12,6 +12,7 @@
 ## `architecture-image`
 
 - Architecture Contract
+- Figure scope decision and Visual Director Brief
 - Evidence-grounded generation prompt
 - Generated high-resolution image as primary output
 - Optional editable SVG/PDF annotation overlay for labels, callouts, or final typography

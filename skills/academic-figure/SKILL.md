@@ -5,7 +5,7 @@ description: "Create, revise, or audit academic figures for CS/AI/ML papers. Dat
 
 # Academic Figure
 
-CS/AI/ML academic-figure router. 实验数据图默认交付 Python/matplotlib 可编辑 SVG，并执行 CS/AI/ML 图表设计 gate。模型框架图、overview figure、复杂模块图和机制图默认走 `architecture-image`：先建立事实合约，再用生图模型生成高分辨率图像，必要时追加可编辑标注层。提示词不是默认最终交付物。
+CS/AI/ML academic-figure router. 实验数据图默认交付 Python/matplotlib 可编辑 SVG，并执行 CS/AI/ML 图表设计 gate。模型框架图、overview figure、复杂模块图和机制图默认走 `architecture-image`：先建立事实合约和 Visual Director Brief，再用生图模型生成高分辨率图像，必要时追加可编辑标注层。提示词不是默认最终交付物。
 
 ## Router Protocol
 
@@ -39,7 +39,7 @@ CS/AI/ML academic-figure router. 实验数据图默认交付 Python/matplotlib �
 ## Completion Criteria
 
 - `chart-from-data`: Figure Contract, CS/AI/ML chart design gate, Python script, source data, editable SVG, QA report — all pass.
-- `architecture-image`: Architecture Contract, generation prompt, generated high-resolution image path, optional editable annotation overlay, caption draft, factual/visual verification report.
+- `architecture-image`: Architecture Contract, Figure Scope, Visual Director Brief, generation prompt, generated high-resolution image path, optional editable annotation overlay, caption draft, factual/visual verification report.
 - `architecture-svg`: Architecture Contract, Python 绘图脚本, 可编辑 SVG, caption draft, 事实核对清单；仅作为简单/显式矢量路径.
 - `arch-prompt`: 仅交付外部工具兼容提示词，并明确标注“非默认出图路径”.
 - `figure-audit`: Every QA item has pass/fail status and concrete remediation.

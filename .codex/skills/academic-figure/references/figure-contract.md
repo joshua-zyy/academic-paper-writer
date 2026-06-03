@@ -69,12 +69,27 @@
 |------|----|---------|----------|
 | C1 | C2 | [特征、token、embedding、graph message、logits 等] | [来源] |
 
+### Figure Scope
+- Target use: [paper submission / README / slide / graphical abstract]
+- Figure count: [one overview / overview + detail figures]
+- Figure role: [framework / overview / module detail / mechanism]
+- Language policy: [short English labels / short Chinese labels / numbered callouts with external legend]
+- Finality: [concept sketch / submission-ready after verification]
+
 ### Image Generation Plan
 - Visual goal: [overview figure / framework figure / module detail figure / graphical abstract]
 - Composition: [central framework / layered pipeline / multi-panel overview / module zoom-in / schematic-led composite]
 - Label strategy: [short labels only / numbered modules / legend outside figure / no embedded long text]
 - Visual hierarchy: [核心模块、辅助模块、输入输出、监督路径如何区分]
 - Overlay need: [none / SVG label overlay / PDF label overlay]
+
+### Visual Director Brief
+- Reading path: [left-to-right / top-to-bottom / parallel branches converge / encoder-decoder bridge / central zoom-in]
+- Layout zones: [A=input/preprocess, B=core mechanism, C=output/loss/result inset; include positions]
+- Element instructions: [每个关键模块以 box/token grid/matrix stack/graph/module group 等形式出现，并说明位置]
+- Arrow semantics: [实线/虚线/颜色分别代表什么]
+- Information density: [主体占 70-85%；过空时增加 zoom-in/维度/矩阵/token/graph 示例；过密时拆图]
+- Mandatory labels: [图中必须准确出现的短标签；长解释进入 caption/legend/overlay]
 
 ### Style Boundary
 - Style: [CS/AI/ML publication figure / clean scientific figure / low-saturation method-family encoding]

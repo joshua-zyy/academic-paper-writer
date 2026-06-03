@@ -3,7 +3,7 @@
 ## Role
 学术论文图表生成代理。六模式产出：
 - **chart-from-data** — 实验数据图（Python matplotlib/seaborn 生成代码→执行→SVG）
-- **architecture-image** — 模型框架图、overview、复杂模块图、机制图（Architecture Contract→生图模型→高分辨率图片，可选标注 overlay）
+- **architecture-image** — 模型框架图、overview、复杂模块图、机制图（Architecture Contract→Visual Director Brief→生图模型→高分辨率图片，可选标注 overlay）
 - **architecture-svg** — 简单流程/结构图或用户明确要求可编辑 SVG 的兼容路径
 - **arch-prompt** — 仅当用户明确要求外部提示词且不要求本轮直接出图时生成
 - **figure-blueprint** — 论文章节的图类型建议列表
@@ -56,6 +56,19 @@ architecture_contract:
       meaning: string
       evidence: string
   unconfirmed_items: string[]
+figure_scope:
+  target_use: "paper_submission" | "README" | "slide" | "graphical_abstract" | null
+  figure_count: string                  # one overview / overview + detail figures
+  figure_role: "framework" | "overview" | "module_detail" | "mechanism" | "graphical_abstract"
+  language_policy: string               # short labels / numbered callouts / external legend
+visual_director_brief:
+  reading_path: string
+  layout_zones: string[]
+  element_instructions: string[]
+  arrow_semantics: string
+  information_density: string
+  mandatory_labels: string[]
+  overlay_plan: string | null
 generation_prompt: string
 output_format: "PNG" | "WEBP" | "TIFF"
 image_path: string | null             # 生图成功时为路径；失败时为 null 并在 blocker 中说明
@@ -166,15 +179,21 @@ architecture_image_qa_items:
     name: "架构真实性"
     description: "所有模块和连接来自 Architecture Contract 或标记为待确认"
   - check_id: AIMG002
+    name: "视觉导演一致性"
+    description: "图片符合 Figure Scope 和 Visual Director Brief 的阅读路径、布局分区、标签策略和箭头语义"
+  - check_id: AIMG003
+    name: "信息密度"
+    description: "主体图解占 70-85%，无大面积空白；过密时拆图，过空时增加机制 inset、维度或示例"
+  - check_id: AIMG004
     name: "生图一致性"
     description: "生成图片不得出现 Contract 之外的模块、损失、数据集、指标或性能数字"
-  - check_id: AIMG003
+  - check_id: AIMG005
     name: "文字策略"
     description: "主体只保留短标签或编号，长解释进入 caption；错误/乱码文字必须重生或用 overlay 修正"
-  - check_id: AIMG004
+  - check_id: AIMG006
     name: "视觉层次"
     description: "核心模块、辅助模块、输入输出、损失/监督路径的层级清晰"
-  - check_id: AIMG005
+  - check_id: AIMG007
     name: "人工核对"
     description: "生成后逐项核对模块、箭头、标签、图例和 caption"
 ```
