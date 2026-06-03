@@ -37,7 +37,7 @@ PALETTE = {
     "gray_neutral": "#A0A0A0",
 }
 
-PALETTE_NMI_PASTEL = {
+PALETTE_CS_AI_PASTEL = {
     "baseline_dark": "#484878",
     "baseline_mid": "#7884B4",
     "baseline_soft": "#B4C0E4",
@@ -60,16 +60,20 @@ DEFAULT_COLORS = [
     PALETTE["neutral_light"],
 ]
 
-DEFAULT_COLORS_NMI_PASTEL = [
-    PALETTE_NMI_PASTEL["baseline_dark"],
-    PALETTE_NMI_PASTEL["baseline_mid"],
-    PALETTE_NMI_PASTEL["baseline_soft"],
-    PALETTE_NMI_PASTEL["ours_tiny"],
-    PALETTE_NMI_PASTEL["ours_base"],
-    PALETTE_NMI_PASTEL["ours_large"],
+PALETTE_NMI_PASTEL = PALETTE_CS_AI_PASTEL  # Backward-compatible alias.
+
+DEFAULT_COLORS_CS_AI_PASTEL = [
+    PALETTE_CS_AI_PASTEL["baseline_dark"],
+    PALETTE_CS_AI_PASTEL["baseline_mid"],
+    PALETTE_CS_AI_PASTEL["baseline_soft"],
+    PALETTE_CS_AI_PASTEL["ours_tiny"],
+    PALETTE_CS_AI_PASTEL["ours_base"],
+    PALETTE_CS_AI_PASTEL["ours_large"],
 ]
 
-PALETTE_LIST = DEFAULT_COLORS_NMI_PASTEL
+DEFAULT_COLORS_NMI_PASTEL = DEFAULT_COLORS_CS_AI_PASTEL  # Backward-compatible alias.
+
+PALETTE_LIST = DEFAULT_COLORS_CS_AI_PASTEL
 
 # Approximate NeurIPS/ICML double-column width in inches
 DOUBLE_COL_WIDTH = 5.5  # inches
@@ -222,7 +226,7 @@ def save_figure(fig, output_path: str):
 
 
 def save_pub_py(fig, filename, dpi=600):
-    """Nature-style convenience wrapper for publication export bundles."""
+    """Publication-style convenience wrapper for export bundles."""
     save_figure(fig, filename)
 
 

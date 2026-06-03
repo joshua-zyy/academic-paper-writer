@@ -1,8 +1,9 @@
 name: academic-figure
 description: >
-  Declarative routing manifest for Python-only academic figure work. SKILL.md
-  uses this file to load the shared figure stance, output contract, mode
-  reference, and deeper references only when needed.
+  Declarative routing manifest for hybrid academic figure work. Data plots use
+  Python-generated editable SVG with CS/AI/ML chart design gates; model framework
+  and complex architecture figures use an evidence-grounded image-generation
+  workflow by default. Deeper references load only when needed.
 
 always_load:
   - static/core/stance.md
@@ -16,13 +17,16 @@ axes:
     detect: |
       Select the smallest mode that satisfies the request. Use an explicit user
       mode if provided. Data files or numeric results imply chart-from-data.
-      Model structure plus a request to draw implies architecture-svg.
-      A request for an external image prompt implies arch-prompt. Existing
+      Model structure plus a request to draw implies architecture-image.
+      Explicit requests for simple editable vector/SVG diagrams may use
+      architecture-svg. A request for an external image prompt without rendering
+      implies arch-prompt. Existing
       figure files plus critique language imply figure-audit; existing figures
       plus requested edits imply figure-revision. Section-level figure planning
       implies figure-blueprint.
     values:
       chart-from-data: references/workflow-chart-from-data.md
+      architecture-image: references/workflow-architecture-image.md
       architecture-svg: references/workflow-architecture-svg.md
       arch-prompt: references/workflow-arch-prompt.md
       figure-blueprint: references/figure-contract.md
@@ -36,7 +40,9 @@ references:
       path: references/figure-contract.md
     - condition: execute Python data plotting workflow
       path: references/workflow-chart-from-data.md
-    - condition: generate or verify model architecture SVG workflow
+    - condition: generate or verify model architecture image workflow
+      path: references/workflow-architecture-image.md
+    - condition: user explicitly requests simple editable SVG architecture workflow
       path: references/workflow-architecture-svg.md
     - condition: user explicitly requests a tool-agnostic architecture prompt
       path: references/workflow-arch-prompt.md
@@ -48,8 +54,8 @@ references:
       path: references/qa-contract.md
     - condition: color, typography, layout, and export rationale
       path: references/design-theory.md
-    - condition: dense multi-panel or high-impact layout pattern
-      path: references/nature-style-chart-patterns.md
+    - condition: CS/AI/ML chart design pattern, dense multi-panel layout, benchmark, ablation, training, robustness, or efficiency figure
+      path: references/cs-ai-chart-design-patterns.md
     - condition: architecture prompt wording details
       path: references/architecture-prompting.md
     - condition: user needs an end-to-end example

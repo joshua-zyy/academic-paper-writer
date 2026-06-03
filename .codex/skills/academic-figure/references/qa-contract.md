@@ -1,6 +1,6 @@
 # QA Contract: 交付前 QA 检查清单
 
-`chart-from-data` 模式的 Step 7、`architecture-svg` 模式的 Step 5、`figure-audit` 模式中使用。逐项检查，所有关键项 pass 方可交付。
+`chart-from-data` 模式的 Step 7、`architecture-image` 模式的 Step 6、`architecture-svg` 兼容路径、`figure-audit` 模式中使用。逐项检查，所有关键项 pass 方可交付。
 
 ## Chart QA 检查清单
 
@@ -41,18 +41,18 @@
 - [ ] 未选择性展示有利结果？
 - [ ] 无隐藏的负面结果？
 
-## Architecture SVG QA 检查清单
+## Architecture Image QA 检查清单
 
 ### 1. 架构真实性
 - [ ] 所有模块均来自 Architecture Contract、论文草稿、代码证据或用户确认？
 - [ ] 所有连接方向均有证据或标记为 `[VERIFY_ARCH: ...]`？
 - [ ] 未添加未确认的损失函数、训练路径、推理路径或外部资源？
 
-### 2. SVG 输出一致性
-- [ ] 最终 SVG 与 Architecture Contract 一致？
-- [ ] SVG 中没有加入 Contract 之外的模块、数据集、损失或性能 claim？
-- [ ] SVG 主体没有长段文字；复杂说明已转入 caption 或图例？
-- [ ] SVG 文字可编辑，而不是全部转为 path？
+### 2. 生图输出一致性
+- [ ] 最终图片与 Architecture Contract 一致？
+- [ ] 图片中没有加入 Contract 之外的模块、数据集、损失或性能 claim？
+- [ ] 图片主体没有长段文字；复杂说明已转入 caption、图例或可编辑 overlay？
+- [ ] 没有 AI 生成的乱码、伪文字、错误模块名或错误箭头？
 
 ### 3. 数据流表达
 - [ ] 实线、虚线、颜色或 label 的语义一致？
@@ -64,12 +64,13 @@
 - [ ] 模块名短而稳定，细节放入图注而非挤在图中？
 - [ ] 颜色低饱和、灰度可辨、色盲友好？
 - [ ] 无不必要的 3D 装饰、过度阴影或视觉噪声？
-- [ ] SVG 在目标版面尺寸下仍清晰可读？
+- [ ] 位图分辨率满足目标版面；如有可编辑 overlay，overlay 与图片对齐？
 
 ### 5. 交付完整性
 
-- [ ] 已保存生成 SVG 文件？
-- [ ] 已保存可复现的 Python 绘图脚本？
+- [ ] 已保存生成图片文件或明确标注生图模型 blocker？
+- [ ] 已保存 generation prompt？
+- [ ] 如需精确标注，已保存可编辑 overlay？
 - [ ] 已输出 Architecture Contract？
 - [ ] 已输出 Caption Draft？
 - [ ] 已列出人工核对项和未确认风险？

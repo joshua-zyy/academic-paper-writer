@@ -1,12 +1,12 @@
 # arch-prompt 工作流
 
-本路径不是默认论文绘图路径。只有用户明确要求“生成提示词”“外部生图工具 prompt”时才使用。一般论文架构图应使用 `architecture-svg` 直接生成 SVG。
+本路径不是默认论文绘图路径。只有用户明确要求“生成提示词”“外部生图工具 prompt”，且本轮不要求直接出图时才使用。一般论文架构图应使用 `architecture-image` 调用生图模型完成主体视觉。
 
 ## 入口
 
 用户明确请求外部生图提示词 → `arch-prompt` 模式
 
-禁止自动触发：academic-paper-writer 的 Step 6.4 对架构图类占位符默认调用 `architecture-svg`。只有用户明确要求外部 prompt 时，才调用本模式。
+禁止自动触发：academic-paper-writer 的 Step 6.4 对架构图类占位符默认调用 `architecture-image`。只有用户明确要求外部 prompt 且不要求本轮生成图片时，才调用本模式。
 
 ## Step 1：确认模型结构
 

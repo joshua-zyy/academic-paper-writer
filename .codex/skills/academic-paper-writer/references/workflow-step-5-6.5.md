@@ -460,22 +460,22 @@ After Draft v1, **必须**自动执行以下子步骤：
 
 ### 6.4c. Figure Contract（前置步骤，在生成任何图表之前**必须**完成）
 
-对每个 `[FIGURE_NEEDED]` 占位符，在生成 SVG 脚本或数据图代码之前，**必须**先完成 Figure Contract：
+对每个 `[FIGURE_NEEDED]` 占位符，在生成架构图、生图提示词、SVG 脚本或数据图代码之前，**必须**先完成 Figure Contract：
 
 1. **Core conclusion**：用一句话陈述该图必须捍卫的论点
 2. **Evidence chain**：将每个计划面板映射到该论点，删除不承载独立证据的面板
 3. **Archetype**：将图分类为 `quantitative grid`、`schematic-led composite`、`image plate + quant` 或 `asymmetric mixed-modality figure`
-4. **Export contract**：设定最终尺寸、可编辑文本、源数据、统计信息、图像完整性说明和导出格式
+4. **Export contract**：设定最终尺寸、数据图可编辑文本、架构图生图/标注层需求、源数据、统计信息、图像完整性说明和导出格式
 
 ### 6.4d. 双路径图表处理
 
 对每个 `[FIGURE_NEEDED]` 按 Figure Contract 的分类结果进行双路径处理：
 
-**architecture-svg 模式 — 架构图/流程图/机制图 SVG**（purpose 含 architecture / structure / pipeline / diagram / network / flow / 架构 / 模块图 / framework / overview 等）：
-- 按下文 Step 6.4g 的 dispatch 模板委托 `academic-figure` 的 `architecture-svg` 模式
-- 生成 Python 绘图脚本到 `./docs/paper-drafts/figures/codes/draw_fig{N}_arch.py`
-- 生成或计划生成 SVG 到 `./docs/paper-drafts/figures/fig{N}_arch.svg`
-- 正文中的占位符替换为图编号引用（如 `Figure X` 或 `图X`）；待补清单记录 SVG 是否已生成和是否通过 QA
+**architecture-image 模式 — 架构图/流程图/机制图生图**（purpose 含 architecture / structure / pipeline / diagram / network / flow / 架构 / 模块图 / framework / overview 等）：
+- 按下文 Step 6.4g 的 dispatch 模板委托 `academic-figure` 的 `architecture-image` 模式
+- 生成 Architecture Contract 和 generation prompt；如生图模型可用，生成图片到 `./docs/paper-drafts/figures/fig{N}_arch.png`
+- 如需要精确文字，生成或计划生成可编辑标注层到 `./docs/paper-drafts/figures/fig{N}_arch_labels.svg`
+- 正文中的占位符替换为图编号引用（如 `Figure X` 或 `图X`）；待补清单记录图片是否已生成、是否有 blocker、是否通过 QA
 
 **chart-from-data 模式 — 数据图绘图代码**（purpose 含 curve / comparison / ablation / result / 曲线 / 对比 / 消融 / 结果 / plot / chart / bar 等）：
 - 按下文 Step 6.4h 的 dispatch 模板生成 Python 绘图代码
@@ -498,19 +498,19 @@ After Draft v1, **必须**自动执行以下子步骤：
 ### 6.4f. 报告审计结果
 将占位符统计信息（`placeholder_stats`）纳入 Section Critique，供 Step 6.8 Verification 引用。
 
-### 6.4g. 架构图 dispatch 模板（architecture-svg 模式）
+### 6.4g. 架构图 dispatch 模板（architecture-image 模式）
 对架构图类的 `[FIGURE_NEEDED]`，按此模板 dispatch：
 
 ```yaml
 Task:
-  description: "生成架构图 SVG - {module_name}"
+  description: "生成架构图生图结果 - {module_name}"
   subagent_type: "general"
   prompt: |
     你已加载 academic-figure 子 Skill（skills/academic-figure/SKILL.md）。
 
-    任务: 以 architecture-svg 模式生成架构图/流程图/机制图 SVG
+    任务: 以 architecture-image 模式生成架构图/流程图/机制图
     图用途: {从 [FIGURE_NEEDED] 的 purpose 字段提取}
-    mode: architecture-svg
+    mode: architecture-image
 
      Figure Contract:
     - Core conclusion: {Step 6.4c 中定义的论点}
@@ -518,34 +518,37 @@ Task:
     - Archetype: {图分类}
     - Export contract: {尺寸、格式等}
 
-    风格要求：低饱和学术配色、短标签、清晰箭头、可编辑 SVG 文本。
+    风格要求：低饱和学术配色、短标签或编号 callout、清晰箭头、主体视觉由生图模型完成；必要时使用可编辑 overlay 保证标签准确。
 
     执行步骤:
-    1. 读取 skills/academic-figure/SKILL.md，按 architecture-svg 模式执行
+    1. 读取 skills/academic-figure/SKILL.md，按 architecture-image 模式执行
     2. 确认模型结构：核心组件列表、数据流方向、关键连接方式（残差/跨层注意力等）
-    3. 生成 Python 矢量绘图脚本，保存到 ./docs/paper-drafts/figures/codes/draw_fig{N}_arch.py
-    4. 生成或计划生成 SVG，目标路径为 ./docs/paper-drafts/figures/fig{N}_arch.svg
-    5. 按 skills/academic-figure/agents/figure_agent.md 中 architecture-svg 模式的 Output Schema 输出结构化结果
+    3. 生成受证据约束的 generation_prompt
+    4. 如当前环境具备生图模型或 imagegen 能力，生成图片，目标路径为 ./docs/paper-drafts/figures/fig{N}_arch.png
+    5. 若图片需要精确标签，生成或计划生成 ./docs/paper-drafts/figures/fig{N}_arch_labels.svg
+    6. 按 skills/academic-figure/agents/figure_agent.md 中 architecture-image 模式的 Output Schema 输出结构化结果
 
-    Output Schema (architecture-svg 模式):
+    Output Schema (architecture-image 模式):
     ```yaml
     architecture_contract: object
-    python_code: string
-    output_format: "SVG"
-    svg_path: string
+    generation_prompt: string
+    output_format: "PNG" | "WEBP" | "TIFF"
+    image_path: string | null
+    annotation_overlay_path: string | null
+    blocker: string | null
     caption_draft: string
     verification_report: object
     ```
 
     约束:
     - 遵循 academic-figure SKILL.md 中的 Red Lines
-    - 不得只交付 prompt；默认交付 Python 脚本 + 可编辑 SVG
+    - 不得强行回退到 Python/SVG；默认使用生图模型。若生图能力不可用，必须输出 blocker 和完整 prompt，不得伪造图片路径
     - 未确认模块或连接必须标记为 `[VERIFY_ARCH: ...]`
 
     返回: 严格按上述 YAML 格式输出，不附加任何额外文本
 ```
 
-dispatch 返回后，将 `python_code` 写入 `./docs/paper-drafts/figures/codes/draw_fig{N}_arch.py`，将 `svg_path` 记录到待补充清单和正文图编号引用中。**禁止**用 prompt 替代默认 SVG 交付。
+dispatch 返回后，将 `image_path`、`generation_prompt`、`annotation_overlay_path` 和 `blocker` 状态记录到待补充清单和正文图编号引用中。**禁止**在可调用生图能力时只用 prompt 替代默认图片交付。
 
 ### 6.4h. 数据图绘图代码 dispatch 模板（chart-from-data 模式）
 对数据图类的 `[FIGURE_NEEDED]`，按此模板 dispatch：

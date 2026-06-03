@@ -301,13 +301,13 @@ Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**执行图�
 ### 触发条件
 
 - Abstract 已生成（隐含所有 core sections Verification = passed）
-- `./docs/paper-drafts/figures/codes/plot_*.py` 或 `./docs/paper-drafts/figures/codes/draw_fig*_arch.py` 存在
+- `./docs/paper-drafts/figures/codes/plot_*.py` 存在，或待补充清单中存在未完成的 `architecture-image` 图项
 
 ### 9a. 扫描图片产出物
 
 1. 检查 `./docs/paper-drafts/figures/codes/` 目录下是否存在 `plot_fig*.py` 且对应 SVG 尚未生成
-2. 检查 `./docs/paper-drafts/figures/codes/` 目录下是否存在 `draw_fig*_arch.py` 且对应 SVG 尚未生成
-3. 统计：已生成 SVG 数 / 数据图代码待执行数 / 架构图 SVG 代码待执行数
+2. 检查待补充清单和 `./docs/paper-drafts/figures/` 下的 `fig*_arch.*`，识别未完成、blocker 或待 QA 的 `architecture-image` 图
+3. 统计：已生成数据图 SVG 数 / 数据图代码待执行数 / 已生成架构图图片数 / 架构图 blocker 数
 
 ### 9b. 数据图批量执行
 
@@ -332,15 +332,15 @@ if (Test-Path $scriptPath) {
 }
 ```
 
-### 9c. 架构图 SVG 批量执行
+### 9c. 架构图生图状态复核
 
-对 `./docs/paper-drafts/figures/codes/draw_fig*_arch.py`：
+对每个 `architecture-image` 图项：
 
-1. 检查 Python 环境与 matplotlib 是否可用。
-2. 执行脚本生成 SVG。
-3. 验证 SVG 文件存在且包含可编辑文本节点。
-4. 核对模块、箭头、标签均来自 Architecture Contract。
-5. 失败时记录到「待补充清单」，不输出 prompt 作为替代最终图。
+1. 若 `image_path` 已存在，核对模块、箭头、标签均来自 Architecture Contract。
+2. 检查是否存在 AI 伪文字、错误模块名、错误连接或分辨率不足。
+3. 若需要精确标签，确认 `annotation_overlay_path` 存在或记录待补。
+4. 若 `blocker` 存在且当前环境可调用生图模型，重新委托 `academic-figure` 的 `architecture-image`。
+5. 若仍无法生图，记录 blocker 和 generation_prompt；不得伪造图片路径或把 prompt 声称为最终图。
 
 ### 9d. 输出图片生成报告
 
@@ -351,7 +351,7 @@ if (Test-Path $scriptPath) {
 
 | 图片 | 类型 | 状态 | 路径/说明 |
 |------|------|------|----------|
-| Figure 1 | 架构图 | ✅ 已生成 | ./docs/paper-drafts/figures/fig1_arch.svg |
+| Figure 1 | 架构图 | ✅ 已生成 | ./docs/paper-drafts/figures/fig1_arch.png |
 | Figure 2 | 数据图 | ❌ 待生成 | ./docs/paper-drafts/figures/codes/plot_fig2.py 执行失败 |
 | Figure 3 | 架构图 | ⚠️ 待修复 | ./docs/paper-drafts/figures/codes/draw_fig3_arch.py 执行失败 |
 | Figure 4 | 数据图 | ✅ 已生成 | ./docs/paper-drafts/figures/fig4.svg |

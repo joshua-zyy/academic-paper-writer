@@ -1,6 +1,6 @@
 # Workflow: architecture-svg
 
-用于生成 CS/AI/ML 论文中的模型框架图、overview figure、复杂模块细节图或机制流程图。默认输出为可编辑 SVG，而不是 prompt 或 raster image。
+兼容路径，仅用于简单流程图/结构图，或用户明确要求可编辑 SVG 的场景。模型框架图、overview figure、复杂模块细节图和复杂机制图默认使用 `architecture-image`，不要因为历史 mode 名称而回退到 Python/SVG。
 
 ## Step 1: Architecture Contract
 
@@ -31,6 +31,8 @@
 ```
 
 如果模型结构证据不足，先输出 `Unconfirmed Items`。允许生成带有 `[VERIFY_ARCH: ...]` 标注的 SVG 草图，但不得把它标为最终投稿图。
+
+如果合约显示图包含多分支模型、复杂 attention/graph/message passing、模块 zoom-in、overview + detail 混合构图，停止本路径并切换 `architecture-image`。
 
 ## Step 2: SVG Layout Plan
 
@@ -114,4 +116,4 @@ mpl.rcParams.update({
 - Caption Draft
 - Verification Report
 
-仅当用户明确要求外部生图工具提示词时，才转入 `arch-prompt` 路径。
+仅当用户明确要求外部生图工具提示词时，才转入 `arch-prompt` 路径。复杂架构图的默认出图路径是 `architecture-image`。

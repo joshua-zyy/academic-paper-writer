@@ -54,7 +54,7 @@
 |   | └ 6.9 更新 Cumulative Draft → 推进下一节 | — | 自动 | — |
 | 7 | 整合 & 依赖感知 section loop | — | 自动 | — |
 | 8 | **引用清单生成**（强制，全文完成后执行） | — | 自动 | — |
-| 9 | **图片批量生成**（强制，全文完成后执行） | `academic-figure`（dispatch，chart-from-data / architecture-svg） | 自动 | — |
+| 9 | **图片批量生成**（强制，全文完成后执行） | `academic-figure`（dispatch，chart-from-data / architecture-image） | 自动 | — |
 
 ---
 

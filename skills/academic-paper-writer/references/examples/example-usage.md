@@ -16,7 +16,7 @@ Step 3: 并行 dispatch citation agent + literature reader → Verified Referenc
 Step 4: dispatch experiment agent → Evidence Inventory (3个newly_run结果, 2个preexisting_artifact)
 Step 5: Section Blueprint → 8节结构 + 每节要点
 Step 6: Draft v1 (Introduction) → 5段完整prose + 待补充清单
-Step 6.4: architecture-svg 生成架构图 SVG
+Step 6.4: architecture-image 生成架构图图片
 Step 6.5: evidence compliance review → evidence_debt: closed
 Step 6.6: prose quality gate → prose_debt: closed
 Step 6.7: expansion pass → thin_draft: no
@@ -42,7 +42,7 @@ Step 2: probe agent 探查代码 → 识别核心模块 (TemporalBranch, Spatial
 Step 3: 文献检索 → 相关 attention 机制文献 (6篇VERIFIED)
 Step 5: Blueprint → 整体框架 → 模块拆解 → 训练目标
 Step 6: Draft v1 → 完整prose + [FIGURE_NEEDED: overall architecture] + 待补充清单
-Step 6.4: architecture-svg 生成分支架构图 SVG
+Step 6.4: architecture-image 生成分支架构图图片
 Step 6.5-6.8: 审查闭环 → Verdict: passed
 Step 6.9: 更新Cumulative Draft → 推进
 ```

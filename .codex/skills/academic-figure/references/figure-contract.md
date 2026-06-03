@@ -1,6 +1,6 @@
 # Figure Contract: 出图前合约模板
 
-`chart-from-data` 模式的 Step 3 与 `architecture-svg` 模式的 Step 1 中使用。Agent 在生成代码或 SVG 前，必须与用户确认对应合约。
+`chart-from-data` 模式的 Step 3、`architecture-image` 模式的 Step 1、以及 `architecture-svg` 兼容路径中使用。Agent 在生成代码、图片或 SVG 前，必须与用户确认对应合约。
 
 ## Chart Contract
 
@@ -47,7 +47,7 @@
 - Vector: [SVG]
 ```
 
-## Architecture SVG Contract
+## Architecture Image Contract
 
 ```markdown
 ## Architecture Contract
@@ -69,25 +69,26 @@
 |------|----|---------|----------|
 | C1 | C2 | [特征、token、embedding、graph message、logits 等] | [来源] |
 
-### SVG Layout Plan
+### Image Generation Plan
 - Visual goal: [overview figure / framework figure / module detail figure / graphical abstract]
-- Composition: [central framework / layered pipeline / multi-panel overview / module zoom-in]
-- Label strategy: [short labels only / numbered modules / legend outside figure / no long text]
+- Composition: [central framework / layered pipeline / multi-panel overview / module zoom-in / schematic-led composite]
+- Label strategy: [short labels only / numbered modules / legend outside figure / no embedded long text]
 - Visual hierarchy: [核心模块、辅助模块、输入输出、监督路径如何区分]
-- Drawing primitives: [boxes / arrows / groups / callouts / matrices / mini-plots]
+- Overlay need: [none / SVG label overlay / PDF label overlay]
 
 ### Style Boundary
-- Style: [high-impact journal / clean scientific vector figure / NMI-style low saturation]
+- Style: [CS/AI/ML publication figure / clean scientific figure / low-saturation method-family encoding]
 - Avoid: [photorealistic lab scene, decorative 3D, excessive glow, unreadable text]
 
 ### Unconfirmed Items
 - [VERIFY_ARCH: 需要用户或代码证据确认的模块、连接或路径]
 
 ### Target Output
-- Script: [./docs/paper-drafts/figures/codes/draw_fig<N>_arch.py]
-- File: [./docs/paper-drafts/figures/fig<N>_arch.svg]
+- Generation prompt: [stored in report or prompt file]
+- Image file: [./docs/paper-drafts/figures/fig<N>_arch.png]
+- Optional overlay: [./docs/paper-drafts/figures/fig<N>_arch_labels.svg]
 - Size: [single-column / double-column / full-width / graphical abstract]
 - Caption: [yes / no]
 ```
 
-若 `Unconfirmed Items` 不为空，允许生成标注了待确认项的 SVG 草图，但不得交付为最终投稿图。最终交付前必须人工核对 SVG 中的模块、连接、标签与图注。
+若 `Unconfirmed Items` 不为空，允许生成标注了待确认风险的概念草图，但不得交付为最终投稿图。最终交付前必须人工核对图片中的模块、连接、标签与图注。

@@ -16,15 +16,32 @@
 
 ## Step 1b：判断 Figure Archetype
 
-借鉴 high-impact journal figure workflow，先判断图在论文中的角色，而不是直接套 chart type。
+先判断图在 CS/AI/ML 论文中的实验论证角色，而不是直接套 chart type。
 
-| Archetype | 使用场景 | 布局倾向 |
+| Evidence role | 使用场景 | 布局倾向 |
 |-----------|----------|----------|
-| `quantitative grid` | 多数据集、多指标、多方法比较 | 对齐轴线、共享 legend、紧凑网格 |
-| `hero metric + supports` | 一个主结果 + 若干稳健性/消融支持 | 主 panel 更大，support panels 更安静 |
+| `benchmark matrix` | 多数据集、多指标、多方法比较 | 对齐轴线、共享 legend、紧凑网格 |
+| `claim-primary result + supports` | 一个主结果 + 若干稳健性/消融/效率支持 | 主结论 panel 更大，support panels 更安静 |
 | `ablation ladder` | 逐步移除/替换模块验证贡献 | 同色系透明度或亮度递进 |
-| `trend with uncertainty` | 训练曲线、scaling law、时间趋势 | line + CI/std band，直接标注关键事件 |
-| `distribution comparison` | 多组分布、误差、稳定性 | box/violin/point-range，避免只看均值 |
+| `training dynamics` | loss/accuracy 曲线、收敛速度、scaling、稳定性 | line + CI/std band，直接标注关键训练事件 |
+| `efficiency-performance tradeoff` | 性能与 latency/FLOPs/params/memory/energy 权衡 | Pareto scatter / connected frontier |
+| `robustness slice` | 跨域、噪声、缺失模态、OOD、公平性分组 | point-range / box / violin，标注样本量 |
+| `error diagnosis` | 混淆矩阵、failure taxonomy、case-level analysis | 突出高风险错误，说明归一化方式 |
+| `representation analysis` | t-SNE/UMAP/PCA、attention map、feature clustering | 标注降维方法、随机种子和采样策略 |
+
+## Step 1c：CS/AI/ML chart design gate
+
+每个 `chart-from-data` 任务都必须先读取 `references/cs-ai-chart-design-patterns.md`，并把下列设计决策写入 Figure Contract：
+
+- 图的实验论证角色：benchmark, ablation, training dynamics, efficiency tradeoff, robustness, error diagnosis, representation analysis, 或 method-result composite。
+- 是否需要 claim-primary panel，或是否应保持 benchmark matrix / quantitative grid。
+- 是否使用 shared legend、legend-only axis，或直接标注 direct labels。
+- 是否需要按证据重要性分配 panel 面积，而不是把所有 panel 强行等宽等高。
+- 是否需要 hatch / texture / luminance contrast 来保证灰度打印。
+- 是否统一方法、模型规模、数据集或任务的视觉编码，避免同一对象在不同 panel 中换色。
+- 是否需要把实验设置、统计信息、`n`、重复次数、误差棒定义和 source-data traceability 放入图注/QA。
+
+只有单张非常简单的实验图可以把该 gate 标记为 `minimal_applicable`，但仍需说明 palette、legend、axis 和 export 的选择。
 
 ## Step 2：选择图表类型
 
@@ -68,10 +85,11 @@ required = ["matplotlib", "seaborn", "numpy", "pandas", "scipy"]
 
 - 使用 `references/api.md` 中定义的辅助函数
 - 设置全局样式：`apply_pub_style()`
+- 应用 Step 1c 的 CS/AI/ML chart design gate，不允许绕过实验角色、布局、legend、direct labels、palette、hatch 的选择记录
 - 按合约布局生成各面板
 - 代码中嵌入数据读取（CSV/TSV/Numpy）
 - 使用色板 `PALETTE`（参考 `references/design-theory.md`）
-- 多方法同族比较优先使用低饱和 `NMI pastel` 色板，避免每个方法都使用高饱和独立色相
+- 多方法同族比较优先使用低饱和 CS/AI/ML family 色板，避免每个方法都使用高饱和独立色相
 - 需要大 legend 时使用 legend-only axis，不挤占数据区域
 - 消融实验优先使用同一色相的透明度/亮度梯度
 - 分组柱状图或密集柱状图必须考虑 hatch，以保证灰度打印可辨

@@ -9,7 +9,17 @@
 - Optional PDF and TIFF/PNG submission exports
 - QA report referencing `references/qa-contract.md`
 
-## `architecture-svg`
+## `architecture-image`
+
+- Architecture Contract
+- Evidence-grounded generation prompt
+- Generated high-resolution image as primary output
+- Optional editable SVG/PDF annotation overlay for labels, callouts, or final typography
+- Caption draft
+- Human-verifiable architecture checklist
+- Unconfirmed items marked with `[VERIFY_ARCH: ...]`
+
+## `architecture-svg`（简单/显式矢量兼容路径）
 
 - Architecture Contract
 - Python vector drawing script

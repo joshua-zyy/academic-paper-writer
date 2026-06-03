@@ -1,11 +1,11 @@
 ---
 name: academic-figure
-description: "Create, revise, or audit academic figures for CS/AI/ML papers using Python-generated editable SVG as the default output. Supports publication-ready data plots, model architecture SVGs, method flow diagrams, mechanism diagrams, overview figures, figure blueprints, figure audits, and figure revisions. Use when: generating model framework SVGs, overview figures, module detail diagrams, data plots from experiment results, auditing existing figures, suggesting figure types for paper sections, revising figure colors/layouts/labels. Only use arch-prompt when the user explicitly asks for external image prompts. Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, 模型框架图, overview figure, model architecture, plot, publication figure, 数据可视化, generate plot, architecture diagram, figure blueprint, 建议图表类型, figure audit, 审查图表, figure revision, 修改图表."
+description: "Create, revise, or audit academic figures for CS/AI/ML papers. Data/result plots default to Python-generated editable SVG with CS/AI/ML-specific design rules for benchmarks, ablations, training dynamics, robustness, diagnostics, and efficiency tradeoffs; model framework, overview, and complex mechanism diagrams default to an evidence-grounded image-generation workflow. Use when: generating model framework images, overview figures, module detail diagrams, data plots from experiment results, auditing figures, suggesting figure types, revising colors/layouts/labels. Use architecture-svg only for simple explicit vector requests; use arch-prompt only when the user explicitly asks for external prompts. Triggers on: 绘图, figure, chart, 画图, 实验图, 训练曲线, 消融实验, 对比图, 混淆矩阵, 架构图, 模型框架图, overview figure, model architecture, plot, publication figure, 数据可视化, generate plot, architecture diagram, figure blueprint, 建议图表类型, figure audit, 审查图表, figure revision, 修改图表."
 ---
 
 # Academic Figure
 
-CS/AI/ML academic-figure router. 默认交付可编辑 SVG：数据图使用 Python/matplotlib；架构图、流程图和机制图使用 Python 矢量元素绘制。提示词不是默认交付物。
+CS/AI/ML academic-figure router. 实验数据图默认交付 Python/matplotlib 可编辑 SVG，并执行 CS/AI/ML 图表设计 gate。模型框架图、overview figure、复杂模块图和机制图默认走 `architecture-image`：先建立事实合约，再用生图模型生成高分辨率图像，必要时追加可编辑标注层。提示词不是默认最终交付物。
 
 ## Router Protocol
 
@@ -24,9 +24,10 @@ CS/AI/ML academic-figure router. 默认交付可编辑 SVG：数据图使用 Pyt
 
 | Mode | Use when |
 |---|---|
-| `chart-from-data` | Data files or numeric results, needs publication plot |
-| `architecture-svg` | 模型结构、方法流程、机制图、overview figure，需要直接生成可编辑 SVG |
-| `arch-prompt` | 仅当用户明确要求外部生图提示词时使用；不是默认路径 |
+| `chart-from-data` | Data files or numeric results, needs publication plot with CS/AI/ML chart design gate |
+| `architecture-image` | 模型框架图、overview figure、复杂模块图、机制图；默认使用生图模型生成 |
+| `architecture-svg` | 仅用于简单流程/结构图，或用户明确要求可编辑 SVG 的兼容路径 |
+| `arch-prompt` | 仅当用户明确要求外部生图提示词且不需要本轮出图时使用 |
 | `figure-blueprint` | Wants figure suggestions for a paper section |
 | `figure-audit` | Existing figure reviewed for publication readiness |
 | `figure-revision` | Existing figure needs revision |
@@ -37,9 +38,10 @@ CS/AI/ML academic-figure router. 默认交付可编辑 SVG：数据图使用 Pyt
 
 ## Completion Criteria
 
-- `chart-from-data`: Figure Contract, Python script, source data, editable SVG, QA report — all pass.
-- `architecture-svg`: Architecture Contract, Python 绘图脚本, 可编辑 SVG, caption draft, 事实核对清单.
-- `arch-prompt`: 仅交付外部工具兼容提示词，并明确标注“非默认路径”.
+- `chart-from-data`: Figure Contract, CS/AI/ML chart design gate, Python script, source data, editable SVG, QA report — all pass.
+- `architecture-image`: Architecture Contract, generation prompt, generated high-resolution image path, optional editable annotation overlay, caption draft, factual/visual verification report.
+- `architecture-svg`: Architecture Contract, Python 绘图脚本, 可编辑 SVG, caption draft, 事实核对清单；仅作为简单/显式矢量路径.
+- `arch-prompt`: 仅交付外部工具兼容提示词，并明确标注“非默认出图路径”.
 - `figure-audit`: Every QA item has pass/fail status and concrete remediation.
 - `figure-blueprint`: Every suggested figure maps to a paper claim and data/evidence source.
 - `figure-revision`: Revised artifact or instructions, QA report, unchanged evidence traceability.
