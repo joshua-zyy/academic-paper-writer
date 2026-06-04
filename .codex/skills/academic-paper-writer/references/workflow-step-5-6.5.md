@@ -420,7 +420,7 @@ Draft v1 生成后，**必须**立即将正文内容写入 `./docs/paper-drafts/
 
 ---
 
-## Step 6.4: Placeholder Audit, Figure Contract, Architecture Figure Pre-generation, and Debt List（**强制执行，不可跳过**）
+## Step 6.4: Placeholder Audit, Figure Contract, Data Figure Code, and Debt List（**强制执行，不可跳过**）
 
 **⚠️ 此步骤为硬性要求。即使 Draft v1 中没有任何占位符，也必须执行 6.4a（占位符扫描）和 6.4b（主动补入检查），确保没有遗漏图表。**
 
@@ -429,10 +429,10 @@ Draft v1 生成后，**必须**立即将正文内容写入 `./docs/paper-drafts/
 - [ ] **6.4a** 扫描全文占位符（统计 + 分类）
 - [ ] **6.4b** 主动补入遗漏的图表占位符（不可跳过，即使无遗漏也要确认）
 - [ ] **6.4c** 为每个 `[FIGURE_NEEDED]` 建立 Figure Contract
-- [ ] **6.4d** 双路径图表处理（architecture → SVG script，data → code）
+- [ ] **6.4d** 图表处理（manual figure need → debt note，data → code）
 - [ ] **6.4e** 更新待补充清单：将 6.4a 扫描到的占位符按类型更新到 paper_draft.md 末尾的「待补充清单」中（格式见 Step 6.3）
 - [ ] **6.4f** 报告审计结果（`placeholder_stats`）
-- [ ] **6.4g** Dispatch 架构图子代理（对每个架构图类占位符）
+- [ ] **6.4g** 记录手工图表需求（对每个架构图/框架图/overview/机制图类占位符）
 - [ ] **6.4h** Dispatch 数据图子代理（对每个数据图类占位符）
 
 **未完成以上全部子步骤前，禁止进入 Step 6.5。**
@@ -453,29 +453,28 @@ After Draft v1, **必须**自动执行以下子步骤：
   ```
   [FIGURE_NEEDED: 图X <模块名>模块图 | 对应小节 | 展示内部结构、输入输出与数据流]
   ```
-  **不得因"模块描述较清晰"而跳过架构图占位符。**
+  **不得因"模块描述较清晰"而跳过手工图表需求记录。**
 - **Main Results 节**：检查每个结果表/指标段落附近是否有对应的数据图占位符，若缺失则插入。
 - **Ablation 节**：检查每个消融实验附近是否有对应的消融结果图占位符，若缺失则插入。
-- **Introduction / Related Work / Discussion 节**：若结构上需要 overview figure 或 taxonomy figure，主动标记。
+- **Introduction / Related Work / Discussion 节**：若结构上需要 overview figure 或 taxonomy figure，主动标记为手工图表需求。
 
 ### 6.4c. Figure Contract（前置步骤，在生成任何图表之前**必须**完成）
 
-对每个 `[FIGURE_NEEDED]` 占位符，在生成架构图、生图提示词、SVG 脚本或数据图代码之前，**必须**先完成 Figure Contract：
+对每个 `[FIGURE_NEEDED]` 占位符，在生成数据图代码或记录手工图表需求之前，**必须**先完成 Figure Contract：
 
 1. **Core conclusion**：用一句话陈述该图必须捍卫的论点
 2. **Evidence chain**：将每个计划面板映射到该论点，删除不承载独立证据的面板
 3. **Archetype**：将图分类为 `quantitative grid`、`schematic-led composite`、`image plate + quant` 或 `asymmetric mixed-modality figure`
-4. **Export contract**：设定最终尺寸、数据图可编辑文本、架构图生图/标注层需求、源数据、统计信息、图像完整性说明和导出格式
+4. **Export contract**：设定最终尺寸、数据图可编辑文本、源数据、统计信息、图像完整性说明和导出格式；架构/框架/overview/机制图只记录人工绘制需求
 
-### 6.4d. 双路径图表处理
+### 6.4d. 图表处理
 
-对每个 `[FIGURE_NEEDED]` 按 Figure Contract 的分类结果进行双路径处理：
+对每个 `[FIGURE_NEEDED]` 按 Figure Contract 的分类结果处理：
 
-**architecture-image 模式 — 架构图/流程图/机制图生图**（purpose 含 architecture / structure / pipeline / diagram / network / flow / 架构 / 模块图 / framework / overview 等）：
-- 按下文 Step 6.4g 的 dispatch 模板委托 `academic-figure` 的 `architecture-image` 模式
-- 生成 Architecture Contract 和 generation prompt；如生图模型可用，生成图片到 `./docs/paper-drafts/figures/fig{N}_arch.png`
-- 如需要精确文字，生成或计划生成可编辑标注层到 `./docs/paper-drafts/figures/fig{N}_arch_labels.svg`
-- 正文中的占位符替换为图编号引用（如 `Figure X` 或 `图X`）；待补清单记录图片是否已生成、是否有 blocker、是否通过 QA
+**manual-figure-needed — 架构图/框架图/流程图/机制图**（purpose 含 architecture / structure / pipeline / diagram / network / flow / 架构 / 模块图 / framework / overview 等）：
+- 不委托 `academic-figure` 自动绘制，不生成图片、SVG 或生图 prompt
+- 按下文 Step 6.4g 记录人工绘制需求、证据来源、必须展示内容和 caption 草案
+- 正文保留占位符或替换为明确待补图编号引用；待补清单记录为 `manual_figure_needed`
 
 **chart-from-data 模式 — 数据图绘图代码**（purpose 含 curve / comparison / ablation / result / 曲线 / 对比 / 消融 / 结果 / plot / chart / bar 等）：
 - 按下文 Step 6.4h 的 dispatch 模板生成 Python 绘图代码
@@ -498,57 +497,17 @@ After Draft v1, **必须**自动执行以下子步骤：
 ### 6.4f. 报告审计结果
 将占位符统计信息（`placeholder_stats`）纳入 Section Critique，供 Step 6.8 Verification 引用。
 
-### 6.4g. 架构图 dispatch 模板（architecture-image 模式）
-对架构图类的 `[FIGURE_NEEDED]`，按此模板 dispatch：
+### 6.4g. 手工图表需求记录模板（manual_figure_needed）
+对架构图/框架图/overview/机制图类的 `[FIGURE_NEEDED]`，不得 dispatch 自动绘图。直接在待补充清单记录：
 
-```yaml
-Task:
-  description: "生成架构图生图结果 - {module_name}"
-  subagent_type: "general"
-  prompt: |
-    你已加载 academic-figure 子 Skill（skills/academic-figure/SKILL.md）。
-
-    任务: 以 architecture-image 模式生成架构图/流程图/机制图
-    图用途: {从 [FIGURE_NEEDED] 的 purpose 字段提取}
-    mode: architecture-image
-
-     Figure Contract:
-    - Core conclusion: {Step 6.4c 中定义的论点}
-    - Evidence chain: {面板→论点映射}
-    - Archetype: {图分类}
-    - Export contract: {尺寸、格式等}
-
-    风格要求：低饱和学术配色、短标签或编号 callout、清晰箭头、主体视觉由生图模型完成；必要时使用可编辑 overlay 保证标签准确。
-
-    执行步骤:
-    1. 读取 skills/academic-figure/SKILL.md，按 architecture-image 模式执行
-    2. 确认模型结构：核心组件列表、数据流方向、关键连接方式（残差/跨层注意力等）
-    3. 生成受证据约束的 generation_prompt
-    4. 如当前环境具备生图模型或 imagegen 能力，生成图片，目标路径为 ./docs/paper-drafts/figures/fig{N}_arch.png
-    5. 若图片需要精确标签，生成或计划生成 ./docs/paper-drafts/figures/fig{N}_arch_labels.svg
-    6. 按 skills/academic-figure/agents/figure_agent.md 中 architecture-image 模式的 Output Schema 输出结构化结果
-
-    Output Schema (architecture-image 模式):
-    ```yaml
-    architecture_contract: object
-    generation_prompt: string
-    output_format: "PNG" | "WEBP" | "TIFF"
-    image_path: string | null
-    annotation_overlay_path: string | null
-    blocker: string | null
-    caption_draft: string
-    verification_report: object
-    ```
-
-    约束:
-    - 遵循 academic-figure SKILL.md 中的 Red Lines
-    - 不得强行回退到 Python/SVG；默认使用生图模型。若生图能力不可用，必须输出 blocker 和完整 prompt，不得伪造图片路径
-    - 未确认模块或连接必须标记为 `[VERIFY_ARCH: ...]`
-
-    返回: 严格按上述 YAML 格式输出，不附加任何额外文本
+```markdown
+- [ ] [FIGURE_NEEDED: {figure_id}] — manual_figure_needed
+  - Purpose: {该图需要帮助读者理解的机制、流程或系统结构}
+  - Evidence source: {用户描述 / 论文草稿 / 代码文件 / README / 已确认图示}
+  - Required content: {必须出现的模块、阶段、输入输出、数据流或对比}
+  - Caption draft: {图注草案}
+  - Boundary: 本项为人工绘制需求；不由 academic-figure 自动生成图片、SVG 或生图 prompt。
 ```
-
-dispatch 返回后，将 `image_path`、`generation_prompt`、`annotation_overlay_path` 和 `blocker` 状态记录到待补充清单和正文图编号引用中。**禁止**在可调用生图能力时只用 prompt 替代默认图片交付。
 
 ### 6.4h. 数据图绘图代码 dispatch 模板（chart-from-data 模式）
 对数据图类的 `[FIGURE_NEEDED]`，按此模板 dispatch：

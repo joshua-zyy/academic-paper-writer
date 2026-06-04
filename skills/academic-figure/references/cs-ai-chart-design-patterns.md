@@ -83,7 +83,7 @@
 
 - 方法示意解释机制，实验 panel 只验证该机制相关 claim。
 - 数据 panel 的编码必须和方法示意保持语义一致。
-- 若方法示意复杂，走 `architecture-image`，不要用数据图 workflow 强行画复杂框架。
+- 若方法示意复杂，标记为人工绘制需求；不要用数据图 workflow 强行画复杂框架，也不要生成生图 prompt 作为替代交付。
 
 ## Pattern 10: Source Data Traceability
 

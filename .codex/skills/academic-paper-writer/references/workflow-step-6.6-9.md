@@ -290,24 +290,24 @@ Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**生成两�
 （逐步更新，每确认一篇更新一行）
 ```
 
-**执行顺序约束**：Step 8 完成后，进入 Step 9（图片批量生成）。
+**执行顺序约束**：Step 8 完成后，进入 Step 9（数据图批量生成）。
 
 ---
 
-## Step 9: 图片批量生成（**强制**，全文完成后执行）
+## Step 9: 数据图批量生成（**强制**，全文完成后执行）
 
-Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**执行图片批量生成。未执行不得输出最终稿。
+Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**执行数据图批量生成扫描。未执行不得输出最终稿。
 
 ### 触发条件
 
 - Abstract 已生成（隐含所有 core sections Verification = passed）
-- `./docs/paper-drafts/figures/codes/plot_*.py` 存在，或待补充清单中存在未完成的 `architecture-image` 图项
+- `./docs/paper-drafts/figures/codes/plot_*.py` 存在，或待补充清单中存在 `manual_figure_needed` 图项需要复核
 
-### 9a. 扫描图片产出物
+### 9a. 扫描图表产出物和手工需求
 
 1. 检查 `./docs/paper-drafts/figures/codes/` 目录下是否存在 `plot_fig*.py` 且对应 SVG 尚未生成
-2. 检查待补充清单和 `./docs/paper-drafts/figures/` 下的 `fig*_arch.*`，识别未完成、blocker 或待 QA 的 `architecture-image` 图
-3. 统计：已生成数据图 SVG 数 / 数据图代码待执行数 / 已生成架构图图片数 / 架构图 blocker 数
+2. 检查待补充清单中的 `manual_figure_needed` 图项，确认其用途、证据来源、必须展示内容和 caption 草案完整
+3. 统计：已生成数据图 SVG 数 / 数据图代码待执行数 / 手工图表需求数 / 数据或证据缺口数
 
 ### 9b. 数据图批量执行
 
@@ -332,28 +332,27 @@ if (Test-Path $scriptPath) {
 }
 ```
 
-### 9c. 架构图生图状态复核
+### 9c. 手工图表需求复核
 
-对每个 `architecture-image` 图项：
+对每个 `manual_figure_needed` 图项：
 
-1. 若 `image_path` 已存在，核对模块、箭头、标签均来自 Architecture Contract。
-2. 检查是否存在 AI 伪文字、错误模块名、错误连接或分辨率不足。
-3. 若需要精确标签，确认 `annotation_overlay_path` 存在或记录待补。
-4. 若 `blocker` 存在且当前环境可调用生图模型，重新委托 `academic-figure` 的 `architecture-image`。
-5. 若仍无法生图，记录 blocker 和 generation_prompt；不得伪造图片路径或把 prompt 声称为最终图。
+1. 确认该项没有被错误标记为自动生成图片、SVG 或 prompt。
+2. 确认用途、证据来源、必须展示内容和 caption 草案齐全。
+3. 若证据来源或必须展示内容不完整，记录为「待人工补充证据」。
+4. 不调用 `academic-figure` 自动绘制模型框架图、架构图、overview 图或复杂机制图。
 
 ### 9d. 输出图片生成报告
 
 在对话中输出简短报告：
 
 ```
-## 图片批量生成报告
+## 数据图批量生成报告
 
 | 图片 | 类型 | 状态 | 路径/说明 |
 |------|------|------|----------|
-| Figure 1 | 架构图 | ✅ 已生成 | ./docs/paper-drafts/figures/fig1_arch.png |
+| Figure 1 | 手工图表 | ⚠️ 人工绘制需求 | manual_figure_needed: overall method overview |
 | Figure 2 | 数据图 | ❌ 待生成 | ./docs/paper-drafts/figures/codes/plot_fig2.py 执行失败 |
-| Figure 3 | 架构图 | ⚠️ 待修复 | ./docs/paper-drafts/figures/codes/draw_fig3_arch.py 执行失败 |
+| Figure 3 | 手工图表 | ⚠️ 待补证据 | 缺少模块连接证据 |
 | Figure 4 | 数据图 | ✅ 已生成 | ./docs/paper-drafts/figures/fig4.svg |
 ```
 
@@ -362,5 +361,5 @@ if (Test-Path $scriptPath) {
 将图片生成报告写入 `./docs/paper-drafts/figures/figure-generation-report.md`。不得将报告追加到 `paper_draft.md` 末尾；`paper_draft.md` 必须继续以同步后的 `## 待补充清单` 作为末尾结构。
 
 **执行顺序约束**：
-- Step 8（引用清单）→ Step 9（图片批量生成）→ 输出最终稿
-- Step 9 不可跳过，即使没有图片待生成也必须执行扫描并输出"无需生成图片"的确认
+- Step 8（引用清单）→ Step 9（数据图批量生成）→ 输出最终稿
+- Step 9 不可跳过，即使没有数据图待生成也必须执行扫描并输出"无需生成数据图"的确认

@@ -122,57 +122,7 @@ finalize_figure(fig, "confusion_matrix")
 
 ---
 
-## 教程 4：外部生图提示词兼容路径（arch-prompt，非默认）
-
-默认模型架构图应使用 `architecture-image` 调用生图模型直接生成图片。本教程仅适用于用户明确要求“生图提示词”或外部工具 prompt，且不要求本轮直接出图的场景。
-
-### 用户输入
-"帮我生成一个 Vision Transformer 架构图的生图提示词，用在论文 Model 部分。"
-
-### 输出
-```markdown
-## Architecture Analysis
-
-Architecture: Vision Transformer (ViT)
-Components: Patch Embedding → [Transformer Encoder × 12] → MLP Head
-
-## Prompt
-
-Scientific diagram of a Vision Transformer (ViT) architecture, white background,
-flat 2D vector illustration style, clean and minimal.
-
-Layout: left to right flow with vertical expansion for the encoder block.
-
-Components:
-1. [Blue] Input Image: H x W x C
-   → Patch Embedding: [P x P patches, linear projection to D dimensions]
-   → [Position embedding added, [CLS] token prepended]
-2. [Gray arrow]
-3. Large vertical block "Transformer Encoder × 12 layers":
-   - [Light green] Layer Norm
-   - [Light green] Multi-Head Self-Attention: 12 heads, head_dim = 64
-     ← [dashed arrow] residual connection
-   - [Light green] Layer Norm
-   - [Light green] MLP: D → 4D → D (GELU activation)
-     ← [dashed arrow] residual connection
-4. [Gray arrow]
-5. [Orange] MLP Head: [CLS] token → Layer Norm → Linear → num_classes
-6. [Red] Output: class prediction
-
-Colors:
-- Blue: input processing
-- Green: transformer encoder layers
-- Orange: classification head
-- Red: output
-- Gray dashed: residual connections
-
-Annotations:
-- [CLS] token marked with a distinct symbol
-- Embedding dimension D labeled at key connection points
-- Each component labeled with technical name in Arial 10pt
-```
-
-## Tutorial 5: Multi-panel 实验图（chart-from-data）
+## Tutorial 4: Multi-panel 实验图（chart-from-data）
 
 ### 用户输入
 "我们需要一个 2-panel 图，左边是训练曲线，右边是最后的性能对比柱状图。"

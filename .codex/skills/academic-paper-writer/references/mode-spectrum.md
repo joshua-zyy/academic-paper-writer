@@ -21,9 +21,6 @@
 | academic-experiments | `evidence-inventory-only` | 平衡 | 中 | 仅盘点，无运行约束 |
 | academic-experiments | `minimal-reproducible-run` | 忠实度 | 重 | 最小可复核流程固定 |
 | academic-figure | `chart-from-data` | 平衡 | 中 | 代码生成有模板但适应数据 |
-| academic-figure | `architecture-image` | 原创性 | 中 | 架构图需要创造性布局，默认由 Figure Contract 和生图模型约束，并通过 QA 核对事实 |
-| academic-figure | `architecture-svg` | 忠实度 | 中 | 仅用于简单流程图或用户明确要求可编辑 SVG 的兼容路径 |
-| academic-figure | `arch-prompt` | 原创性 | 轻 | 仅在用户明确要求外部生图提示词时使用 |
 | academic-figure | `figure-revision` | 忠实度 | 重 | 按 QA Contract 逐项检查 |
 | academic-figure | `figure-audit` | 忠实度 | 重 | 审查清单固定 |
 | academic-polishing | `prose-quality-gate` | 忠实度 | 重 | 质量检查清单固定 |

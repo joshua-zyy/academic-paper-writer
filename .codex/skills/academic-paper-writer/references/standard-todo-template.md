@@ -45,7 +45,7 @@
   [ ] [下一节名] 重复 6.0–6.9 …
 [ ] Step 7: 整合 & Abstract 生成（所有 section + Verification 完成后）
 [ ] Step 8: 引用清单生成（强制，全文完成后）
-[ ] Step 9: 图片批量生成（强制，全文完成后）
+[ ] Step 9: 数据图批量生成（强制，全文完成后）
 ```
 
 ### 使用说明
@@ -56,7 +56,7 @@
 4. **Step 7-9 位置**：
    - **Step 7（跨节一致性检查）**：在每节 6.8 Verification 完成后执行，用于依赖检查、标记回修队列、选择下一节。Step 7 是 section 循环控制器，与 Step 6 交替执行，不应推到所有 section 完成后。
    - **Step 8（引用清单）**：在所有 section 完成 + Abstract 生成后执行。
-   - **Step 9（图片批量生成）**：在所有 section 完成 + Abstract 生成后执行，位于 Step 8 之后。
+   - **Step 9（数据图批量生成）**：在所有 section 完成 + Abstract 生成后执行，位于 Step 8 之后。
 
 ---
 

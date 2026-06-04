@@ -90,7 +90,7 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 ### 🚧 开发进度
 
 <p align="center">
-  <img src="https://img.shields.io/badge/📊_图片绘制-积极完善中-purple" alt="图片绘制">
+  <img src="https://img.shields.io/badge/📊_数据图绘制-积极完善中-purple" alt="数据图绘制">
   <img src="https://img.shields.io/badge/✨_文字润色-积极完善中-purple" alt="文字润色">
   <img src="https://img.shields.io/badge/🔍_文献检索-积极完善中-purple" alt="文献检索">
   <img src="https://img.shields.io/badge/📚_引用管理-积极完善中-purple" alt="引用管理">
@@ -131,7 +131,7 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 | 🔬 **academic-experiments** | 实验取证 | 实验证据盘点、最小可复核执行、协议风险审计 | `复核实验`、`verify results` |
 | ✅ **academic-reviser** | 审稿人 | 证据审查、三轮自审、Verification 判定 | `审修`、`self review` |
 | ✨ **academic-polishing** | 文体打磨 | Prose Quality Gate、Claim Strength Audit、去 AI 化 | `润色`、`claim strength` |
-| 📊 **academic-figure** | 图表生成 | 实验数据图（Python 代码） + 架构图提示词 | `绘图`、`训练曲线`、`架构图` |
+| 📊 **academic-figure** | 数据图生成 | 实验数据图（Python 代码）、图表审查与修改；架构图只记录手工绘制需求 | `绘图`、`训练曲线`、`消融实验` |
 | 🏛️ **academic-venue-research** | 期刊调研 | 调研目标 venue 投稿要求与写作风格，产出标准化 Venue Brief | `期刊调研`、`venue research`、`投稿要求` |
 
 ---
@@ -331,7 +331,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 | 🏛️ 目标 Venue 调研 | `academic-venue-research` | dispatch 子 Agent |
 | 🔍 文献检索与核验（含本地文献库优先 + subagent 全文阅读） | `academic-citation` + `literature-reader-agent` | dispatch 子 Agent |
 | 🔬 实验证据复核 | `academic-experiments` | dispatch 子 Agent |
-| 📊 图表 / 架构图 | `academic-figure` | dispatch 子 Agent |
+| 📊 数据图 / 实验结果图 | `academic-figure` | dispatch 子 Agent |
 | ✨ Prose Quality Gate | `academic-polishing` | **内化调用**（主 Agent 自行执行） |
 | ✅ 证据审查与 Verification | `academic-reviser` | dispatch 子 Agent |
 
@@ -390,7 +390,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 │    ↓                                                                    │
 │   ✏️ Step 6  Draft v1（前置深度探查检查 + 占位符系统 + 待补充清单）       │
 │    ↓                                                                    │
-│   📌 Step 6.4  占位符审计 + 图表生成                                       │
+│   📌 Step 6.4  占位符审计 + 数据图代码 / 手工图表需求                      │
 │    ↓                                                                    │
 │   ┌──────────────────────────────────────────────────────────────────┐   │
 │   │              质量门（双阶段审查）                                    │   │
@@ -407,7 +407,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 │   📌 Abstract 后置 — 所有核心章节全部 passed 后才允许生成                  │
 │   📋 Step 8  引用清单生成（**强制**，核验 >= `min_citations` 篇引用，默认 35）                │
 │    ↓                                                                    │
-│   🖼️ Step 9  图片批量生成（**强制**，执行数据图代码 + 架构图 SVG 脚本）                 │
+│   🖼️ Step 9  数据图批量生成（**强制**，执行数据图代码 + 复核手工图表需求）              │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -536,10 +536,10 @@ academic-paper-writer/
     │   ├── agents/                     # experiment_agent
     │   ├── scripts/                    # evidence_scanner.py
     │   └── references/                 # 证据盘点、运行策略、协议风险
-    └── academic-figure/                # 📊 图表生成
+    └── academic-figure/                # 📊 数据图生成
         ├── agents/                     # figure_agent
         ├── scripts/                    # chart_template.py + qa_figure.py
-        └── references/                 # 设计理论、图表类型、QA、架构提示词
+        └── references/                 # 设计理论、图表类型、QA、教程
 ```
 
 ### 建议阅读顺序

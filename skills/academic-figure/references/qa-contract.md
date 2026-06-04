@@ -1,6 +1,6 @@
 # QA Contract: 交付前 QA 检查清单
 
-`chart-from-data` 模式的 Step 7、`architecture-image` 模式的 Step 7、`architecture-svg` 兼容路径、`figure-audit` 模式中使用。逐项检查，所有关键项 pass 方可交付。
+`chart-from-data` 和 `figure-audit` 模式中使用。逐项检查，所有关键项 pass 方可交付。
 
 ## Chart QA 检查清单
 
@@ -41,50 +41,7 @@
 - [ ] 未选择性展示有利结果？
 - [ ] 无隐藏的负面结果？
 
-## Architecture Image QA 检查清单
+## 越界检查
 
-### 1. 架构真实性
-- [ ] 所有模块均来自 Architecture Contract、论文草稿、代码证据或用户确认？
-- [ ] 所有连接方向均有证据或标记为 `[VERIFY_ARCH: ...]`？
-- [ ] 未添加未确认的损失函数、训练路径、推理路径或外部资源？
-
-### 2. 视觉导演一致性
-- [ ] 最终图片符合 Figure Scope 的用途、张数、语言策略和最终状态？
-- [ ] 图片执行了 Visual Director Brief 中的 reading path、layout zones、element instructions 和 arrow semantics？
-- [ ] 主阅读路径能在 30 秒内被理解，而不是需要正文逐句解释？
-
-### 3. 信息密度与画面组织
-- [ ] 主体架构图占据约 70-85% 画面，没有大面积无意义空白？
-- [ ] 机制图不只是大标题和少量孤立模块；必要时包含 zoom-in、tensor shape、matrix/token/graph 示例、attention/heatmap inset 或 before/after 路径？
-- [ ] 如果内容拥挤，已拆分为 overview + mechanism detail，而不是压缩字体和箭头？
-- [ ] 每张图只有一个主观点，辅助 inset 不抢走核心路径？
-
-### 4. 生图输出一致性
-- [ ] 最终图片与 Architecture Contract 一致？
-- [ ] 图片中没有加入 Contract 之外的模块、数据集、损失或性能 claim？
-- [ ] 图片主体没有长段文字；复杂说明已转入 caption、图例或可编辑 overlay？
-- [ ] 没有 AI 生成的乱码、伪文字、错误模块名或错误箭头？
-
-### 5. 数据流表达
-- [ ] 实线、虚线、颜色或 label 的语义一致？
-- [ ] 主阅读路径清晰，读者能按一个方向理解整体流程？
-- [ ] 若 SVG 中的箭头或标签有歧义，已在 caption 中解释？
-
-### 6. 可读性与投稿适配
-- [ ] 双栏缩放后核心模块名仍可读？
-- [ ] 模块名短而稳定，细节放入图注而非挤在图中？
-- [ ] 颜色低饱和、灰度可辨、色盲友好？
-- [ ] 无不必要的 3D 装饰、过度阴影或视觉噪声？
-- [ ] 位图分辨率满足目标版面；如有可编辑 overlay，overlay 与图片对齐？
-
-### 7. 交付完整性
-
-- [ ] 已保存生成图片文件或明确标注生图模型 blocker？
-- [ ] 已保存 generation prompt？
-- [ ] 已输出 Figure Scope 和 Visual Director Brief？
-- [ ] 如需精确标注，已保存可编辑 overlay？
-- [ ] 已输出 Architecture Contract？
-- [ ] 已输出 Caption Draft？
-- [ ] 已列出人工核对项和未确认风险？
-
-未完成人工核对时，不得声称图片已经是最终投稿版本。
+- [ ] 若请求涉及模型框架图、架构图、overview 图或复杂机制图，是否已标记为人工绘制需求而不是自动出图？
+- [ ] 是否避免交付外部生图 prompt、Python boxes/arrows 或 SVG 作为越界替代？

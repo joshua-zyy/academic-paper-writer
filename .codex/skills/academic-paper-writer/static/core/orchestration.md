@@ -57,7 +57,7 @@ Abstract 为后置章节，不在初始队列中。默认顺序：Introduction �
 1. **输出目录**：`./docs/paper-drafts/`
 2. **论文文件**：`paper_draft.md` — 正文 + 参考文献 + 待补项，逐步追加
 3. **Blueprint文件**：`section_blueprint.md` — 每节更新
-4. **图片目录**：`figures/` — SVG 图表输出；`figures/codes/` — `plot_*.py` 与 `draw_fig*_arch.py`
+4. **图片目录**：`figures/` — SVG 数据图输出与手工图表需求记录；`figures/codes/` — `plot_*.py`
 5. **对话输出限制**：禁止在对话中输出完整论文正文，仅显示简短进度摘要
 6. **写入时机**：每节 Draft 生成后、Verification 完成后使用 Write/Edit 更新 `paper_draft.md`
 7. **中间状态**：Evidence Inventory、Verified References、Revision Queue 等在 agent 上下文中维护

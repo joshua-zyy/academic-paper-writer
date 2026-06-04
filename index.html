@@ -872,9 +872,9 @@
           <article class="card skill-card">
             <div>
               <div class="skill-title"><span>📊</span><h3>academic-figure</h3></div>
-              <p>生成实验数据图的 Python 代码，并辅助构思架构图提示词</p>
+              <p>生成实验数据图的 Python 代码，并支持图表审查、修改与数据图建议</p>
             </div>
-            <div class="tag-row"><span class="tag">绘图</span><span class="tag">训练曲线</span><span class="tag">architecture</span></div>
+            <div class="tag-row"><span class="tag">绘图</span><span class="tag">训练曲线</span><span class="tag">ablation</span></div>
           </article>
 
           <article class="card skill-card">
@@ -925,14 +925,14 @@
         <div>
           <p class="section-kicker">Dispatch Model</p>
           <h2>编排器派发 sub-agent，各司其职</h2>
-          <p class="section-desc" style="max-width: 620px; margin-top: 18px;">核心编排器不直接处理所有任务——写作前通过并行 probe-agent 探查项目，调研阶段顺序派发期刊调研、引用核验和实验复核，章节循环中按需派发图表生成和终审验证；润色则由编排器内化调用规则自行完成，确保文体风格一致</p>
+          <p class="section-desc" style="max-width: 620px; margin-top: 18px;">核心编排器不直接处理所有任务——写作前通过并行 probe-agent 探查项目，调研阶段顺序派发期刊调研、引用核验和实验复核，章节循环中按需派发数据图生成、手工图表需求记录和终审验证；润色则由编排器内化调用规则自行完成，确保文体风格一致</p>
         </div>
         <div class="dispatch" aria-label="编排派发模型">
           <pre><span class="dp-orch">主编排器</span><span class="dp-tb"> ──┬── </span><span class="dp-ag">期刊调研</span><span class="dp-tb"> ──── </span><span class="ta">投稿要求与写作风格调研</span>
 <span class="dp-tb">          ├── </span><span class="dp-ag">引用核验</span><span class="dp-tb"> ──── </span><span class="ta">文献检索与 VERIFIED 判定</span>
 <span class="dp-tb">          ├── </span><span class="dp-ag">实验复核</span><span class="dp-tb"> ──── </span><span class="ta">实验日志与结果表核验</span>
 <span class="dp-tb">          ├── </span><span class="dp-na">润色</span><span class="dp-tb"> ──────── </span><span class="ta">Prose Gate · Claim 强度审计</span><span class="dp-tb">  </span><span class="dp-note">(内化执行)</span>
-<span class="dp-tb">          ├── </span><span class="dp-ag">图表生成</span><span class="dp-tb"> ──── </span><span class="ta">数据可视化与架构图代码</span>
+<span class="dp-tb">          ├── </span><span class="dp-ag">数据图生成</span><span class="dp-tb"> ──── </span><span class="ta">数据可视化与手工图表需求</span>
 <span class="dp-tb">          └── </span><span class="dp-ag">终审验证</span><span class="dp-tb"> ──── </span><span class="ta">审稿人视角 · 三轮自审</span>
 <span class="dp-tb">          </span><span class="dp-note">并行探查 → 顺序调研 → 章节循环 · 统一 Gate 管控</span></pre>
         </div>
@@ -990,7 +990,7 @@ task("引用核验", academic-citation)
 task("实验复核", academic-experiments)
 
 # 章节循环（每节重复，顺序执行）
-task("图表生成", academic-figure)
+task("数据图生成", academic-figure)
 task("终审验证", academic-reviser)
 # 润色由编排器内化执行</pre>
         </div>
@@ -1096,7 +1096,7 @@ task("终审验证", academic-reviser)
           <div class="progress-item">
             <span class="progress-dot"></span>
             <span class="progress-icon">📊</span>
-            <span class="progress-title">图片绘制</span>
+            <span class="progress-title">数据图绘制</span>
           </div>
           <div class="progress-item">
             <span class="progress-dot"></span>

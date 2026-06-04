@@ -2,18 +2,18 @@
 
 ## Figure Contract（前置步骤）
 
-在生成任何图表提示词或绘图代码之前，必须先完成以下 Figure Contract：
+在生成任何数据绘图代码之前，必须先完成以下 Figure Contract：
 
 1. **Core conclusion**：用一句话陈述该图必须捍卫的论点
 2. **Evidence chain**：将每个计划面板映射到该论点，删除不承载独立证据的面板
 3. **Archetype**：将图分类为 `quantitative grid`、`schematic-led composite`、`image plate + quant` 或 `asymmetric mixed-modality figure`
-4. **Export contract**：设定最终尺寸、数据图可编辑文本、架构图生图/标注层需求、源数据、统计信息、图像完整性说明和导出格式
+4. **Export contract**：设定最终尺寸、数据图可编辑文本、源数据、统计信息、图像完整性说明和导出格式
 
-## 双路径处理
+## 图表处理路径
 
 | 图类型 | 遇到占位符时 | 输出 |
 |--------|:---:|------|
-| 架构图/框架图/流程图/机制图 | 默认调用 `academic-figure` 的 `architecture-image`，用生图模型生成主体图片 | 图片写入 `./docs/paper-drafts/figures/fig{N}_arch.png`；必要时标注层写入 `./docs/paper-drafts/figures/fig{N}_arch_labels.svg`；正文占位符替换为图编号引用 |
+| 架构图/框架图/流程图/机制图 | 不自动绘制；记录为 `manual_figure_needed` | 在待补充清单中写明人工绘制需求、证据来源、caption 草案和边界说明；不生成图片、SVG 或生图 prompt |
 | 数据结果图 | 自动生成 Python 绘图代码 | 代码写入 `./docs/paper-drafts/figures/codes/plot_{figure_id}.py`，正文保留占位符，**不自动执行** |
 
 > 注：数据图代码在 Step 6.4 阶段不自动执行，留待 Step 9 全文完成后统一批量执行。
@@ -33,9 +33,9 @@
 4. **CS/AI/ML 设计 gate**：先确认实验论证角色、claim-primary panel/shared legend/direct labels/hatch/palette，再写代码
 5. **简洁风格**：仅保留左+下 spine，frameless legend，tight_layout
 
-## 图片批量生成（Step 9）
+## 数据图批量生成（Step 9）
 
-全文所有核心章节 Verification 通过后，在 Step 9 统一执行图片批量生成。
+全文所有核心章节 Verification 通过后，在 Step 9 统一执行数据图批量生成。
 
 ### 数据图批量执行
 
@@ -43,19 +43,19 @@
 2. 对每个脚本：检查 Python 环境 → 执行脚本 → 验证 SVG 输出 → 快速 QA
 3. 执行失败不阻塞整体流程，记录为「待手动修复」
 
-### 架构图生图状态复核
+### 手工图表需求复核
 
-1. 扫描待补充清单中 `architecture-image` 项和 `./docs/paper-drafts/figures/fig*_arch.*`
-2. 对已生成图片：核对 Architecture Contract、模块/连接、伪文字、分辨率和可选标注层
-3. 对仍为 blocker 的图片：若当前环境可调用生图模型则重新执行 `architecture-image`；否则记录 blocker，不伪造图片路径
+1. 扫描待补充清单中的 `manual_figure_needed` 项。
+2. 确认每项包含用途、证据来源、必须展示内容和 caption 草案。
+3. 不调用 `academic-figure` 自动绘制模型框架图、架构图、overview 图或复杂机制图。
 
 ### 生成后验证清单
 
-| 检查项 | 数据图 | 架构图 |
+| 检查项 | 数据图 | 手工图表需求 |
 |--------|:---:|:---:|
-| 文件存在且可打开 | ✅ | ✅ |
+| 文件存在且可打开 | ✅ | 不适用 |
 | 配色为学术色板（非 rainbow/jet） | ✅ | ✅ |
 | 坐标轴标签可读、无乱码 | ✅ | — |
-| 模块/连接与代码/论文描述一致 | — | ✅ |
-| 输出格式合规 | SVG | 高分辨率图片 + 可选标注层 |
-| 灰度打印可辨识 | ✅ | ✅ |
+| 必须展示内容有证据来源 | — | ✅ |
+| 输出格式合规 | SVG | 手工绘制需求记录完整 |
+| 灰度打印可辨识 | ✅ | 交由人工绘图阶段检查 |

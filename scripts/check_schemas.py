@@ -98,12 +98,27 @@ def check_reference_files_exist(skills_root: Path) -> list:
 def check_figure_dispatch_modes(skills_root: Path) -> list:
     issues = []
     stale_paths = []
-    required_modes = ["arch-prompt", "chart-from-data", "architecture-svg"]
+    required_modes = ["chart-from-data", "figure-blueprint", "figure-audit", "figure-revision"]
+    forbidden_modes = ["arch-prompt", "architecture-image", "architecture-svg"]
+
+    repo_root = _repo_root_from_skills(skills_root)
+    text_sources = []
 
     orchestrator_refs = skills_root / "academic-paper-writer" / "references"
     if orchestrator_refs.exists():
-        content = "\n".join(p.read_text(encoding="utf-8") for p in orchestrator_refs.rglob("*.md"))
-        stale_paths.extend(re.findall(r'\bpath:\s*[ABC]\b|路径\s*[ABC]|[ABC]\s*路径', content))
+        text_sources.extend(p.read_text(encoding="utf-8") for p in orchestrator_refs.rglob("*.md"))
+
+    for path in [
+        repo_root / "README.md",
+        repo_root / "index.html",
+        skills_root / "academic-figure" / "SKILL.md",
+        skills_root / "academic-figure" / "manifest.yaml",
+    ]:
+        if path.exists():
+            text_sources.append(path.read_text(encoding="utf-8"))
+
+    content = "\n".join(text_sources)
+    stale_paths.extend(re.findall(r'\bpath:\s*[ABC]\b|路径\s*[ABC]|[ABC]\s*路径', content))
 
     if stale_paths:
         issues.append(("FAIL", f"Stale academic-figure path labels found: {sorted(set(stale_paths))}"))
@@ -117,8 +132,24 @@ def check_figure_dispatch_modes(skills_root: Path) -> list:
     missing_modes = [mode for mode in required_modes if mode not in all_content]
     if missing_modes:
         issues.append(("FAIL", f"Missing academic-figure mode names in dispatch templates: {missing_modes}"))
+    forbidden_hits = [mode for mode in forbidden_modes if mode in all_content]
+    if forbidden_hits:
+        issues.append(("FAIL", f"Deprecated academic-figure architecture modes still referenced: {forbidden_hits}"))
+    stale_public_phrases = [
+        "架构图提示词",
+        "图表 / 架构图",
+        "架构提示词",
+        "图片批量生成",
+        "架构图 SVG 脚本",
+        "辅助构思架构图提示词",
+        "数据可视化与架构图代码",
+        "图片绘制",
+    ]
+    stale_public_hits = [phrase for phrase in stale_public_phrases if phrase in content]
+    if stale_public_hits:
+        issues.append(("FAIL", f"Stale public architecture-figure capability text found: {stale_public_hits}"))
 
-    if not stale_paths and not missing_modes:
+    if not stale_paths and not missing_modes and not forbidden_hits and not stale_public_hits:
         issues.append(("PASS", "Figure dispatch templates use correct mode names"))
     return issues
 
@@ -346,9 +377,11 @@ def check_probe_types(skills_root: Path) -> list:
 def check_figure_agent_mode_names(skills_root: Path) -> list:
     paths = [
         skills_root / "academic-figure" / "agents" / "figure_agent.md",
+        skills_root / "academic-figure" / "SKILL.md",
+        skills_root / "academic-figure" / "manifest.yaml",
         skills_root / "academic-figure" / "references" / "workflow-chart-from-data.md",
-        skills_root / "academic-figure" / "references" / "workflow-arch-prompt.md",
-        skills_root / "academic-figure" / "references" / "workflow-architecture-svg.md",
+        skills_root / "academic-figure" / "references" / "figure-contract.md",
+        skills_root / "academic-figure" / "references" / "qa-contract.md",
     ]
     stale_patterns = [
         r'A\s*路径', r'B\s*路径', r'C\s*路径',

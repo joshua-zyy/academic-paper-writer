@@ -7,8 +7,8 @@
 - `paper_draft.md`: 论文正文、唯一正式 `## References`、以及末尾统一「待补充清单」。正文只能使用 inline citation marker；各节不得单独列出引用说明或章节级参考文献。
 - `section_blueprint.md`: 当前 Section Blueprint 与 Section Contract
 - `venue-brief.md`: 目标 venue 要求与风格说明
-- `figures/`: 图表输出；实验数据图默认交付 SVG，架构图默认交付生图模型生成的高分辨率图片
-- `figures/codes/`: 生成的 Python 数据绘图脚本，或简单矢量兼容路径脚本
+- `figures/`: 图表输出；实验数据图默认交付 SVG，模型框架图/架构图/overview/复杂机制图只记录人工绘制需求
+- `figures/codes/`: 生成的 Python 数据绘图脚本
 
 ## 写入边界
 

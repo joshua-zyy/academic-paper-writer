@@ -16,7 +16,7 @@
 |------|-------|------|---------|
 | 准备 | 0–4（含 1.4, 1.5, 1b） | `workflow-step-0-4.md` | 判定模式、确认 venue、**项目上下文提取**、**Venue Requirements Research**、本地文献库、PDF→MD 转换准备、**并行**证据审计、文献检索（含引用数量硬门禁 Gate B）、实验复核 |
 | 起草与初步审查 | 5–6（含 6.0–6.5） | `workflow-step-5-6.5.md` | Section Plan、Draft v1、占位符审计与图表、证据合规审查 |
-| 审查与整合 | 6.6–9 | `workflow-step-6.6-9.md` | Prose Gate、Expansion、Verification、Section Loop、引用清单、图片批量生成 |
+| 审查与整合 | 6.6–9 | `workflow-step-6.6-9.md` | Prose Gate、Expansion、Verification、Section Loop、引用清单、数据图批量生成 |
 
 ---
 
@@ -46,7 +46,7 @@
 |   | ├ 6.1 前置探查 — **Phase 2 深层逐节探查**：搞懂"怎么做/为什么"（公式推导、机制细节、实验深度）**MUST use sub-agents for multi-probe sections** | probe-agent / citation-agent / literature-reader-agent（并行） | 自动 | — | **深层逐节**：针对当前 section 做深入代码级/文献级探查，直接支撑起草 |
 |   | ├ 6.2 Draft v1（含占位符 + 待补充清单） | — | 自动 | DP-3 | — |
 |   | ├ 6.3 写入 paper_draft.md | — | 自动 | — | — |
-|   | ├ 6.4 占位符审计 + 图表生成（⚠️ **强制执行，不可跳过**） | `academic-figure`（dispatch） | 自动 | — |
+|   | ├ 6.4 占位符审计 + 数据图代码/手工图表需求记录（⚠️ **强制执行，不可跳过**） | `academic-figure`（仅数据图 dispatch） | 自动 | — |
 |   | ├ 6.5 证据合规审查（⚠️ **强制，Review Phase 1**） | `academic-reviser`（dispatch） | 自动 | — |
 |   | ├ 6.6 Prose Quality Gate（⚠️ **强制，Review Phase 2**） | `academic-polishing`（**内化调用**） | 自动 | — |
 |   | ├ 6.7 Expansion Pass（⚠️ **强制，内容密度检查**） | — | 自动 | — |
@@ -54,7 +54,7 @@
 |   | └ 6.9 更新 Cumulative Draft → 推进下一节 | — | 自动 | — |
 | 7 | 整合 & 依赖感知 section loop | — | 自动 | — |
 | 8 | **引用清单生成**（强制，全文完成后执行） | — | 自动 | — |
-| 9 | **图片批量生成**（强制，全文完成后执行） | `academic-figure`（dispatch，chart-from-data / architecture-image） | 自动 | — |
+| 9 | **数据图批量生成**（强制，全文完成后执行） | `academic-figure`（dispatch，chart-from-data） | 自动 | — |
 
 ---
 

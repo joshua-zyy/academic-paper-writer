@@ -1,9 +1,10 @@
 name: academic-figure
 description: >
-  Declarative routing manifest for hybrid academic figure work. Data plots use
-  Python-generated editable SVG with CS/AI/ML chart design gates; model framework
-  and complex architecture figures use an evidence-grounded image-generation
-  workflow by default. Deeper references load only when needed.
+  Declarative routing manifest for academic data/result figure work. Data plots
+  use Python-generated editable SVG with CS/AI/ML chart design gates. Model
+  framework diagrams, architecture diagrams, overview diagrams, and complex
+  mechanism schematics are outside automatic drawing scope. Deeper references
+  load only when needed.
 
 always_load:
   - static/core/stance.md
@@ -17,18 +18,14 @@ axes:
     detect: |
       Select the smallest mode that satisfies the request. Use an explicit user
       mode if provided. Data files or numeric results imply chart-from-data.
-      Model structure plus a request to draw implies architecture-image.
-      Explicit requests for simple editable vector/SVG diagrams may use
-      architecture-svg. A request for an external image prompt without rendering
-      implies arch-prompt. Existing
-      figure files plus critique language imply figure-audit; existing figures
-      plus requested edits imply figure-revision. Section-level figure planning
-      implies figure-blueprint.
+      Existing figure files plus critique language imply figure-audit; existing
+      figures plus requested edits imply figure-revision. Section-level figure
+      planning implies figure-blueprint. Requests to draw model framework,
+      architecture, overview, or complex mechanism diagrams route to
+      figure-blueprint only for manual_figure_needed notes; never render images,
+      SVG, or prompts.
     values:
       chart-from-data: references/workflow-chart-from-data.md
-      architecture-image: references/workflow-architecture-image.md
-      architecture-svg: references/workflow-architecture-svg.md
-      arch-prompt: references/workflow-arch-prompt.md
       figure-blueprint: references/figure-contract.md
       figure-audit: references/qa-contract.md
       figure-revision: references/qa-contract.md
@@ -36,16 +33,10 @@ axes:
 
 references:
   on_demand:
-    - condition: build a Figure Contract or Architecture Contract
+    - condition: build a Figure Contract
       path: references/figure-contract.md
     - condition: execute Python data plotting workflow
       path: references/workflow-chart-from-data.md
-    - condition: generate or verify model architecture image workflow
-      path: references/workflow-architecture-image.md
-    - condition: user explicitly requests simple editable SVG architecture workflow
-      path: references/workflow-architecture-svg.md
-    - condition: user explicitly requests a tool-agnostic architecture prompt
-      path: references/workflow-arch-prompt.md
     - condition: write Python plotting code
       path: references/api.md
     - condition: select chart type
@@ -56,7 +47,5 @@ references:
       path: references/design-theory.md
     - condition: CS/AI/ML chart design pattern, dense multi-panel layout, benchmark, ablation, training, robustness, or efficiency figure
       path: references/cs-ai-chart-design-patterns.md
-    - condition: architecture prompt wording details, visual director planning, or paper-figure quality controls
-      path: references/architecture-prompting.md
     - condition: user needs an end-to-end example
       path: references/tutorials.md
