@@ -102,27 +102,27 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 
 ---
 
-## 📑 目录
+<h2 id="目录">📑 目录</h2>
 
-- [Skills 一览](#-skills-一览)
-- [快速开始](#-快速开始)
+- [Skills 一览](#skills-一览)
+- [快速开始](#快速开始)
   - [Claude Code 插件安装](#方式一claude-code-插件安装推荐)
   - [Codex CLI 安装](#方式二codex-cli-安装)
   - [手动加载](#方式三手动加载)
-- [推荐配置](#-推荐配置)
-- [核心设计](#-核心设计)
-- [编排器核心工作流](#-编排器核心工作流)
-- [使用示例](#-使用示例)
-- [适用场景](#-适用场景)
-- [文档分层](#-文档分层)
-- [项目结构](#-项目结构)
-- [安全边界](#-安全边界)
-- [维护与验证](#-维护与验证)
-- [参考项目](#-参考项目)
+- [推荐配置](#推荐配置)
+- [核心设计](#核心设计)
+- [编排器核心工作流](#编排器核心工作流)
+- [使用示例](#使用示例)
+- [适用场景](#适用场景)
+- [文档分层](#文档分层)
+- [项目结构](#项目结构)
+- [安全边界](#安全边界)
+- [维护与验证](#维护与验证)
+- [参考项目](#参考项目)
 
 ---
 
-## 📋 Skills 一览
+<h2 id="skills-一览">📋 Skills 一览</h2>
 
 | Skill | 角色 | 用途 | 典型触发词 |
 |-------|------|------|-----------|
@@ -136,9 +136,9 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 
 ---
 
-## 🚀 快速开始
+<h2 id="快速开始">🚀 快速开始</h2>
 
-### 方式一：Claude Code 插件安装（推荐）
+<h3 id="方式一claude-code-插件安装推荐">方式一：Claude Code 插件安装（推荐）</h3>
 
 #### 选项 A：开发版（自动更新）
 
@@ -188,7 +188,7 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 - `/academic-figure` - 图表生成
 - `/academic-venue-research` - 期刊调研
 
-### 方式二：Codex CLI 安装
+<h3 id="方式二codex-cli-安装">方式二：Codex CLI 安装</h3>
 
 #### 选项 A：开发版（main 分支）
 
@@ -242,7 +242,7 @@ git checkout v1.0.0
 | **稳定版** | `stable` | `git pull` | 生产环境 |
 | **指定版本** | `v1.0.0` 等 | 手动切换 | 需要锁定版本 |
 
-### 方式三：手动加载
+<h3 id="方式三手动加载">方式三：手动加载</h3>
 
 ```bash
 git clone https://github.com/joshua-zyy/academic-paper-writer.git
@@ -277,15 +277,15 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 ---
 
-## ⚙️ 推荐配置
+<h2 id="推荐配置">⚙️ 推荐配置</h2>
 
 ### 推荐模型
 
-| 模型                       | 说明                                                             |
-|--------------------------|----------------------------------------------------------------|
-| 🚀 **gpt-5.5**           | anyRouter中提供免费的api，地址: https://anyrouter.top/register?aff=hZXa |
-| 🚀 **claude-4.8**        | anyRouter中提供免费的api，地址: https://anyrouter.top/register?aff=hZXa |
-| 🚀 **DeepSeek V4 Flash** | 没其他原因，主要是token价格低，且是推理模型支持1m上下文，可以用于测试skill效果                  |
+| 模型                       | 说明                                                                                       |
+|--------------------------|------------------------------------------------------------------------------------------|
+| 🚀 **gpt-5.5**           | anyRouter中提供免费的api，需要使用vpn+教育邮箱/linux do账号注册，地址: https://anyrouter.top/register?aff=hZXa |
+| 🚀 **claude-4.8**        | anyRouter中提供免费的api，需要使用vpn+教育邮箱/linux do账号注册，地址: https://anyrouter.top/register?aff=hZXa                           |
+| 🚀 **DeepSeek V4 Flash** | 没其他原因，主要是token价格低，且是推理模型支持1m上下文，可以用于测试skill效果                                            |
 
 ### 推荐 Agent 平台
 
@@ -300,7 +300,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 ---
 
-## 🏗️ 核心设计
+<h2 id="核心设计">🏗️ 核心设计</h2>
 
 ### 🔍 证据优先，逐节闭环
 
@@ -361,7 +361,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 ---
 
-## 🔄 编排器核心工作流
+<h2 id="编排器核心工作流">🔄 编排器核心工作流</h2>
 
 ```text
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -420,7 +420,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 ---
 
-## 💡 使用示例
+<h2 id="使用示例">💡 使用示例</h2>
 
 ### 📄 完整论文起草
 
@@ -453,7 +453,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 ---
 
-## 🎭 适用场景
+<h2 id="适用场景">🎭 适用场景</h2>
 
 <table>
 <tr>
@@ -490,7 +490,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 ---
 
-## 📚 文档分层
+<h2 id="文档分层">📚 文档分层</h2>
 
 | 层级 | 文件 | 作用 |
 |------|------|------|
@@ -502,7 +502,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 ---
 
-## 📁 项目结构
+<h2 id="项目结构">📁 项目结构</h2>
 
 ```text
 academic-paper-writer/
@@ -555,7 +555,7 @@ academic-paper-writer/
 
 ---
 
-## 🛡️ 安全边界
+<h2 id="安全边界">🛡️ 安全边界</h2>
 
 > 这个项目最重要的不是"写得快"，而是**不越界**。
 
@@ -570,7 +570,7 @@ academic-paper-writer/
 
 ---
 
-## 🔧 维护与验证
+<h2 id="维护与验证">🔧 维护与验证</h2>
 
 ### 版本管理
 
@@ -610,7 +610,7 @@ python scripts/check_schemas.py --skills-root ./skills
 - ✅ SKILL.md 中引用的 reference 文件是否存在
 - ✅ 步骤编号是否一致
 
-## 📖 参考项目
+<h2 id="参考项目">📖 参考项目</h2>
 
 - ⚡ [superpowers](https://github.com/obra/superpowers) 
 - 🌿 [nature-skills](https://github.com/Yuan1z0825/nature-skills)  
