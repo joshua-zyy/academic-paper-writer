@@ -114,7 +114,7 @@ query_types:
 
 当 `local_ref_md_dir != null` 时，在常规检索**之前**执行：
 
-1. 读取 `<local_ref_md_dir>/_index_ref.json`（由 `convert-pdfs-to-md.py` 生成）
+1. 读取 `<local_ref_md_dir>/_index_ref.json`（由 `convert-pdfs-to-md.py` 生成，每条记录包含 `images_dir` 字段指示图片目录，空字符串表示无图片）
 2. 用关键词在索引中搜索（匹配 title、first_500_chars）
 3. 命中的候选文献，使用 `literature-reader-agent` 阅读其 MD 全文
 4. 产出 LiteratureReadingReport，供引用决策
