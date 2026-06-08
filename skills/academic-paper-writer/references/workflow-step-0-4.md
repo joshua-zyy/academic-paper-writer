@@ -788,12 +788,12 @@ Constraint: only VERIFIED references enter the draft body.
    - `strongly_cite` / `cite` → 写入 Verified References
    - `consider` → 记录为候选，判断是否论述需要
    - `skip` → 放弃
-3. 根据 report 中的 `citable_claims`（仅 `source: 原文`），建立每个引用→正文主张的映射
+3. 根据 report 中的 `citable_claims`（`source: 原文` 或 `source: 图片`），建立每个引用→正文主张的映射
 4. 输出完整的 Citation-to-Claim Map
 
 **重要规则**：
 - Subagent 的 `recommendation` 仅为参考。主 agent 基于论文整体论证结构做最终决定
-- 仅 `source: 原文` 的 `citable_claims` 可作为确定性引用依据
+- `source: 原文` 和 `source: 图片` 的 `citable_claims` 可作为确定性引用依据
 - `source: 推断` 的内容最多用于背景描述，且须在正文中降级表述（如"我们认为...可能..."）
 
 For Introduction / Related Work: if retries still produce zero VERIFIED references and the user cannot provide usable seed papers, block before Step 6. Do **not** proceed with a `[REF_NEEDED]`-only draft for these sections.

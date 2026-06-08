@@ -31,11 +31,15 @@ literature_reading_report:
   # ——— 可引用的 claim 列表 ———
   citable_claims:
     - claim: string               # 可被引用的 claim
-      source: enum                # 原文 / 推断
-      source_quote: string | null      # 原文的具体语句（source=原文时必填，推断时为 null）
+      source: enum                # 原文 / 推断 / 图片
+      source_quote: string | null      # 原文的具体语句（source=原文时必填）或图片路径（source=图片时）
       confidence: enum            # high / medium / low
       suitable_purpose:           # background / method_comparison / baseline / dataset_source
         - string
+
+  # ——— 多模态图片阅读状态（仅在 images 传入时有效） ———
+  image_reading: enum | null      # performed / skipped / not_applicable
+  image_reading_notes: string | null  # 降级原因或补充说明
 
   # ——— 关联度评估 ———
   relevance_to_current_work: enum # high / medium / low
@@ -86,6 +90,16 @@ literature_reading_report:
       confidence: medium
       suitable_purpose:
         - background
+
+    - claim: "模型架构采用 6 层 encoder + 6 层 decoder 堆叠"
+      source: 图片
+      source_quote: "paper1_images/fig1.png"
+      confidence: high
+      suitable_purpose:
+        - method_comparison
+
+  image_reading: performed
+  image_reading_notes: null
 
   relevance_to_current_work: high
   relevance_rationale: "本文也使用注意力机制处理序列数据，Transformer 是核心基线"

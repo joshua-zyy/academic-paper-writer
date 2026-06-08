@@ -16,7 +16,7 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
    - `red-lines.md` defines absolute prohibitions. Do not negotiate these.
    - `output-contract.md` defines deliverables per mode.
    - `anti-patterns.md` defines known failure modes and their correct alternatives.
-4. Detect the workflow using the manifest's `workflow` axis. Literature reading output must separate source quotes from agent inference; only `source: 原文` content may be used as citation evidence.
+4. Detect the workflow using the manifest's `workflow` axis. Literature reading output must separate source quotes from agent inference; only `source: 原文` or `source: 图片` content may be used as citation evidence.
 5. Echo the selected mode to the user before executing.
 6. Reach for `references/` only when the manifest's `references.on_demand` condition is satisfied.
 

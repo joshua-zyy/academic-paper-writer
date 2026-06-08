@@ -50,7 +50,7 @@
    - MD 中提取的 core claims、key results 可直接用于判断「该论文与本文的相关性」
    - 但引用该论文时仍须确认元数据（标题、作者、venue 等）的准确性
 3. **增量转换的时效保证**：
-   - 使用 `convert-pdfs-to-md.py` 时确保 MD 不比对应 PDF 旧（脚本默认检查 mtime）
+   - 使用 `convert-pdfs-to-md.py` 时确保 MD 和图片目录不比对应 PDF 旧（脚本默认检查 mtime，包含图片目录）
    - 若用户更新了 PDF 但未重新运行脚本，agent 应提示"MD 可能过期，建议重新转换"
 4. **多源冲突处理**：
    - MD 内容与一级来源元数据不一致 → 以一级来源为准

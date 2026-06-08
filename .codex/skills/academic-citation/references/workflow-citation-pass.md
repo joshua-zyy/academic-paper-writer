@@ -47,7 +47,7 @@
    - 获取成功 → 将内容转化为纯文本，dispatch `literature-reader-agent` 阅读全文
    - 获取失败（付费墙等）→ 降级为摘要 + 元数据，标注 `source_of_content: abstract_only`
 2. **并行 dispatch**：多篇候选文献的阅读**必须并行**执行
-3. 阅读报告参与引用决策：以 report 中的 `citable_claims`（`source: 原文`）为主要引用依据
+3. 阅读报告参与引用决策：以 report 中的 `citable_claims`（`source: 原文` 或 `source: 图片`）为主要引用依据
 
 ## Step 3b: Subagent 阅读结果聚合
 

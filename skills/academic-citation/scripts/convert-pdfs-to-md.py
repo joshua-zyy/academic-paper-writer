@@ -61,7 +61,7 @@ def convert_pdf_to_md(pdf_path: Path, md_path: Path, images_dir: Path) -> Option
     )
 
     md_content = re.sub(
-        r'!\[([^\]]*)\]\([^)]*' + re.escape(images_dir.name) + r'/([^)]+)\)',
+        r'!\[([^\]]*)\]\([^)]*' + re.escape(images_dir.name) + r'[\\/]([^)]+)\)',
         r'![\1](' + images_dir.name + r'/\2)',
         md_content,
     )
@@ -99,7 +99,7 @@ def extract_metadata(text: str, pdf_stem: str) -> dict:
             break
     for line in lines:
         if line.strip():
-            first_500 = " ".join(lines[:20])[:500]
+            first_500 = re.sub(r'!\[[^\]]*\]\([^)]+\)', '', " ".join(lines[:20]))[:500]
             break
     return {"title": title, "first_500_chars": first_500}
 

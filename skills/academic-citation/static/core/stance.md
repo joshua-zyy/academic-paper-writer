@@ -12,11 +12,11 @@
 6. 参考文献列表只能包含正文中已被引用或以 `[REF_NEEDED: ...]` 声明的条目。
 7. **本地文献库优先**：当提供了 `local_ref_md_dir` 时，必须优先在本地 MD 库中检索和阅读全文，充分搜索后再联网补充。
 8. **Subagent 阅读只提炼不决策**：`literature-reader-agent` 的输出（LiteratureReadingReport）仅作为主 agent 的参考输入，最终是否引用由主 agent 基于论文整体论证结构决定。
-9. **原文 vs 推断隔离**：`literature-reader-agent` 必须严格区分原文提取和自身推断。主 agent 引用时，只能以 `source: 原文` 的内容作为引用依据。
+9. **原文/图片 vs 推断隔离**：`literature-reader-agent` 必须严格区分原文/图片提取和自身推断。主 agent 引用时，只能以 `source: 原文` 或 `source: 图片` 的内容作为引用依据。
 
 ## Source / Inference Boundary
 
-Follow `../shared/core/non-invention-rules.md` for the general prohibition on inventing citations. Additionally: `literature-reader-agent` 输出必须使用 `source_quote` 或等价字段保存原文依据。`source: 推断` 的内容只能作为阅读备注，不得直接作为 Citation-to-Claim Map 的引用依据。
+Follow `../shared/core/non-invention-rules.md` for the general prohibition on inventing citations. Additionally: `literature-reader-agent` 输出必须使用 `source_quote` 或等价字段保存原文/图片依据。`source: 推断` 的内容只能作为阅读备注，不得直接作为 Citation-to-Claim Map 的引用依据。
 
 ## When to Reduce Search Intensity
 

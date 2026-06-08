@@ -116,10 +116,15 @@ query_types:
 
 1. 读取 `<local_ref_md_dir>/_index_ref.json`（由 `convert-pdfs-to-md.py` 生成，每条记录包含 `images_dir` 字段指示图片目录，空字符串表示无图片）
 2. 用关键词在索引中搜索（匹配 title、first_500_chars）
-3. 命中的候选文献，使用 `literature-reader-agent` 阅读其 MD 全文
-4. 产出 LiteratureReadingReport，供引用决策
-5. 若本地搜索结果充分且内容匹配 → 跳过联网检索
-6. 若不足或不匹配 → 继续常规联网检索（从 Step 2 起）
+3. 命中的候选文献，在 dispatch literature-reader-agent 前，解析 MD 文件中的图片引用：
+   - 在 markdown_content 中搜索 `!\[([^\]]*)\]\(([^)]+)\)` 模式
+   - 对每个匹配，将相对路径（如 `paper1_images/fig1.png`）基于 md_path 所在目录解析为绝对路径
+   - 提取图片引用**前后各约 200 字符**的上下文文本（学术论文中 caption 通常在图片引用之后，前置提取无法捕获关键信息）
+   - 构造 `images` 数组，每项包含：`relative_path`、`absolute_path`、`alt_text`、`context`
+4. 使用 `literature-reader-agent` 阅读其 MD 全文及附带图片
+5. 产出 LiteratureReadingReport，供引用决策
+6. 若本地搜索结果充分且内容匹配 → 跳过联网检索
+7. 若不足或不匹配 → 继续常规联网检索（从 Step 2 起）
 
 **约束**：
 - 索引搜索只初步过滤，每篇候选仍须由 reader agent 阅读以确认内容匹配
@@ -150,6 +155,14 @@ Task:
 
     任务: 阅读并提炼以下论文
     markdown_content: {从 MD 文件读取的全文内容}
+    md_path: {MD 文件的绝对路径}
+    images: {解析出的图片列表，格式见下方示例；若无图片则设置为空数组 []}
+    # 有图片时的格式示例:
+    # images:
+    #   - relative_path: {如 "paper1_images/fig1.png"}
+    #     absolute_path: {解析后的图片绝对路径}
+    #     alt_text: {![]() 中的 alt 文本}
+    #     context: {图片引用前后各约 200 字符的上下文文本（若图为文档开头则后置为空，末尾则前置为空）}
     paper_metadata:
       title: {title}
       authors: {authors}
@@ -160,9 +173,10 @@ Task:
 
     执行步骤:
     1. 读取 skills/academic-citation/agents/literature-reader-agent.md
-    2. 遵循 Constraints (Red Lines)，严格区分 `[原文]` 与 `[推断]`
-    3. 按 Reading Guidance 顺序提取信息
-    4. 输出遵循 literature-reading-report.md schema
+    2. 若 images 不为空，执行「一体化多模态阅读」；否则执行「纯文本阅读」
+    3. 遵循 Constraints (Red Lines)，严格区分 [原文]、[图片] 与 [推断]
+    4. 根据 images 是否为空选择阅读路径，提取信息
+    5. 输出遵循 literature-reading-report.md schema
 
     返回: 完整 LiteratureReadingReport
 ```
