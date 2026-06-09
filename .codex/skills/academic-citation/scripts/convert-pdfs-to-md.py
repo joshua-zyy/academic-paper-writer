@@ -58,13 +58,20 @@ def convert_pdf_to_md(pdf_path: Path, md_path: Path, images_dir: Path) -> Option
         image_path=str(images_dir),
         image_format="png",
         dpi=300,
+        use_ocr=False,
     )
 
+    # 移除图片中的 OCR 文字标记
     md_content = re.sub(
-        r'!\[([^\]]*)\]\([^)]*' + re.escape(images_dir.name) + r'[\\/]([^)]+)\)',
-        r'![\1](' + images_dir.name + r'/\2)',
+        r'\*\*----- Start of picture text -----\*\*<br>.*?\*\*----- End of picture text -----\*\*<br>',
+        '',
         md_content,
+        flags=re.DOTALL
     )
+
+    # 修复图片路径：将绝对路径改为相对于 .md 文件的相对路径
+    old_path_prefix = str(images_dir).replace("\\", "/")
+    md_content = md_content.replace(f"![]({old_path_prefix}/", f"![]({images_dir.name}/")
 
     if not md_content or not md_content.strip():
         return None
