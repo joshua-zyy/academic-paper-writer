@@ -1,0 +1,43 @@
+name: academic-latex-layout
+description: >
+  Declarative routing manifest for academic LaTeX layout work. The skill handles
+  draft-to-template LaTeX generation, existing .tex layout repair, and report-only
+  layout audit with semantic float mapping and compiled PDF review loops.
+
+always_load:
+  - static/core/stance.md
+  - static/core/red-lines.md
+  - static/core/output-contract.md
+  - static/core/anti-patterns.md
+  - ../shared/core/evidence-policy.md
+  - ../shared/core/non-invention-rules.md
+  - ../shared/core/output-boundaries.md
+
+axes:
+  mode:
+    detect: |
+      Use explicit user intent first. Draft plus template plus figure/table assets
+      maps to draft-to-latex-layout. Existing .tex project layout symptoms map to
+      layout-repair unless the user asks only for diagnosis, which maps to layout-audit.
+    values:
+      draft-to-latex-layout: references/workflow-draft-to-latex-layout.md
+      layout-repair: references/workflow-layout-repair.md
+      layout-audit: references/layout-audit-contract.md
+    multi: false
+
+references:
+  on_demand:
+    - condition: draft-to-template LaTeX generation
+      path: references/workflow-draft-to-latex-layout.md
+    - condition: existing .tex project repair
+      path: references/workflow-layout-repair.md
+    - condition: report-only layout audit
+      path: references/layout-audit-contract.md
+    - condition: choosing float placement, barriers, figure*, table*, widths, or subfigures
+      path: references/float-placement-patterns.md
+    - condition: inspecting venue or template constraints
+      path: references/template-constraints.md
+    - condition: compiling, previewing PDF, reviewing output, or looping repairs
+      path: references/pdf-preview-loop.md
+    - condition: final report or audit output
+      path: references/report-format.md

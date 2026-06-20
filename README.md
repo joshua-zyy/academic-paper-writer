@@ -7,7 +7,7 @@
     </a>
     <img src="https://img.shields.io/badge/domain-CS%2FAI%2FML-brightgreen" alt="Domain">
     <img src="https://img.shields.io/badge/status-active-success" alt="Status">
-    <img src="https://img.shields.io/badge/skill%20system-7%20skills-9A4D8E" alt="Skills">
+    <img src="https://img.shields.io/badge/skill%20system-8%20skills-9A4D8E" alt="Skills">
     <img src="https://img.shields.io/badge/architecture-Core%20%2B%20Subskills-orange" alt="Architecture">
   </p>
     <p align="center">
@@ -133,6 +133,7 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 | ✨ **academic-polishing** | 文体打磨 | Prose Quality Gate、Claim Strength Audit、去 AI 化 | `润色`、`claim strength` |
 | 📊 **academic-figure** | 数据图生成 | 实验数据图（Python 代码）、图表审查与修改；架构图只记录手工绘制需求 | `绘图`、`训练曲线`、`消融实验` |
 | 🏛️ **academic-venue-research** | 期刊调研 | 调研目标 venue 投稿要求与写作风格，产出标准化 Venue Brief | `期刊调研`、`venue research`、`投稿要求` |
+| 📐 **academic-latex-layout** | 独立 Skill | 学术论文 LaTeX 布局、图表浮动体放置、模板适配与布局修复（独立调用） | `LaTeX 布局`、`float placement`、`layout repair` |
 
 ---
 
@@ -187,6 +188,7 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 - `/academic-polishing` - 文体打磨
 - `/academic-figure` - 图表生成
 - `/academic-venue-research` - 期刊调研
+- `/academic-latex-layout` - LaTeX 布局与浮动体放置
 
 <h3 id="方式二codex-cli-安装">方式二：Codex CLI 安装</h3>
 
@@ -536,10 +538,15 @@ academic-paper-writer/
     │   ├── agents/                     # experiment_agent
     │   ├── scripts/                    # evidence_scanner.py
     │   └── references/                 # 证据盘点、运行策略、协议风险
-    └── academic-figure/                # 📊 数据图生成
-        ├── agents/                     # figure_agent
-        ├── scripts/                    # chart_template.py + qa_figure.py
-        └── references/                 # 设计理论、图表类型、QA、教程
+    ├── academic-figure/                # 📊 数据图生成
+    │   ├── agents/                     # figure_agent
+    │   ├── scripts/                    # chart_template.py + qa_figure.py
+    │   └── references/                 # 设计理论、图表类型、QA、教程
+    └── academic-latex-layout/          # 📐 LaTeX 布局
+        ├── SKILL.md
+        ├── manifest.yaml
+        ├── references/                 # 浮动体放置、模板约束、PDF 预览循环
+        └── static/core/                # 核心规则与边界
 ```
 
 ### 建议阅读顺序
