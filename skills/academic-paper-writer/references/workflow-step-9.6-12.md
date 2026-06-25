@@ -1,15 +1,15 @@
-# Orchestration Workflow — Part 3: Review, Integration & Batch Generation (Step 6.6–9)
+# Orchestration Workflow — Part 3: Review, Integration & Batch Generation (Step 9.6–12)
 
-本文件包含编排器 Step 6.6–9 的详细执行流程。按需加载，避免一次性加载全部步骤。
+本文件包含编排器 Step 9.6–12 的详细执行流程。按需加载，避免一次性加载全部步骤。
 
 完整步骤索引见 `orchestration-workflow.md`。
 
 ---
 
-## Step 6.6: Prose Quality Gate (Review Phase 2: Prose Gate) — 内化调用
+## Step 9.6: Prose Quality Gate (Review Phase 2: Prose Gate) — 内化调用
 
 - Create a todo list for prose checks.
-- Check Step 6.5 `evidence_debt` before selecting the prose operation level.
+- Check Step 9.5 `evidence_debt` before selecting the prose operation level.
 - If `evidence_debt = closed`, run the full Prose Quality Gate and Claim Strength Audit.
 - If `evidence_debt = open`, run only safe language repair: grammar, clarity, meta-comment removal, and claim-strength downgrades. Do not make unsupported claims more persuasive or more certain.
 - **内化调用 `academic-polishing`**：主 Agent 读取 `skills/academic-polishing/SKILL.md` 的规则后自行执行润色与 claim 强度审计，不 dispatch 子 Agent。
@@ -56,7 +56,7 @@ Prose rewrite loop: max 2 rounds. If still open after 2 rounds, carry `prose_deb
 - 无上下文传递损失
 - 润色后的文本与前后节风格一致
 
-### Step 6.6 内化调用模板
+### Step 9.6 内化调用模板
 
 主 Agent 读取 `skills/academic-polishing/SKILL.md` 后，按以下参数执行：
 
@@ -79,7 +79,7 @@ Internalized Call:
 
 输出：`prose_debt`（open/closed）+ `failed_items` + 改写后文本 + `claim_strength_changes`
 
-## Step 6.7: Expansion Pass (Content Density Check)
+## Step 9.7: Expansion Pass (Content Density Check)
 
 - Create a todo list for thin-draft checks.
 
@@ -92,7 +92,7 @@ Thin-draft conditions（详见 `references/content-density.md`）:
 
 Expansion principle: use only existing evidence and compliant placeholders. Prioritize filling "reader understanding chain" gaps.
 
-## Step 6.8: Self-Review & Verification
+## Step 9.8: Self-Review & Verification
 
 - Create a todo list for review items.
 - Delegate to `academic-reviser` via the dispatch template below（full-section-review mode）.
@@ -126,7 +126,7 @@ Task:
     **verdict = passed 条件**：
     - 所有硬 debt 闭合：`prose_debt = closed`、`section_contract_debt = closed`、`citation_debt = closed`、`evidence_debt = closed`
     - `thin_draft = no`
-    - `figure_debt` 为软发布债务：open 时不单独阻止当前 section passed，但必须记录到 Step 9 或外部阻塞清单
+    - `figure_debt` 为软发布债务：open 时不单独阻止当前 section passed，但必须记录到 Step 12 或外部阻塞清单
     - 任何硬 debt 未闭合 → verdict = blocked（禁止伪装为 passed）
     - blocked 时输出 safe_to_continue + frozen_claims
 
@@ -148,30 +148,30 @@ If `blocked`, must include `safe_to_continue` and `frozen_claims`. Only advance 
 
 ### 文件更新（强制）
 
-Revised Draft 生成后，**必须**将更新后的正文写入 `./docs/paper-drafts/paper_draft.md`（Edit 工具替换对应节内容）。
+Revised Draft 生成后，**必须**将更新后的正文写入 `./academic-paper-writer/paper-drafts/paper_draft.md`（Edit 工具替换对应节内容）。
 
 **禁止在对话中输出完整 Revised Draft 正文。** 对话中仅输出进度摘要。
 
-### Step 6.9: Update Cumulative Draft and Advance
+### Step 9.9: Update Cumulative Draft and Advance
 
-- 将当前 section 的 Revised Draft 追加或替换到 `./docs/paper-drafts/paper_draft.md` 中。
+- 将当前 section 的 Revised Draft 追加或替换到 `./academic-paper-writer/paper-drafts/paper_draft.md` 中。
 - 更新 Section Queue：将当前 section 标记为 `completed`。
-- 推进到下一 section（按 Section Queue 顺序），回到 Step 6.0。
+- 推进到下一 section（按 Section Queue 顺序），回到 Step 9.0。
 
 ---
 
-## Step 7: Integration & Section Loop (Dependency-Aware)
+## Step 10: Integration & Section Loop (Dependency-Aware)
 
 For `full-paper-planning`, do not end after one section revision.
 
-### 7a. Status Update
+### 10a. Status Update
 
-- If `failed` and not externally blocked → keep current section active, continue next Step 6.8 round.
+- If `failed` and not externally blocked → keep current section active, continue next Step 9.8 round.
 - If `blocked` and `safe_to_continue = yes` → write blockers to Revision Queue, freeze claims, advance.
 - If `blocked` and `safe_to_continue = no` → keep active, wait for external evidence.
 - Merge into Cumulative Draft; update Section Queue and Revision Queue.
 
-### 7b. Dependency Check
+### 10b. Dependency Check
 
 After current section passes Verification, read `references/section-dependency-matrix.md`:
 
@@ -185,7 +185,7 @@ After current section passes Verification, read `references/section-dependency-m
      - User confirms → move Y to head of Section Queue.
      - User skips → Y keeps `pending`, auto-rechecked when Y is completed later.
 
-### 7c. Select Next Section and Advance
+### 10c. Select Next Section and Advance
 
 Choose from sections whose `depends_on` are all satisfied and `revision_queue` has no `pending`:
 
@@ -203,7 +203,7 @@ Continue until:
 - Blocking evidence gaps would significantly increase hallucination risk
 - User explicitly requests pause
 
-### 7d. Abstract Generation (Hard Gate D)
+### 10d. Abstract Generation (Abstract Readiness Gate)
 
 Abstract is **not** in the initial Section Queue. It can only be generated after **all** of the following conditions are met:
 
@@ -219,22 +219,22 @@ When generating Abstract:
 - Do not introduce new claims, methods, or terminology not present in the body
 - Place Abstract at the beginning of the final Cumulative Draft output
 
-### 7e. Progress Report（auto 模式下每节完成后输出）
+### 10e. Progress Report（auto 模式下每节完成后输出）
 
 每节 Verification 完成后，在对话中输出简短进度摘要：
 
 > **{Section}**: {verdict} → Next: {next_section}
 > {如有关键问题，最多 1-2 条；否则省略}
 
-此摘要**替代**完整正文的对话输出。完整内容仅在 `./docs/paper-drafts/paper_draft.md` 中可查阅。
+此摘要**替代**完整正文的对话输出。完整内容仅在 `./academic-paper-writer/paper-drafts/paper_draft.md` 中可查阅。
 
-### 7f. File Update（强制）
+### 10f. File Update（强制）
 
-每节 Verification 完成后，**必须**使用 Edit 工具更新 `./docs/paper-drafts/paper_draft.md`，将当前节的最新版本追加或替换到论文文件中。
+每节 Verification 完成后，**必须**使用 Edit 工具更新 `./academic-paper-writer/paper-drafts/paper_draft.md`，将当前节的最新版本追加或替换到论文文件中。
 
 ---
 
-## Step 8: 生成正式 References 与外部引用清单（**强制**，全文完成后执行）
+## Step 11: 生成正式 References 与外部引用清单（**强制**，全文完成后执行）
 
 Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**生成两类引用产物：
 
@@ -257,7 +257,7 @@ Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**生成两�
 6. 统计去重后引用总数。
 7. 若总数 < `min_citations`，在对话中提示用户："当前引用 X 篇，未达到本轮配置的 min_citations={min_citations}。建议补充以下方向的文献检索：[...]"。用户确认后可继续，但 `referenced-literature-checklist.md` 顶部标注 `⚠️ 引用数未达标：X/{min_citations}`。
 8. 为每篇文献记录：标题、作者、venue、引用章节、引用目的。
-9. **必须**写入 `./docs/paper-drafts/referenced-literature-checklist.md`。
+9. **必须**写入 `./academic-paper-writer/paper-drafts/referenced-literature-checklist.md`。
 
 **输出模板**：
 ```markdown
@@ -273,12 +273,9 @@ Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**生成两�
 ## 确认方式
 
 1. 将上述文献的 PDF 放入本地文献库目录
-2. 运行转换命令：
-   ```
-   python skills/academic-citation/scripts/convert-pdfs-to-md.py <pdf_dir> <refs_md_dir> --type ref
-   ```
+2. 按 Step 2 的 MinerU API 转换门控运行 `convert-pdfs-to-md.py`，并提供生成的 `refs_md` 目录
 3. 告知 agent："确认引用"
-4. Agent 将 dispatch literature-reader-agent 逐篇阅读，
+4. Agent 验证 `_index_ref.json` 后 dispatch literature-reader-agent 逐篇阅读，
    对比论文实际内容与 draft 中的引用描述是否一致
 5. 每篇输出的确认结果：
    - ✅ **accurate** — 引用准确，描述与原文一致
@@ -290,38 +287,38 @@ Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**生成两�
 （逐步更新，每确认一篇更新一行）
 ```
 
-**执行顺序约束**：Step 8 完成后，进入 Step 9（数据图批量生成）。
+**执行顺序约束**：Step 11 完成后，进入 Step 12（数据图批量生成）。
 
 ---
 
-## Step 9: 数据图批量生成（**强制**，全文完成后执行）
+## Step 12: 数据图批量生成（**强制**，全文完成后执行）
 
 Abstract 生成后、输出最终 Cumulative Draft 之前，**必须**执行数据图批量生成扫描。未执行不得输出最终稿。
 
 ### 触发条件
 
 - Abstract 已生成（隐含所有 core sections Verification = passed）
-- `./docs/paper-drafts/figures/codes/plot_*.py` 存在，或待补充清单中存在 `manual_figure_needed` 图项需要复核
+- `./academic-paper-writer/paper-drafts/figures/codes/plot_*.py` 存在，或待补充清单中存在 `manual_figure_needed` 图项需要复核
 
-### 9a. 扫描图表产出物和手工需求
+### 12a. 扫描图表产出物和手工需求
 
-1. 检查 `./docs/paper-drafts/figures/codes/` 目录下是否存在 `plot_fig*.py` 且对应 SVG 尚未生成
+1. 检查 `./academic-paper-writer/paper-drafts/figures/codes/` 目录下是否存在 `plot_fig*.py` 且对应 SVG 尚未生成
 2. 检查待补充清单中的 `manual_figure_needed` 图项，确认其用途、证据来源、必须展示内容和 caption 草案完整
 3. 统计：已生成数据图 SVG 数 / 数据图代码待执行数 / 手工图表需求数 / 数据或证据缺口数
 
-### 9b. 数据图批量执行
+### 12b. 数据图批量执行
 
-对每个 `./docs/paper-drafts/figures/codes/plot_fig{N}.py`：
+对每个 `./academic-paper-writer/paper-drafts/figures/codes/plot_fig{N}.py`：
 
 1. **环境检查**：确认 matplotlib、seaborn 等依赖可用
-2. **执行脚本**：使用 PowerShell 运行 `python ./docs/paper-drafts/figures/codes/plot_fig{N}.py`
+2. **执行脚本**：使用 PowerShell 运行 `python ./academic-paper-writer/paper-drafts/figures/codes/plot_fig{N}.py`
 3. **验证产出**：确认生成了对应的 SVG 文件
 4. **QA 检查**（快速）：配色正确、坐标轴可读、无乱码
 5. 若执行失败：记录错误原因，标记为「待手动修复」，不阻塞后续图片执行
 
 **执行模板**：
 ```powershell
-$scriptPath = "./docs/paper-drafts/figures/codes/plot_fig{N}.py"
+$scriptPath = "./academic-paper-writer/paper-drafts/figures/codes/plot_fig{N}.py"
 if (Test-Path $scriptPath) {
     python $scriptPath 2>&1
     if ($LASTEXITCODE -eq 0) {
@@ -332,7 +329,7 @@ if (Test-Path $scriptPath) {
 }
 ```
 
-### 9c. 手工图表需求复核
+### 12c. 手工图表需求复核
 
 对每个 `manual_figure_needed` 图项：
 
@@ -341,7 +338,7 @@ if (Test-Path $scriptPath) {
 3. 若证据来源或必须展示内容不完整，记录为「待人工补充证据」。
 4. 不调用 `academic-figure` 自动绘制模型框架图、架构图、overview 图或复杂机制图。
 
-### 9d. 输出图片生成报告
+### 12d. 输出图片生成报告
 
 在对话中输出简短报告：
 
@@ -351,15 +348,15 @@ if (Test-Path $scriptPath) {
 | 图片 | 类型 | 状态 | 路径/说明 |
 |------|------|------|----------|
 | Figure 1 | 手工图表 | ⚠️ 人工绘制需求 | manual_figure_needed: overall method overview |
-| Figure 2 | 数据图 | ❌ 待生成 | ./docs/paper-drafts/figures/codes/plot_fig2.py 执行失败 |
+| Figure 2 | 数据图 | ❌ 待生成 | ./academic-paper-writer/paper-drafts/figures/codes/plot_fig2.py 执行失败 |
 | Figure 3 | 手工图表 | ⚠️ 待补证据 | 缺少模块连接证据 |
-| Figure 4 | 数据图 | ✅ 已生成 | ./docs/paper-drafts/figures/fig4.svg |
+| Figure 4 | 数据图 | ✅ 已生成 | ./academic-paper-writer/paper-drafts/figures/fig4.svg |
 ```
 
-### 9e. 更新 Cumulative Draft
+### 12e. 更新 Cumulative Draft
 
-将图片生成报告写入 `./docs/paper-drafts/figures/figure-generation-report.md`。不得将报告追加到 `paper_draft.md` 末尾；`paper_draft.md` 必须继续以同步后的 `## 待补充清单` 作为末尾结构。
+将图片生成报告写入 `./academic-paper-writer/paper-drafts/figures/figure-generation-report.md`。不得将报告追加到 `paper_draft.md` 末尾；`paper_draft.md` 必须继续以同步后的 `## 待补充清单` 作为末尾结构。
 
 **执行顺序约束**：
-- Step 8（引用清单）→ Step 9（数据图批量生成）→ 输出最终稿
-- Step 9 不可跳过，即使没有数据图待生成也必须执行扫描并输出"无需生成数据图"的确认
+- Step 11（引用清单）→ Step 12（数据图批量生成）→ 输出最终稿
+- Step 12 不可跳过，即使没有数据图待生成也必须执行扫描并输出"无需生成数据图"的确认

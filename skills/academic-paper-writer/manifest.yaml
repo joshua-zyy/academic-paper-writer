@@ -1,7 +1,7 @@
 name: academic-paper-writer
 description: >
   Declarative routing manifest for the academic-paper-writer orchestrator. The
-  orchestrator keeps the existing Step 0-9 workflow and loads only the core
+  orchestrator keeps the existing Step 0-12 workflow and loads only the core
   stance, workflow summary, output contract, and step references needed for the
   current request.
 
@@ -25,10 +25,10 @@ axes:
       experiment-only requests pass through to the corresponding sub-skill.
     values:
       full-paper-planning: references/orchestration-workflow.md
-      section-drafting: references/workflow-step-5-6.5.md
-      section-revision: references/workflow-step-6.6-9.md
-      related-work-or-citation-pass: references/workflow-step-0-4.md
-      experiment-evidence-pass: references/workflow-step-0-4.md
+      section-drafting: references/workflow-step-8-9.5.md
+      section-revision: references/workflow-step-9.6-12.md
+      related-work-or-citation-pass: references/workflow-step-0-7.md
+      experiment-evidence-pass: references/workflow-step-0-7.md
     multi: false
   paper_type:
     detect: |
@@ -67,12 +67,12 @@ references:
   on_demand:
     - condition: complete orchestrator workflow, dispatch templates, and shared inputs
       path: references/orchestration-workflow.md
-    - condition: Step 0-4 execution and venue setup
-      path: references/workflow-step-0-4.md
-    - condition: Blueprint and Step 6.0-6.5 execution
-      path: references/workflow-step-5-6.5.md
-    - condition: Step 6.6-9 execution and final gates
-      path: references/workflow-step-6.6-9.md
+    - condition: Step 0-7 execution and preparation gates
+      path: references/workflow-step-0-7.md
+    - condition: Step 8 blueprint and Step 9.0-9.5 execution
+      path: references/workflow-step-8-9.5.md
+    - condition: Step 9.6-12 execution and final gates
+      path: references/workflow-step-9.6-12.md
     - condition: section-specific required moves and reader-state transitions
       path: references/section-writing-contracts.md
     - condition: default section queue

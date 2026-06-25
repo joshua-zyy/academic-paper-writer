@@ -115,4 +115,4 @@ venue_brief:
 
 ## Invocation
 
-由 `academic-paper-writer` 编排器在 Step 1.5 委托，按 `references/workflow-step-0-4.md` 中的 dispatch 模板创建子代理执行。
+由 `academic-paper-writer` 编排器在 Step 4 委托，按 `references/workflow-step-0-7.md` 中的 dispatch 模板创建子代理执行。

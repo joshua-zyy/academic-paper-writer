@@ -16,13 +16,13 @@
 
 | Gate | 触发位置 | 核心条件 | 失败处理 |
 |------|---------|---------|---------|
-| E: Venue 调研 | Step 1 → Step 2 | venue 确认后必须完成 Step 1.5，生成 venue-brief.md | 阻塞，不得进入 Step 2 |
-| A: 证据完备 | Step 2 → Step 6 | 至少一条可引用证据（`newly_run`/`preexisting_artifact`） | 降级路径或阻塞 |
-| B: 引用就绪 | Step 3 → Step 6 | 至少一条 `VERIFIED` 引用或明确"无需文献" | 按 section 分流，Intro/RW 阻塞，Method 可占位 |
-| C: Verification | Step 6.8 → Step 7 | 所有硬 debt 闭合 + thin_draft = no（figure_debt 为软发布债务，open 时不单独阻止当前 section passed） | passed/blocked/failed，详细见 workflow |
-| D: 引用数量 | Step 8 → 输出 | 全文去重后引用总数 >= `min_citations` | 未达标时提醒用户，可继续补充后重检 |
+| E: Venue 调研 | Step 1 → Step 5 | 若用户提供本地 PDF 文献库，必须先完成 Step 2 并验证 MD 目录；venue 确认后必须完成 Step 4，生成 venue-brief.md | 阻塞，不得进入 Step 5 |
+| A: 证据完备 | Step 5 → Step 9 | 至少一条可引用证据（`newly_run`/`preexisting_artifact`） | 降级路径或阻塞 |
+| B: 当前节引用就绪 | Step 6 → Step 9 | 当前 section 的关键 claims 有 VERIFIED 引用、Citation-to-Claim Map 或显式 `[REF_NEEDED]` 占位 | 按 section 分流，Intro/RW 阻塞，Method/Results 可带占位进入但必须记录 debt |
+| C: Verification | Step 9.8 → Step 10 | 所有硬 debt 闭合 + thin_draft = no（figure_debt 为软发布债务，open 时不单独阻止当前 section passed） | passed/blocked/failed，详细见 workflow |
+| D: 全文引用数量 | Step 11 → 输出 | 全文去重后引用总数 >= `min_citations` | 未达标时提醒用户，可继续补充后重检 |
 
-## 6.1 Pre-Draft Probe Rules
+## 9.1 Pre-Draft Probe Rules
 
 起草前根据当前 section 类型 dispatch 深层探查。需要探查 → **必须先 dispatch 再起草**，不得跳过。
 
@@ -35,7 +35,7 @@
 | Main Results / Ablation | `experiment_results`（主结果、基线对比、消融数值） | 单探查 |
 | Discussion | `interpretability`（可解释性结果、网络分析） | 单探查 |
 
-Dispatch 模板见 `references/workflow-step-0-4.md` 和 `references/workflow-step-5-6.5.md`。
+Dispatch 模板见 `references/workflow-step-0-7.md` 和 `references/workflow-step-8-9.5.md`。
 
 ## Default Section Queue
 
@@ -47,18 +47,18 @@ Abstract 为后置章节，不在初始队列中。默认顺序：Introduction �
 
 | DP | 位置 | Agent 展示 |
 |----|------|-----------|
-| DP-1 | Step 1.5 完成后 | Venue Brief 摘要（venue、语言、min_citations） |
-| DP-2 | Step 5 Blueprint 完成后 | Section Blueprint（章节结构、每节要点、证据来源） |
-| DP-3 | Step 6.2 Draft v1 完成后 | Draft 摘要（当前节、段落数、待补充清单） |
-| DP-4 | Step 6.8 Verification 完成后 | Verification Status（verdict、未闭合问题） |
+| DP-1 | Step 4 完成后 | Venue Brief 摘要（venue、语言、min_citations） |
+| DP-2 | Step 8 Blueprint 完成后 | Section Blueprint（章节结构、每节要点、证据来源） |
+| DP-3 | Step 9.2 Draft v1 完成后 | Draft 摘要（当前节、段落数、待补充清单） |
+| DP-4 | Step 9.8 Verification 完成后 | Verification Status（verdict、未闭合问题） |
 
 ## File Output Rules
 
-1. **输出目录**：`./docs/paper-drafts/`
+1. **输出目录**：`./academic-paper-writer/paper-drafts/`
 2. **论文文件**：`paper_draft.md` — 正文 + 参考文献 + 待补项，逐步追加
 3. **Blueprint文件**：`section_blueprint.md` — 每节更新
 4. **图片目录**：`figures/` — SVG 数据图输出与手工图表需求记录；`figures/codes/` — `plot_*.py`
 5. **对话输出限制**：禁止在对话中输出完整论文正文，仅显示简短进度摘要
 6. **写入时机**：每节 Draft 生成后、Verification 完成后使用 Write/Edit 更新 `paper_draft.md`
 7. **中间状态**：Evidence Inventory、Verified References、Revision Queue 等在 agent 上下文中维护
-8. **Venue Brief**：`venue-brief.md` — Step 1.5 输出，后续步骤必参考
+8. **Venue Brief**：`venue-brief.md` — Step 4 输出，后续步骤必参考

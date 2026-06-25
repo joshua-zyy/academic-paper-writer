@@ -265,7 +265,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 | 脚本 | 用途 | 依赖                        |
 |------|------|---------------------------|
-| `skills/academic-citation/scripts/convert-pdfs-to-md.py` | 将本地 PDF 文献转换为 Markdown（本地文献库功能，含图片提取） | Python 3.10+, `pymupdf4llm` |
+| `skills/academic-citation/scripts/convert-pdfs-to-md.py` | 将本地 PDF 文献转换为 Markdown（默认使用 MinerU API，含图片提取与索引生成） | Python 3.10+, MinerU API Token |
 | `scripts/check_schemas.py` | 验证跨技能 schema 一致性 | Python 3.12+|
 
 ### 3. 准备输入材料
@@ -345,11 +345,11 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 | Gate                  | 触发位置 | 核心条件 | 失败处理 |
 |-----------------------|---------|---------|---------|
-| 🏛️ **A：Venue 调研**    | Step 1 → Step 2 | venue 确认后必须完成 Step 1.5，生成 venue-brief.md | 阻塞，不得进入 Step 2 |
-| 🔬 **B：证据完备**         | Step 2 → Step 6 | 至少一条可引用证据 | 降级路径或阻塞 |
-| 📖 **C：引用就绪**         | Step 3 → Step 6 | 至少一条 VERIFIED 引用 | Intro/RW 阻塞；Method 可占位 |
-| 🚪 **D：Verification** | Step 6.8 → Step 7 | 所有 debt 闭合 + 内容达标 | passed/blocked/failed |
-| 📚 **E：引用数量**         | Step 8 → 输出 | 全文去重引用 >= `min_citations` 篇（默认 35） | 未达标时提醒，可补充后重检 |
+| 🏛️ **E：Venue 调研** | Step 1 → Step 5 | 若用户提供本地 PDF 文献库，Step 2 已验证 MD 目录；venue 确认后必须完成 Step 4 并生成 venue-brief.md | 阻塞，不得进入 Step 5 |
+| 🔬 **A：证据完备** | Step 5 → Step 9 | 至少一条可引用证据（`newly_run` 或 `preexisting_artifact`） | 降级路径或阻塞 |
+| 📖 **B：当前节引用就绪** | Step 6 → Step 9 | 当前 section 的关键 claims 有 VERIFIED 引用、Citation-to-Claim Map、项目证据或显式 `[REF_NEEDED]` debt | Intro/RW 阻塞；Method/Results 可带记录的 debt |
+| 🚪 **C：Verification** | Step 9.8 → Step 10 | 所有 hard debt 闭合 + `thin_draft=no` | passed/blocked/failed |
+| 📚 **D：全文引用数量** | Step 11 → 输出 | 全文去重引用 >= `min_citations` | 未达标时提醒，可补充后重检 |
 
 跨 skill 之间通过显式 **数据契约** 交换信息：
 
@@ -371,13 +371,15 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 │                                                                          │
 │   🎯 Step 0  判定任务模式                                                 │
 │    ↓                                                                    │
-│   🔒 Step 1  确认 venue / 语言 + 本地文献库（🔴硬阻塞）                   │
+│   🔒 Step 1  确认 venue / 语言 / min_citations + 本地文献库（🔴硬阻塞）  │
 │    ↓                                                                    │
-│   🏛️ Step 1.5  Venue 调研（🔴硬阻塞，生成 venue-brief.md）                │
+│   📄 Step 2  PDF→MD MinerU 转换确认（条件执行，缺 MD 时阻塞等待用户）     │
 │    ↓                                                                    │
-│   ⏭  Step 1b  可选 PDF→MD 转换（生成脚本提示用户，不阻塞主流程）           │
+│   🔍 Step 3  项目上下文提取                                               │
 │    ↓                                                                    │
-│   🔍 Step 2  并行证据审计（⚡涉及多 probe 时必须并行 dispatch）            │
+│   🏛️ Step 4  Venue Requirements Research（生成 venue-brief.md）          │
+│    ↓                                                                    │
+│   🔬 Step 5  并行证据审计（⚡涉及多 probe 时必须并行 dispatch）            │
 │    ↓                                                                    │
 │   ┌──────────────────────────────────────────────────────────────────┐   │
 │   │              调研阶段                                              │   │
@@ -396,29 +398,29 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 │    ↓                                                                    │
 │   ┌──────────────────────────────────────────────────────────────────┐   │
 │   │              质量门（双阶段审查）                                    │   │
-│   │  ⚖️ Step 6.5  证据合规审查（Review Phase 1）                                 │   │
-│   │  ✨ Step 6.6  Prose Quality Gate（Review Phase 2，内化调用）                  │   │
-│   │  📏 Step 6.7 Expansion Pass（内容密度检查）                           │   │
+│   │  ⚖️ Step 9.5  证据合规审查（Review Phase 1）                         │   │
+│   │  ✨ Step 9.6  Prose Quality Gate（Review Phase 2，内化调用）          │   │
+│   │  📏 Step 9.7  Expansion Pass（内容密度检查）                         │   │
 │   └──────────────────────────────────────────────────────────────────┘   │
 │    ↓                                                                    │
-│   ✅ Step 6.8  Self-Review & Verification                                 │
+│   ✅ Step 9.8  Self-Review & Verification                                │
 │    │                                                                    │
-│   ├── passed  →  🔄 Step 7  依赖感知 Section Loop（推进下一节）          │
-│   └── failed  →  ⬆️ 回到 Step 6.5 证据合规审查 重来                        │
+│   ├── passed  →  🔄 Step 10  依赖感知 Section Loop（推进下一节）         │
+│   └── failed  →  ⬆️ 回到 Step 9.5 证据合规审查 重来                      │
 │                                                                          │
 │   📌 Abstract 后置 — 所有核心章节全部 passed 后才允许生成                  │
-│   📋 Step 8  引用清单生成（**强制**，核验 >= `min_citations` 篇引用，默认 35）                │
+│   📋 Step 11  引用清单生成（**强制**，核验 >= `min_citations`）          │
 │    ↓                                                                    │
-│   🖼️ Step 9  数据图批量生成（**强制**，执行数据图代码 + 复核手工图表需求）              │
+│   🖼️ Step 12  数据图批量生成（**强制**，执行数据图代码 + 复核手工图表需求）│
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
 > - 🔒 Step 1 是硬阻塞，缺少 venue/language + 本地文献库确认时不能继续
-> - Step 8→Step 9→输出最终稿，两者均为强制步骤，不可跳过
+> - Step 11→Step 12→输出最终稿，两者均为强制步骤，不可跳过
 > - 📐 `section-drafting` 也要走完整闭环，只是缩小证据范围
 > - 🚧 Introduction / Related Work 在零 VERIFIED 引用时必须阻塞
-> - ⚡ Step 2 涉及多个 probe 时**必须并行** dispatch，不得串行
-> - 📋 论文完成时 Step 8 **强制**生成引用清单，核验 >= `min_citations` 篇引用（默认 35）
+> - ⚡ Step 5 / Step 9.1 涉及多个 probe 时**必须并行** dispatch，不得串行
+> - 📋 论文完成时 Step 11 **强制**生成引用清单，核验 >= `min_citations`
 
 ---
 
@@ -498,7 +500,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 |------|------|------|
 | **战略层** | `SKILL.md` | 高层规则、触发条件、Hard Gates 摘要、数据契约、reference 导航 |
 | **战术导航** | `orchestration-workflow.md` | 导航索引，指引到按阶段拆分的执行文件 |
-| **战术执行** | `workflow-step-0-4.md`<br/>`workflow-step-5-6.5.md`<br/>`workflow-step-6.6-9.md` | 拆分为 3 个文件的详细执行手册，每个包含独立 dispatch 模板、step-by-step 流程、fallback 路径。**按阶段加载以节省上下文窗口** |
+| **战术执行** | `workflow-step-0-7.md`<br/>`workflow-step-8-9.5.md`<br/>`workflow-step-9.6-12.md` | 拆分为 3 个文件的详细执行手册，每个包含独立 dispatch 模板、step-by-step 流程、fallback 路径。**按阶段加载以节省上下文窗口** |
 
 > 💡 **阅读建议**：改规则摘要、使用边界、导航 → 看 `SKILL.md`。改具体执行步骤、模板、失败路径 → 按 Step 阶段加载对应的 `workflow-step-*.md`。
 

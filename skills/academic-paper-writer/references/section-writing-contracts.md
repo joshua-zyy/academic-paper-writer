@@ -199,21 +199,12 @@ Before a section can enter prose polishing, confirm:
 
 - The required moves for that section are present or explicitly marked as missing.
 - Each strong claim has a citation, artifact, result, figure/table, or placeholder.
-- **Verified References 覆盖检查**（强制）：
-  - 该节中 VERIFIED 状态的实际引用数 ≥ 该节的**最低阈值**（硬门禁）：
-    | Section | 最低阈值 | 建议目标（Step 5 预检用） |
-    |---------|---------|--------------------------|
-    | Introduction | ≥5 | 5-8 |
-    | Related Work | ≥8 | 8-15 |
-    | Method | ≥3 | 3-5 |
-    | Experimental Setup | ≥2 | 2-3 |
-    | Main Results | ≥2 | 2-3 |
-    | Ablation | ≥1 | 1-2 |
-    | Discussion | ≥3 | 3-5 |
-    | Conclusion | ≥1 | 1-2 |
-  - Contract Gate 检查最低阈值（不满足则硬阻塞）；Step 5 预检使用建议目标（不满足时触发补充检索但允许继续）
-  - 该节中 `[REF_NEEDED]` 占位符数 ≤ 该节引用总数的 20%（即该节 80% 以上的引用已有 VERIFIED 来源）
-  - 若 `[REF_NEEDED]` 占比 > 20% → 回退到 Step 3b 补充文献，不得继续起草
+- **当前节引用就绪检查**（强制）：
+  - 本检查只判断当前 section 的关键 claims 是否具备可起草的引用基础；不执行全文 `min_citations` 统计。
+  - 每个关键 claim 必须满足以下至少一项：有 VERIFIED 引用并映射到 Citation-to-Claim Map；有项目证据支撑且无需外部文献；或保留明确 `[REF_NEEDED: ...]` debt。
+  - Step 8 中的引用数量范围仅作为 planning target 和补充检索提示，不是 Contract Gate 的硬阈值。
+  - Introduction / Related Work 若无法形成 VERIFIED references、Citation-to-Claim Map、work clusters 或 exemplar support，保持 blocked 并回退 Step 6b。
+  - Method / Results / Discussion / Conclusion 可在少量 `[REF_NEEDED]` debt 已显式记录时继续，但 `citation_debt` 必须保持 open，后续 Verification 不得伪装为 passed。
 - The section's first and last paragraphs change the reader state in the intended direction.
 - The section does not rely on fluent prose to conceal open evidence_debt, rationale_debt, result_debt, or protocol_debt.
 - All inline citations use numeric `[1]` format consistently; no author-year citations exist in the prose.

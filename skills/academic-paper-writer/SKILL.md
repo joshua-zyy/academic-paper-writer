@@ -1,11 +1,11 @@
 ---
 name: academic-paper-writer
-description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordinates evidence audit, citation search, experiment verification, prose polishing, peer review, and figure generation across 6 sub-skills. Uses section-by-section drafting with Draft→Quality Gate→Expansion→Self-Review→Revision→Verification closed loop. Use when: writing a full paper draft from research notes or code repo, drafting paper sections one-by-one, coordinating multi-skill paper writing workflow, managing evidence-to-citation closed loop. Triggers on: 写论文, paper draft, 初稿, write introduction, draft method, 论文起草, full paper outline, section-by-section drafting, 证据闭环, 分节起草, academic paper writing, research paper drafting, write CS paper, draft AI paper, 从零写论文, 逐节写作."
+description: "Use when writing or revising CS/AI/ML papers from research notes, code repositories, local literature libraries, target venue requirements, or section-level drafting requests. Triggers include 写论文, 初稿, paper draft, write introduction, write method, full paper outline, section-by-section drafting, 证据闭环, 论文起草, 从零写论文, 逐节写作."
 ---
 
 # Academic Paper Writer (Core Orchestrator)
 
-证据闭环型、分节推进的论文编排代理。协调六个子技能：Step 0→1→1.5→2→3→4→5→6→7→8→9。
+证据闭环型、分节推进的论文编排代理。协调六个子技能：Step 0→1→2→3→4→5→6→7→8→9→10→11→12。
 
 ## Router Protocol
 
@@ -16,7 +16,7 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
    - `red-lines.md` defines absolute prohibitions. Do not negotiate these.
    - `output-contract.md` defines file outputs, deliverables, and completion criteria.
    - `anti-patterns.md` defines known failure modes and their correct alternatives.
-   - `workflow.md` defines the Step 0-9 sequence summary.
+   - `workflow.md` defines the Step 0-12 sequence summary.
    - `../shared/core/` policies define evidence, non-invention, and output boundaries.
 4. Detect `mode`, `paper_type`, `section`, and `language` using manifest axes.
 5. Echo the detected mode to the user before executing.
@@ -36,13 +36,13 @@ description: "Core orchestrator for writing CS/AI/ML papers from scratch. Coordi
 
 | Task | Sub-Skill | Step |
 |---|---|---|
-| Venue research | academic-venue-research | Step 1.5 |
-| Evidence audit | Probe agent | Step 2 |
-| Citation search | academic-citation | Step 3 |
-| Experiment audit | academic-experiments | Step 4 |
-| Figure generation | academic-figure | Step 6.4 |
-| Prose polishing | academic-polishing | Step 6.6 (internal) |
-| Draft review | academic-reviser | Step 6.5 / 6.8 |
+| Venue research | academic-venue-research | Step 4 |
+| Evidence audit | Probe agent | Step 5 |
+| Citation search | academic-citation | Step 6 |
+| Experiment audit | academic-experiments | Step 7 |
+| Figure generation | academic-figure | Step 9.4 |
+| Prose polishing | academic-polishing | Step 9.6 (internal) |
+| Draft review | academic-reviser | Step 9.5 / 9.8 |
 
 ## Push Modes
 
@@ -57,13 +57,13 @@ Switch anytime via user request.
 
 | Gate | Trigger | Condition | Failure |
 |---|---|---|---|
-| E: Venue | Step 1→2 | venue-brief.md exists | Blocked |
-| A: Evidence | Step 2→6 | >= 1 usable evidence | Degradation or blocked |
-| B: Citation | Step 3→6 | >= 1 VERIFIED or explicit no-literature | Section-dependent: Intro/RW blocked, Method may use placeholder |
-| C: Verification | Step 6.8→7 | All hard debts closed + thin_draft=no | passed/failed/blocked |
-| D: Citation Count | Step 8→output | Total >= min_citations | Warn, allow retry |
+| E: Venue | Step 1→5 | 若用户提供本地 PDF 文献库，Step 2 已验证 MD 目录；venue-brief.md exists | Blocked |
+| A: Evidence | Step 5→9 | >= 1 usable evidence | Degradation or blocked |
+| B: Section Citation Readiness | Step 6→9 | Current section has VERIFIED citations, Citation-to-Claim Map, or explicit `[REF_NEEDED]` debt for key claims | Section-dependent: Intro/RW blocked, Method/Results may proceed with tracked debt |
+| C: Verification | Step 9.8→10 | All hard debts closed + thin_draft=no | passed/failed/blocked |
+| D: Full-Paper Citation Count | Step 11→output | Total >= min_citations | Warn, allow retry |
 
-## 6.1 Pre-Draft Probe Rules
+## 9.1 Pre-Draft Probe Rules
 
 | Section | Probes to Dispatch | Strategy |
 |---|---|---|

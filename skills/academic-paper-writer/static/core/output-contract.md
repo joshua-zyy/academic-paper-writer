@@ -1,6 +1,6 @@
 # 编排器输出契约（Orchestrator Output Contract）
 
-完整论文生成期间，`academic-paper-writer` 编排器负责写入 `./docs/paper-drafts/` 下的最终产物。
+完整论文生成期间，`academic-paper-writer` 编排器负责写入 `./academic-paper-writer/paper-drafts/` 下的最终产物。
 
 ## 默认文件
 

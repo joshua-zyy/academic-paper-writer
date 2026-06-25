@@ -15,7 +15,7 @@
 | **general-writing-guide.md**（本文件） | 通用学术写作原则、结构指导、风格规范 | 写作前了解原则、写作中参考结构、完成后检查规范 |
 | **exemplar-*.md** | CS/AI/ML领域的具体示例和可迁移模式 | 写作前参考领域范例、模仿优秀论文结构 |
 | **writing-guidelines.md** | Venue适配、证据分层、风格调研 | 确认目标venue后、进行风格适配时 |
-| **section-writing-contracts.md** | 章节论证契约、必需修辞动作、失败检查 | Step 5生成Section Contract、Step 6.0/6.8检查论证功能 |
+| **section-writing-contracts.md** | 章节论证契约、必需修辞动作、失败检查 | Step 8生成Section Contract、Step 9.0/9.8检查论证功能 |
 
 ### 决策树：何时参考哪个文件？
 

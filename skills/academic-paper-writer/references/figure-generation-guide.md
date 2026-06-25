@@ -14,9 +14,9 @@
 | 图类型 | 遇到占位符时 | 输出 |
 |--------|:---:|------|
 | 架构图/框架图/流程图/机制图 | 不自动绘制；记录为 `manual_figure_needed` | 在待补充清单中写明人工绘制需求、证据来源、caption 草案和边界说明；不生成图片、SVG 或生图 prompt |
-| 数据结果图 | 自动生成 Python 绘图代码 | 代码写入 `./docs/paper-drafts/figures/codes/plot_{figure_id}.py`，正文保留占位符，**不自动执行** |
+| 数据结果图 | 自动生成 Python 绘图代码 | 代码写入 `./academic-paper-writer/paper-drafts/figures/codes/plot_{figure_id}.py`，正文保留占位符，**不自动执行** |
 
-> 注：数据图代码在 Step 6.4 阶段不自动执行，留待 Step 9 全文完成后统一批量执行。
+> 注：数据图代码在 Step 9.4 阶段不自动执行，留待 Step 12 全文完成后统一批量执行。
 
 ## 数据绘图代码规范
 
@@ -33,13 +33,13 @@
 4. **CS/AI/ML 设计 gate**：先确认实验论证角色、claim-primary panel/shared legend/direct labels/hatch/palette，再写代码
 5. **简洁风格**：仅保留左+下 spine，frameless legend，tight_layout
 
-## 数据图批量生成（Step 9）
+## 数据图批量生成（Step 12）
 
-全文所有核心章节 Verification 通过后，在 Step 9 统一执行数据图批量生成。
+全文所有核心章节 Verification 通过后，在 Step 12 统一执行数据图批量生成。
 
 ### 数据图批量执行
 
-1. 扫描 `./docs/paper-drafts/figures/codes/` 下所有 `plot_fig*.py`
+1. 扫描 `./academic-paper-writer/paper-drafts/figures/codes/` 下所有 `plot_fig*.py`
 2. 对每个脚本：检查 Python 环境 → 执行脚本 → 验证 SVG 输出 → 快速 QA
 3. 执行失败不阻塞整体流程，记录为「待手动修复」
 

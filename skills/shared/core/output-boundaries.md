@@ -4,7 +4,7 @@
 
 ## 编排器所有权（Orchestrator Ownership）
 
-完整论文生成期间，`academic-paper-writer` 编排器拥有 `./docs/paper-drafts/` 下最终产物的写入权。
+完整论文生成期间，`academic-paper-writer` 编排器拥有 `./academic-paper-writer/paper-drafts/` 下最终产物的写入权。
 
 ## 子 skill 所有权（Sub-Skill Ownership）
 

@@ -29,7 +29,7 @@ description: "Research target venue requirements and writing style for CS/AI/ML 
 
 ## Agent Dispatch
 
-`agents/venue-research-agent.md` is dispatched by the orchestrator at Step 1.5. The agent returns Venue Brief Markdown content; it must not write files directly during orchestrated use. File writes are owned by the orchestrator.
+`agents/venue-research-agent.md` is dispatched by the orchestrator at Step 4. The agent returns Venue Brief Markdown content; it must not write files directly during orchestrated use. File writes are owned by the orchestrator.
 
 ## Independent Use
 

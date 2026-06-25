@@ -258,12 +258,16 @@ def check_python_only_figure_policy(skills_root: Path) -> list:
 
 
 def check_min_citations_usage(skills_root: Path) -> list:
-    workflow = skills_root / "academic-paper-writer" / "references" / "workflow-step-6.6-9.md"
-    content = _read_if_exists(workflow)
+    workflow_paths = [
+        skills_root / "academic-paper-writer" / "references" / "workflow-step-0-7.md",
+        skills_root / "academic-paper-writer" / "references" / "workflow-step-8-9.5.md",
+        skills_root / "academic-paper-writer" / "references" / "workflow-step-9.6-12.md",
+    ]
+    content = "\n".join(_read_if_exists(path) for path in workflow_paths)
     hardcoded_patterns = ["< 35 篇", "未达到 35 篇", ">= 35", "至少 35"]
     found = [pattern for pattern in hardcoded_patterns if pattern in content]
     if found:
-        return [("FAIL", f"hardcoded citation threshold found in workflow-step-6.6-9.md: {found}")]
+        return [("FAIL", f"hardcoded citation threshold found in workflow step files: {found}")]
     return [("PASS", "Citation threshold uses min_citations instead of hardcoded 35")]
 
 
@@ -271,7 +275,7 @@ def check_figure_debt_flow(skills_root: Path) -> list:
     paths = [
         skills_root / "shared" / "schemas" / "verification-report.md",
         skills_root / "academic-reviser" / "SKILL.md",
-        skills_root / "academic-paper-writer" / "references" / "workflow-step-6.6-9.md",
+        skills_root / "academic-paper-writer" / "references" / "workflow-step-9.6-12.md",
     ]
     content = "\n".join(_read_if_exists(path) for path in paths)
     deadlock_patterns = [
@@ -286,7 +290,7 @@ def check_figure_debt_flow(skills_root: Path) -> list:
 
 
 def check_subagent_file_write_ownership(skills_root: Path) -> list:
-    workflow = skills_root / "academic-paper-writer" / "references" / "workflow-step-0-4.md"
+    workflow = skills_root / "academic-paper-writer" / "references" / "workflow-step-0-7.md"
     content = _read_if_exists(workflow)
     conflict = "你已加载 academic-venue-research" in content and "生成 venue-brief.md 文件" in content
     if conflict:
@@ -295,16 +299,16 @@ def check_subagent_file_write_ownership(skills_root: Path) -> list:
 
 
 def check_prose_gate_evidence_debt(skills_root: Path) -> list:
-    workflow = skills_root / "academic-paper-writer" / "references" / "workflow-step-6.6-9.md"
+    workflow = skills_root / "academic-paper-writer" / "references" / "workflow-step-9.6-12.md"
     content = _read_if_exists(workflow)
     blocking_phrases = [
-        "Confirm Step 6.5 `evidence_debt = closed` before executing",
-        "确认 Step 6.5 `evidence_debt = closed` before executing",
+        "Confirm Step 9.5 `evidence_debt = closed` before executing",
+        "确认 Step 9.5 `evidence_debt = closed` before executing",
     ]
     found = [phrase for phrase in blocking_phrases if phrase in content]
     if found:
-        return [("FAIL", f"Step 6.6 blocks all prose repair on closed evidence debt: {found}")]
-    return [("PASS", "Step 6.6 allows safe prose repair when evidence_debt is open")]
+        return [("FAIL", f"Step 9.6 blocks all prose repair on closed evidence debt: {found}")]
+    return [("PASS", "Step 9.6 allows safe prose repair when evidence_debt is open")]
 
 
 def check_probe_types(skills_root: Path) -> list:

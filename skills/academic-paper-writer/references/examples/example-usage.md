@@ -9,20 +9,22 @@
 ```
 Step 0: mode=full-paper-planning, scope=empirical CS/AI paper
 Step 1: 确认 venue=IEEE T-AFFC, 英文, min_citations=用户未指定(null)
-Step 1.5: Venue Requirements Research → venue-brief.md (双栏, 12页, 匿名评审, IEEE模板, 平均引用30篇)
-Step 1.5.3b: 自动推断 min_citations=35 (30+5余量)
-Step 2: 并行 dispatch probe agents 探查代码/数据/配置
-Step 3: 并行 dispatch citation agent + literature reader → Verified References (12篇本地+8篇外部)
-Step 4: dispatch experiment agent → Evidence Inventory (3个newly_run结果, 2个preexisting_artifact)
-Step 5: Section Blueprint → 8节结构 + 每节要点
-Step 6: Draft v1 (Introduction) → 5段完整prose + 待补充清单
-Step 6.4: 记录整体方法图 manual_figure_needed；如有实验数据图则生成绘图代码
-Step 6.5: evidence compliance review → evidence_debt: closed
-Step 6.6: prose quality gate → prose_debt: closed
-Step 6.7: expansion pass → thin_draft: no
-Step 6.8: verification → Verdict: passed, Score: 8/10
-Step 6.9: 更新Cumulative Draft → 推进到 Related Work
-Step 7: 推进到 Related Work...
+Step 2: 如有本地 PDF 文献库，提示用户用 MinerU 转换并等待 MD 目录；无 PDF 库则跳过
+Step 3: 提取项目上下文 → project_keywords / project_description
+Step 4: Venue Requirements Research → venue-brief.md (双栏, 12页, 匿名评审, IEEE模板, 平均引用30篇)
+Step 4.3b: 自动推断 min_citations=35 (30+5余量)
+Step 5: 并行 dispatch probe agents 探查代码/数据/配置
+Step 6: 并行 dispatch citation agent + literature reader → Verified References (12篇本地+8篇外部)
+Step 7: dispatch experiment agent → Evidence Inventory (3个newly_run结果, 2个preexisting_artifact)
+Step 8: Section Blueprint → 8节结构 + 每节要点
+Step 9.2: Draft v1 (Introduction) → 5段完整prose + 待补充清单
+Step 9.4: 记录整体方法图 manual_figure_needed；如有实验数据图则生成绘图代码
+Step 9.5: evidence compliance review → evidence_debt: closed
+Step 9.6: prose quality gate → prose_debt: closed
+Step 9.7: expansion pass → thin_draft: no
+Step 9.8: verification → Verdict: passed, Score: 8/10
+Step 9.9: 更新Cumulative Draft
+Step 10: 依赖检查并推进到 Related Work...
 ```
 
 **对话输出**（auto 模式）：
@@ -38,13 +40,13 @@ Step 7: 推进到 Related Work...
 **执行流程摘要**：
 ```
 Step 0: mode=section-drafting, section=Method
-Step 2: probe agent 探查代码 → 识别核心模块 (TemporalBranch, SpatialBranch, FusionModule)
-Step 3: 文献检索 → 相关 attention 机制文献 (6篇VERIFIED)
-Step 5: Blueprint → 整体框架 → 模块拆解 → 训练目标
-Step 6: Draft v1 → 完整prose + [FIGURE_NEEDED: overall architecture] + 待补充清单
-Step 6.4: 记录分支架构图 manual_figure_needed，不自动绘制；生成数据图代码（如有）
-Step 6.5-6.8: 审查闭环 → Verdict: passed
-Step 6.9: 更新Cumulative Draft → 推进
+Step 5: probe agent 探查代码 → 识别核心模块 (TemporalBranch, SpatialBranch, FusionModule)
+Step 6: 文献检索 → 相关 attention 机制文献 (6篇VERIFIED)
+Step 8: Blueprint → 整体框架 → 模块拆解 → 训练目标
+Step 9.2: Draft v1 → 完整prose + [FIGURE_NEEDED: overall architecture] + 待补充清单
+Step 9.4: 记录分支架构图 manual_figure_needed，不自动绘制；生成数据图代码（如有）
+Step 9.5-9.8: 审查闭环 → Verdict: passed
+Step 9.9: 更新Cumulative Draft → 推进
 ```
 
 **输出片段**（Draft v1 Method 开头）：
@@ -61,11 +63,11 @@ Step 6.9: 更新Cumulative Draft → 推进
 **执行流程摘要**：
 ```
 Step 0: mode=section-revision, section=Related Work
-Step 6.5: evidence compliance review → 发现3处裸claim无citation
-Step 6.6: prose quality gate → prose_debt: open (罗列式段落)
-Step 6.7: expansion pass → 补充work cluster综合比较
-Step 6.8: verification → Verdict: passed, Score: 7/10
-Step 6.9: 更新Revised Draft到Cumulative Draft
+Step 9.5: evidence compliance review → 发现3处裸claim无citation
+Step 9.6: prose quality gate → prose_debt: open (罗列式段落)
+Step 9.7: expansion pass → 补充work cluster综合比较
+Step 9.8: verification → Verdict: passed, Score: 7/10
+Step 9.9: 更新Revised Draft到Cumulative Draft
 ```
 
 **输出**（Section Critique 摘要）：

@@ -30,12 +30,12 @@ Debt types tracked: `prose_debt`, `section_contract_debt`, `citation_debt`, `evi
 | `cross-section-review` | Cross-section consistency check |
 | `verification-only` | Verdict only, no re-review |
 | `targeted-review` | Specific issue (e.g. citation closure only) |
-| `targeted-evidence-mode` | Evidence compliance only (orchestrator Step 6.5) |
+| `targeted-evidence-mode` | Evidence compliance only (orchestrator Step 9.5) |
 | `mock-reviewer-package` | Optional pre-submission 3-reviewer package |
 
 ## Agent Dispatch
 
-`agents/reviser_agent.md` dispatched by orchestrator at Step 6.5 or 6.6. Subagent returns structured review content; must not modify project files or invent reviewer identities, experiments, citations, or unprovided evidence.
+`agents/reviser_agent.md` dispatched by orchestrator at Step 9.5 or Step 9.8. Subagent returns structured review content; must not modify project files or invent reviewer identities, experiments, citations, or unprovided evidence.
 
 ## Independent Use
 

@@ -4,7 +4,7 @@
 
 **用途**: 审修技能到论文编排器之间的验证状态交换格式。
 **生产者**: `academic-reviser`
-**消费者**: `academic-paper-writer` (Step 6.8, Step 7)
+**消费者**: `academic-paper-writer` (Step 9.8, Step 10)
 
 ## 结构
 
@@ -41,7 +41,7 @@ verification_report:
 | 字段 | 含义 | 判定标准 |
 |------|------|---------|
 | `overall_score` | 整体质量评分（1-10） | 9-10: 所有 debt 闭合，内容充实; 7-8: 硬 debt 闭合，少量可改进; 5-6: 主要 debt 闭合，中等改进空间; 3-4: 部分 debt 未闭合; 1-2: 多个 debt 未闭合 |
-| `prose_debt` | 文体质量缺口 | `academic-polishing` Step 6.6 输出 |
+| `prose_debt` | 文体质量缺口 | `academic-polishing` Step 9.6 输出 |
 | `section_contract_debt` | 章节论证功能缺口 | 缺少对应 section 的 required moves、reader-state 转换或 evidence hooks |
 | `citation_debt` | 引用缺口 | 正文中存在未闭合 `[REF_NEEDED]` 或裸 claim |
 | `evidence_debt` | 证据缺口 | 存在无证据支撑的 claim 或 `[RESULT_UNVERIFIED]` |

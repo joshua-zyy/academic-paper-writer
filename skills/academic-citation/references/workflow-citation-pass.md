@@ -6,6 +6,26 @@
 - 提取关键检索词：任务名、方法家族、数据集、模态
 - 若为 Introduction 或 Related Work，额外确认是否需要 Exemplar Set
 
+## Step 1a-preflight: 本地 PDF 文献库转换门槛
+
+当用户提供本地文献库路径时，先判断它是否已经是可读 MD 文献库：
+
+- 若目录包含 `_index_ref.json` → 视为 `local_ref_md_dir`，进入 Step 1a。
+- 若目录包含 PDF，或没有 `_index_ref.json` → 视为 `local_ref_pdf_dir`，先停止 citation workflow。
+
+对 `local_ref_pdf_dir` 只做以下提示，不继续检索、不 dispatch reader agent：
+
+1. 让用户到 MinerU 注册并创建 API Token。
+2. 提示用户通过环境变量设置 Token，不要写入脚本：
+   ```powershell
+   $env:MINERU_API_TOKEN = "YOUR_MINERU_TOKEN"
+   ```
+3. 指导用户运行转换脚本：
+   ```powershell
+   python .agents/skills/academic-paper-writer/skills/academic-citation/scripts/convert-pdfs-to-md.py <pdf_dir> <md_output_dir> --type ref
+   ```
+4. 告知用户：转换完成后回复“pdf2md 已完成”，并提供 `<md_output_dir>`。收到确认后再继续 Step 1a。
+
 ## Step 1a: 本地文献库优先检索
 
 当配置了 `local_ref_md_dir` 时，在联网检索之前执行：

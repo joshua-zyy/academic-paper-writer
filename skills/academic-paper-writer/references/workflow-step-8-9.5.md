@@ -1,25 +1,19 @@
-# Orchestration Workflow — Part 2: Drafting (Step 5–6.5)
+# Orchestration Workflow — Part 2: Drafting (Step 8–9.5)
 
-本文件包含编排器 Step 5–6.5 的详细执行流程。按需加载，避免一次性加载全部步骤。
+本文件包含编排器 Step 8–9.5 的详细执行流程。按需加载，避免一次性加载全部步骤。
 
 完整步骤索引见 `orchestration-workflow.md`。
 
 ---
 
-## Step 5: Generate Section Plan
+## Step 8: Generate Section Plan
 
 - Create a todo list for plan core modules.
-- **引用预检**（强制，不可跳过）：进入 Section Plan 前，确认当前节所需的 Verified References 数量是否充足。
-  - Introduction: 至少 5-8 篇 VERIFIED 引用可用（含 Exemplar Set 的 3-5 篇）
-  - Related Work: 至少 8-15 篇 VERIFIED 引用可用（含 Exemplar Set 的 4-8 篇）
-  - Method: 至少 3-5 篇 VERIFIED 引用可用（方法来源引用）
-  - Experimental Setup: 至少 2-3 篇 VERIFIED 引用可用（数据集、基线来源）
-  - Main Results: 至少 2 篇 VERIFIED 引用可用（基线对比来源）
-  - Ablation: 至少 1 篇 VERIFIED 引用可用（消融对比来源）
-  - Discussion: 至少 3 篇 VERIFIED 引用可用（局限性讨论、机制解释来源）
-  - Conclusion: 至少 1 篇 VERIFIED 引用可用（领域意义文献）
-  - Abstract: 不单独检查（后置于正文完成）
-  - 不足时 → 回退到 Step 3b 补充对应方向的文献
+- **引用规划预检**（强制，不可跳过）：进入 Section Plan 前，确认当前节的关键 claims 是否已通过 Gate B，或是否存在显式 `[REF_NEEDED]` debt。
+  - 以下数量仅为 planning target，用于判断是否建议补充检索；不是当前节硬门禁：Introduction 5-8、Related Work 8-15、Method 3-5、Experimental Setup 2-3、Main Results 2+、Ablation 1+、Discussion 3+、Conclusion 1+。
+  - Introduction / Related Work 若缺少 VERIFIED references、Citation-to-Claim Map、work clusters 或 Exemplar Set 支撑 → 回退 Step 6b，不进入起草。
+  - 其他 section 若仍有 `[REF_NEEDED]`，必须写入 debt list，并在 Step 9.5/9.8 中保持 `citation_debt = open`，不得伪装为 passed。
+  - Abstract 不单独检查（后置于正文完成）。
 - Read `references/paper-structure.md` and select structure by paper type and venue.
 - Read `references/section-writing-contracts.md` and create a Section Contract for each planned section: reader state before/after, required moves, evidence hooks, and section-specific failure checks.
 - Generate Evidence Map: section goal, key claims, evidence sources, gaps.
@@ -40,12 +34,12 @@
 
 ## Two-Stage Writing Process
 
-**Stage 1: Blueprint (Bullet Points)** — Step 5 输出
+**Stage 1: Blueprint (Bullet Points)** — Step 8 输出
 - 使用 bullet points 组织论点结构
 - 标注关键引用位置
 - 规划段落职责和论证顺序
 
-**Stage 2: Draft v1 (Flowing Prose)** — Step 6 输出
+**Stage 2: Draft v1 (Flowing Prose)** — Step 9 输出
 - 将 bullet points 转换为完整段落
 - 添加过渡句和逻辑连接
 - 自然融入 inline citations（统一使用数字格式 `[1]`, `[2]`）
@@ -78,18 +72,18 @@ temporal dependencies—leaving the joint spatiotemporal modeling problem
 unresolved. To bridge this gap, we propose a dual-branch Transformer that...
 ```
 
-## Step 6: Section Complete Loop — Phase 1: Drafting (6.0–6.3)
+## Step 9: Section Complete Loop — Phase 1: Drafting (9.0–9.3)
 
-### Step 6.0: Section Contract Gate
+### Step 9.0: Section Contract Gate
 
 - Create a todo list for subtopics to cover.
-- **Section Contract Gate**: before writing prose, check the current Section Contract from Step 5. Draft v1 must satisfy the section's required moves or preserve explicit debt placeholders. If the contract is missing, return to Step 5 instead of drafting.
+- **Section Contract Gate**: before writing prose, check the current Section Contract from Step 8. Draft v1 must satisfy the section's required moves or preserve explicit debt placeholders. If the contract is missing, return to Step 8 instead of drafting.
 
-### Step 6.1: Pre-Draft Deep Probe
+### Step 9.1: Pre-Draft Deep Probe
 
-- **与 Step 2 探查的区别**：Step 2 Phase 1 是**轻量全量扫描**（盘点"有什么"——module cards、代码结构、配置文件）；Step 6.1 是**深层逐节探查**（搞懂"怎么做/为什么"——公式推导、机制细节、实验深度），直接支撑 Draft v1 起草。
+- **与 Step 5 探查的区别**：Step 5 Phase 1 是**轻量全量扫描**（盘点"有什么"——module cards、代码结构、配置文件）；Step 9.1 是**深层逐节探查**（搞懂"怎么做/为什么"——公式推导、机制细节、实验深度），直接支撑 Draft v1 起草。
 
-- **强制 sub-agent 规则**：Step 6.1 所有标记为"必须并行"的探查**必须使用 sub-agent dispatch**（Task 工具），不得由主 Agent 直接内化执行。原因：深层探查涉及大量代码/文献阅读，内化执行会导致上下文饱和和不可靠省略。
+- **强制 sub-agent 规则**：Step 9.1 所有标记为"必须并行"的探查**必须使用 sub-agent dispatch**（Task 工具），不得由主 Agent 直接内化执行。原因：深层探查涉及大量代码/文献阅读，内化执行会导致上下文饱和和不可靠省略。
 
 - **前置检查：是否需要深层探查** — 在起草前检查当前 section 类型，按以下规则决定是否需要 dispatch 深层探查：
   | 当前 section | 需 dispatch 的探查 | 并行策略 |
@@ -101,7 +95,7 @@ unresolved. To bridge this gap, we propose a dual-branch Transformer that...
   | Main Results / Ablation | `experiment_results`（主结果、基线对比、消融数值） | 单探查 |
   | Discussion | `interpretability`（可解释性结果、网络分析） | 单探查 |
   - 需要探查 → **必须先 dispatch 再起草**，不得跳过。
-  - 项目探查 dispatch 模板见 `references/workflow-step-0-4.md` 的 `### 单探查 dispatch 模板` 和 `### 并行 dispatch 模板（强制并行）`。
+  - 项目探查 dispatch 模板见 `references/workflow-step-0-7.md` 的 `### 单探查 dispatch 模板` 和 `### 并行 dispatch 模板（强制并行）`。
   - Introduction / Related Work 的文献深度探索模板见下方"Section 文献深度探索 dispatch 模板"。
   - Method 场景也可直接使用下方的内联模板。
   - 不需要 → 跳过，记录 "deep_probe: skipped"
@@ -132,7 +126,7 @@ Task B:
     输出预处理步骤列表。
     Red Lines: 只读，不编造，不递归全仓库。
 ```
-其他 section 类型的单探查 dispatch 见 `references/workflow-step-0-4.md` 的 `### 单探查 dispatch 模板`。
+其他 section 类型的单探查 dispatch 见 `references/workflow-step-0-7.md` 的 `### 单探查 dispatch 模板`。
 
 **Introduction 文献深度探索 dispatch 模板（**必须同时发出 3 个 Task，互不等待**）**：
 ```yaml
@@ -172,9 +166,10 @@ Task B:
     任务: 从本地文献库中搜索与 Introduction 高度相关的文献，并深度阅读。
 
     执行步骤:
-    1. 扫描 local_ref_md_dir 中的 MD 文件，搜索与项目主题（task/method/domain）相关的论文
-    2. 选取 3-5 篇最相关的论文进行全文阅读
-    3. 按 skills/academic-citation/agents/literature-reader-agent.md 的 schema 输出 LiteratureReadingReport
+    1. 若 local_ref_md_dir 为 null，返回"无本地文献"
+    2. 读取 local_ref_md_dir/_index_ref.json，按项目主题（task/method/domain）关键词检索候选
+    3. 只读取索引命中的 3-5 篇最相关 MD 全文；禁止直接扫描或读取全部 MD 文件
+    4. 按 skills/academic-citation/agents/literature-reader-agent.md 的 schema 输出 LiteratureReadingReport
 
     重点提取:
     - 领域背景和关键问题（Background）
@@ -260,9 +255,10 @@ Task B:
     任务: 从本地文献库中搜索与 Related Work 高度相关的文献，并深度阅读。
 
     执行步骤:
-    1. 扫描 local_ref_md_dir 中的 MD 文件，搜索与项目方法相关、baseline 相关、数据集相关的论文
-    2. 选取 4-8 篇最相关的论文进行全文阅读
-    3. 按 skills/academic-citation/agents/literature-reader-agent.md 的 schema 输出 LiteratureReadingReport
+    1. 若 local_ref_md_dir 为 null，返回"无本地文献"
+    2. 读取 local_ref_md_dir/_index_ref.json，按方法、baseline、数据集关键词检索候选
+    3. 只读取索引命中的 4-8 篇最相关 MD 全文；禁止直接扫描或读取全部 MD 文件
+    4. 按 skills/academic-citation/agents/literature-reader-agent.md 的 schema 输出 LiteratureReadingReport
 
     重点提取:
     - 可形成的工作簇（work clusters）：共享 idea + 代表工作 + 能力 + 限制
@@ -309,7 +305,7 @@ Task C:
 
     返回: 完整结构化输出
 ```
-### Step 6.2: Draft v1 Generation
+### Step 9.2: Draft v1 Generation
 
 - Check Evidence Map and Verified References.
 - Generate Draft v1 Markdown body.
@@ -322,7 +318,7 @@ Body constraints:
 - **Evidence type annotation**: Every numerical result in body must be annotated with its evidence type:
   - `newly_run` results: append "(newly_run, YYYY-MM-DD)" or similar timestamp
   - `preexisting_artifact` results: append "(preexisting_artifact, source: path/to/file)"
-  - Example: "accuracy 86.58% (newly_run, 2026-05-10)" or "AUC 0.9314 (preexisting_artifact, experiments/run_logs/exp001.log)"
+  - Example: "accuracy 89.58% (newly_run, 2026-05-10)" or "AUC 0.9314 (preexisting_artifact, experiments/run_logs/exp001.log)"
 - Placeholders:
   - `[REF_NEEDED: claim/topic]`
   - `[FIGURE_NEEDED: purpose | placement | why]`
@@ -344,13 +340,13 @@ Body constraints:
 
 Reference list must only contain entries cited in body or declared via `[REF_NEEDED: ...]`.
 
-**引用质量约束**：写完整节 Draft v1 后，统计该节中 VERIFIED 引用数与 `[REF_NEEDED]` 占位符数。若 `[REF_NEEDED]` 占比超过该节总引用数的 20%，**该节视为 Draft v1 未完成**，必须在继续下一步前补充文献（回退到 Step 3b 补充检索、Step 3c 更新映射）。
+**引用质量约束**：写完整节 Draft v1 后，统计该节中 VERIFIED 引用数与 `[REF_NEEDED]` 占位符数。若 `[REF_NEEDED]` 占比过高或覆盖关键 claim，优先回退到 Step 6b 补充文献（Step 6c 更新映射）。Introduction / Related Work 不得带 `[REF_NEEDED]`-only 结构进入审查；其他 section 可带显式 debt 继续，但 `citation_debt` 必须保持 open，直到补齐引用或删除/降级相关 claim。
 
-### Step 6.3: Write Draft v1 to File
+### Step 9.3: Write Draft v1 to File
 
 ### 文件写入（强制）
 
-Draft v1 生成后，**必须**立即将正文内容写入 `./docs/paper-drafts/paper_draft.md`。使用 Write 工具（首次）或 Edit 工具（追加/替换）更新文件。
+Draft v1 生成后，**必须**立即将正文内容写入 `./academic-paper-writer/paper-drafts/paper_draft.md`。使用 Write 工具（首次）或 Edit 工具（追加/替换）更新文件。
 
 **References 位置规则（强制）**：`## References` 是全稿唯一正式参考文献列表，只能出现在 `paper_draft.md` 末尾的统一位置。任何章节 Draft v1 不得在章节末尾单独输出“引用说明”“本节参考文献”或类似块。
 
@@ -402,50 +398,50 @@ Draft v1 生成后，**必须**立即将正文内容写入 `./docs/paper-drafts/
 
 ### ⚠️ Section 完成门控（强制，每节必执行）
 
-> **Draft v1 ≠ 初稿完成。** 只有完成 Step 6.4 → 6.9 全部子步骤后，当前 section 才算初稿完成，方可推进到下一节。
+> **Draft v1 ≠ 初稿完成。** 只有完成 Step 9.4 → 9.9 全部子步骤后，当前 section 才算初稿完成，方可推进到下一节。
 
-**本门控为概要清单。以下每个子步骤均有各自的详细执行清单**（如 6.4 有 6.4a→6.4h 八项子清单、6.6 有零容忍触发词规则等）。**仅勾选概要项而未执行详细子步骤，视为未完成。**
+**本门控为概要清单。以下每个子步骤均有各自的详细执行清单**（如 9.4 有 9.4a→9.4h 八项子清单、9.6 有零容忍触发词规则等）。**仅勾选概要项而未执行详细子步骤，视为未完成。**
 
-**以下清单必须在离开本节前逐项完成。任一未完成，禁止开始下一节。用户催促时也不得跳过 6.4→6.9 审查阶段。**
+**以下清单必须在离开本节前逐项完成。任一未完成，禁止开始下一节。用户催促时也不得跳过 9.4→9.9 审查阶段。**
 
-- [ ] **6.4** 占位符审计 + 图表生成（详细清单: 6.4a→6.4h，即使无占位符也必须执行扫描）
-- [ ] **6.5** 证据合规审查（Review Phase 1 — dispatch academic-reviser，`evidence_debt = closed` 方可继续）
-- [ ] **6.6** Prose Quality Gate（Review Phase 2 — 内化调用 academic-polishing，含零容忍触发词规则）
-- [ ] **6.7** Expansion Pass（内容密度检查，参考 `content-density.md` 的 thin draft 判定）
-- [ ] **6.8** Self-Review & Verification（dispatch academic-reviser，verdict = passed 方可继续）
-- [ ] **6.9** 更新 Cumulative Draft → 推进到下一节
+- [ ] **9.4** 占位符审计 + 图表生成（详细清单: 9.4a→9.4h，即使无占位符也必须执行扫描）
+- [ ] **9.5** 证据合规审查（Review Phase 1 — dispatch academic-reviser，`evidence_debt = closed` 方可继续）
+- [ ] **9.6** Prose Quality Gate（Review Phase 2 — 内化调用 academic-polishing，含零容忍触发词规则）
+- [ ] **9.7** Expansion Pass（内容密度检查，参考 `content-density.md` 的 thin draft 判定）
+- [ ] **9.8** Self-Review & Verification（dispatch academic-reviser，verdict = passed 方可继续）
+- [ ] **9.9** 更新 Cumulative Draft → 推进到下一节
 
-**违反门控的典型错误**：Draft v1 写入文件后直接跳到下一节，跳过 6.4→6.9 审查阶段。
-**正确行为**：Draft v1 写入 → 逐项按详细清单执行 6.4 → 6.5 → 6.6 → 6.7 → 6.8 → 6.9 → 然后才推进下一节。
+**违反门控的典型错误**：Draft v1 写入文件后直接跳到下一节，跳过 9.4→9.9 审查阶段。
+**正确行为**：Draft v1 写入 → 逐项按详细清单执行 9.4 → 9.5 → 9.6 → 9.7 → 9.8 → 9.9 → 然后才推进下一节。
 
 ---
 
-## Step 6.4: Placeholder Audit, Figure Contract, Data Figure Code, and Debt List（**强制执行，不可跳过**）
+## Step 9.4: Placeholder Audit, Figure Contract, Data Figure Code, and Debt List（**强制执行，不可跳过**）
 
-**⚠️ 此步骤为硬性要求。即使 Draft v1 中没有任何占位符，也必须执行 6.4a（占位符扫描）和 6.4b（主动补入检查），确保没有遗漏图表。**
+**⚠️ 此步骤为硬性要求。即使 Draft v1 中没有任何占位符，也必须执行 9.4a（占位符扫描）和 9.4b（主动补入检查），确保没有遗漏图表。**
 
-### Step 6.4 执行清单（必须逐项完成）
+### Step 9.4 执行清单（必须逐项完成）
 
-- [ ] **6.4a** 扫描全文占位符（统计 + 分类）
-- [ ] **6.4b** 主动补入遗漏的图表占位符（不可跳过，即使无遗漏也要确认）
-- [ ] **6.4c** 为每个 `[FIGURE_NEEDED]` 建立 Figure Contract
-- [ ] **6.4d** 图表处理（manual figure need → debt note，data → code）
-- [ ] **6.4e** 更新待补充清单：将 6.4a 扫描到的占位符按类型更新到 paper_draft.md 末尾的「待补充清单」中（格式见 Step 6.3）
-- [ ] **6.4f** 报告审计结果（`placeholder_stats`）
-- [ ] **6.4g** 记录手工图表需求（对每个架构图/框架图/overview/机制图类占位符）
-- [ ] **6.4h** Dispatch 数据图子代理（对每个数据图类占位符）
+- [ ] **9.4a** 扫描全文占位符（统计 + 分类）
+- [ ] **9.4b** 主动补入遗漏的图表占位符（不可跳过，即使无遗漏也要确认）
+- [ ] **9.4c** 为每个 `[FIGURE_NEEDED]` 建立 Figure Contract
+- [ ] **9.4d** 图表处理（manual figure need → debt note，data → code）
+- [ ] **9.4e** 更新待补充清单：将 9.4a 扫描到的占位符按类型更新到 paper_draft.md 末尾的「待补充清单」中（格式见 Step 9.3）
+- [ ] **9.4f** 报告审计结果（`placeholder_stats`）
+- [ ] **9.4g** 记录手工图表需求（对每个架构图/框架图/overview/机制图类占位符）
+- [ ] **9.4h** Dispatch 数据图子代理（对每个数据图类占位符）
 
-**未完成以上全部子步骤前，禁止进入 Step 6.5。**
+**未完成以上全部子步骤前，禁止进入 Step 9.5。**
 
 ---
 
 After Draft v1, **必须**自动执行以下子步骤：
 
-### 6.4a. 扫描全文占位符
+### 9.4a. 扫描全文占位符
 统计并分类所有占位符的数量、位置与内容：
 - `[FIGURE_NEEDED]`、`[TABLE_NEEDED]`、`[RESULT_NEEDED]`、`[REF_NEEDED]`、`[METHOD_DETAIL_NEEDED]`、`[DATASET_DETAIL_NEEDED]`、`[RATIONALE_NEEDED]`
 
-### 6.4b. 主动补入遗漏的图表占位符（**必须**，不可跳过）
+### 9.4b. 主动补入遗漏的图表占位符（**必须**，不可跳过）
 **适用范围**：Introduction、Related Work、Method、Experimental Setup、Main Results、Ablation、Discussion 等所有 section。
 
 **检查规则**：对当前 section 进行结构分析，主动补入缺失的图占位：
@@ -458,7 +454,7 @@ After Draft v1, **必须**自动执行以下子步骤：
 - **Ablation 节**：检查每个消融实验附近是否有对应的消融结果图占位符，若缺失则插入。
 - **Introduction / Related Work / Discussion 节**：若结构上需要 overview figure 或 taxonomy figure，主动标记为手工图表需求。
 
-### 6.4c. Figure Contract（前置步骤，在生成任何图表之前**必须**完成）
+### 9.4c. Figure Contract（前置步骤，在生成任何图表之前**必须**完成）
 
 对每个 `[FIGURE_NEEDED]` 占位符，在生成数据图代码或记录手工图表需求之前，**必须**先完成 Figure Contract：
 
@@ -467,26 +463,26 @@ After Draft v1, **必须**自动执行以下子步骤：
 3. **Archetype**：将图分类为 `quantitative grid`、`schematic-led composite`、`image plate + quant` 或 `asymmetric mixed-modality figure`
 4. **Export contract**：设定最终尺寸、数据图可编辑文本、源数据、统计信息、图像完整性说明和导出格式；架构/框架/overview/机制图只记录人工绘制需求
 
-### 6.4d. 图表处理
+### 9.4d. 图表处理
 
 对每个 `[FIGURE_NEEDED]` 按 Figure Contract 的分类结果处理：
 
 **manual-figure-needed — 架构图/框架图/流程图/机制图**（purpose 含 architecture / structure / pipeline / diagram / network / flow / 架构 / 模块图 / framework / overview 等）：
 - 不委托 `academic-figure` 自动绘制，不生成图片、SVG 或生图 prompt
-- 按下文 Step 6.4g 记录人工绘制需求、证据来源、必须展示内容和 caption 草案
+- 按下文 Step 9.4g 记录人工绘制需求、证据来源、必须展示内容和 caption 草案
 - 正文保留占位符或替换为明确待补图编号引用；待补清单记录为 `manual_figure_needed`
 
 **chart-from-data 模式 — 数据图绘图代码**（purpose 含 curve / comparison / ablation / result / 曲线 / 对比 / 消融 / 结果 / plot / chart / bar 等）：
-- 按下文 Step 6.4h 的 dispatch 模板生成 Python 绘图代码
-- 绘图代码写入 `./docs/paper-drafts/figures/codes/plot_fig{N}.py`
+- 按下文 Step 9.4h 的 dispatch 模板生成 Python 绘图代码
+- 绘图代码写入 `./academic-paper-writer/paper-drafts/figures/codes/plot_fig{N}.py`
 - 正文保留占位符，记入待补项列表
-- **不自动执行绘图代码**（全文完成后 Step 9 统一批量执行）
+- **不自动执行绘图代码**（全文完成后 Step 12 统一批量执行）
 
-### 6.4e. 更新待补充清单（**必须，不可省略**）
+### 9.4e. 更新待补充清单（**必须，不可省略**）
 
-**不再创建独立的清单格式。** 使用 Step 6.3 定义的「## 待补充清单」格式（已在 `paper_draft.md` 中）。
+**不再创建独立的清单格式。** 使用 Step 9.3 定义的「## 待补充清单」格式（已在 `paper_draft.md` 中）。
 
-1. 将 6.4a 扫描到的所有占位符按以下类别更新到 paper_draft.md 末尾的「待补充清单」：
+1. 将 9.4a 扫描到的所有占位符按以下类别更新到 paper_draft.md 末尾的「待补充清单」：
    - **引用待补充**：所有 `[REF_NEEDED]` 占位符，逐项写为 `- [ ] [REF_NEEDED: {claim/topic}] — {所在 section}`
    - **图表待补充**：所有 `[FIGURE_NEEDED]` + `[TABLE_NEEDED]` 占位符
    - **结果待补充**：所有 `[RESULT_NEEDED]` + `[RESULT_UNVERIFIED]` 占位符
@@ -494,10 +490,10 @@ After Draft v1, **必须**自动执行以下子步骤：
 2. 已填充的占位符（不再存在于正文中的），将其 checkbox 从 `- [ ]` 改为 `- [x]`
 3. 即使某类占位符不存在，也在清单中保留该类标题并标注「（无）」
 
-### 6.4f. 报告审计结果
-将占位符统计信息（`placeholder_stats`）纳入 Section Critique，供 Step 6.8 Verification 引用。
+### 9.4f. 报告审计结果
+将占位符统计信息（`placeholder_stats`）纳入 Section Critique，供 Step 9.8 Verification 引用。
 
-### 6.4g. 手工图表需求记录模板（manual_figure_needed）
+### 9.4g. 手工图表需求记录模板（manual_figure_needed）
 对架构图/框架图/overview/机制图类的 `[FIGURE_NEEDED]`，不得 dispatch 自动绘图。直接在待补充清单记录：
 
 ```markdown
@@ -509,7 +505,7 @@ After Draft v1, **必须**自动执行以下子步骤：
   - Boundary: 本项为人工绘制需求；不由 academic-figure 自动生成图片、SVG 或生图 prompt。
 ```
 
-### 6.4h. 数据图绘图代码 dispatch 模板（chart-from-data 模式）
+### 9.4h. 数据图绘图代码 dispatch 模板（chart-from-data 模式）
 对数据图类的 `[FIGURE_NEEDED]`，按此模板 dispatch：
 
 ```yaml
@@ -523,7 +519,7 @@ Task:
     数据来源: {实验数据路径或 Evidence Map 中的对应条目}
 
     Figure Contract:
-    - Core conclusion: {Step 6.4c 中定义的论点}
+    - Core conclusion: {Step 9.4c 中定义的论点}
     - Evidence chain: {面板→论点映射}
     - Archetype: {图分类}
     - Export contract: SVG
@@ -548,7 +544,7 @@ Task:
     3. 同一方法在不同面板中保持颜色一致
     4. 多面板遵循 overview → deviation → relationship 三层递进
     5. 反冗余检查：无两个面板回答同一科学问题
-     6. 导出 SVG 到 ./docs/paper-drafts/figures/ 目录
+     6. 导出 SVG 到 ./academic-paper-writer/paper-drafts/figures/ 目录
      7. 代码末尾包含 savefig 语句
 
     输出:
@@ -560,9 +556,9 @@ Task:
     返回: Python 绘图代码 + 图表说明
 ```
 
-dispatch 返回后，**必须**将绘图代码写入 `./docs/paper-drafts/figures/codes/plot_fig{N}.py`。**不自动执行代码**。
+dispatch 返回后，**必须**将绘图代码写入 `./academic-paper-writer/paper-drafts/figures/codes/plot_fig{N}.py`。**不自动执行代码**。
 
-## Step 6.5: Evidence Compliance Review (Review Phase 1: Evidence)
+## Step 9.5: Evidence Compliance Review (Review Phase 1: Evidence)
 
 - Create a todo list for evidence compliance checks.
 - Delegate to `academic-reviser` in `targeted-evidence-mode` via the dispatch template below.
@@ -601,9 +597,9 @@ Task:
 
 This is Review Phase 1 (Evidence). Only proceed to Review Phase 2 (Prose Gate) after `evidence_debt = closed`.
 
-Input: Draft v1 text, Evidence Map, Verified References, placeholder_stats from Step 6.4.
+Input: Draft v1 text, Evidence Map, Verified References, placeholder_stats from Step 9.4.
 Output: `evidence_debt` (open|closed), `evidence_issues` list.
 
-If protocol risks from Step 4 materially weaken a claim's support (for example: no independent test set, missing strong baselines, or single-run results used for strong conclusions), keep `evidence_debt = open` for that claim until the text is downgraded, the risk is made explicit, or the claim is frozen/blocked.
+If protocol risks from Step 7 materially weaken a claim's support (for example: no independent test set, missing strong baselines, or single-run results used for strong conclusions), keep `evidence_debt = open` for that claim until the text is downgraded, the risk is made explicit, or the claim is frozen/blocked.
 
-If `evidence_debt = open`, record issues and return to Step 6. Do not proceed to Step 6.6 while open.
+If `evidence_debt = open`, record issues and return to Step 9. Do not proceed to Step 9.6 while open.

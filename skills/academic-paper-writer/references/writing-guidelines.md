@@ -13,7 +13,7 @@
 ## 使用定位
 
 本文件用于两件事：
-- 当用户提供目标会议/期刊时，生成 Venue Brief（详见 Step 1.5）
+- 当用户提供目标会议/期刊时，生成 Venue Brief（详见 Step 4）
 - 在写作与修订阶段辅助 venue 风格适配
 
 注意：
@@ -33,7 +33,7 @@
 - 匿名要求
 - 官方语言与格式偏好
 
-**调研时机**：Step 1.5（venue 确认后立即执行，不可推迟到起草阶段）
+**调研时机**：Step 4（venue 确认后，且 Step 2 本地 PDF→MD 门控与 Step 3 项目上下文提取完成后立即执行，不可推迟到起草阶段）
 
 **调研优先级**：
 1. 官方 CFP / author guidelines 页面（一级证据）
@@ -70,7 +70,7 @@
 
 ## 3. Venue Brief 模板
 
-完整模板定义见 `workflow-step-0-4.md` Step 1.5.2。以下为核心字段摘要：
+完整模板定义见 `workflow-step-0-7.md` Step 4.2。以下为核心字段摘要：
 
 | 字段 | 说明 |
 |------|------|
@@ -90,7 +90,7 @@
 - Required Structure 要写成可执行的章节顺序。
 - Preferred Structure Notes 只写高价值差异。
 - 如果某项未确认，写 Unknown，不要猜。
-- 完整模板和执行流程见 `workflow-step-0-4.md` Step 1.5。
+- 完整模板和执行流程见 `workflow-step-0-7.md` Step 4。
 
 ---
 
@@ -129,7 +129,7 @@
 
 ### 何时使用 bullet points
 
-Bullet points **仅用于** Step 5 Blueprint 阶段，作为规划工具组织论点结构和论证顺序。
+Bullet points **仅用于** Step 8 Blueprint 阶段，作为规划工具组织论点结构和论证顺序。
 
 ### 如何转换 bullet → prose
 

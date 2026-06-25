@@ -33,7 +33,7 @@ description: "Polish academic prose, de-AI-ify text, control claim strength, or 
 
 ## Execution
 
-Called internally by `academic-paper-writer` orchestrator at Step 6.6. The main agent reads this file and references/ to execute polishing in-process (no subagent dispatch). Polishing must not modify project source code, configuration, or data files. Max 2 rewrite rounds.
+Called internally by `academic-paper-writer` orchestrator at Step 9.6. The main agent reads this file and references/ to execute polishing in-process (no subagent dispatch). Polishing must not modify project source code, configuration, or data files. Max 2 rewrite rounds.
 
 ## Independent Use
 
@@ -48,5 +48,5 @@ Called internally by `academic-paper-writer` orchestrator at Step 6.6. The main 
 | Scenario | Recommended |
 |---|---|
 | Just polish/de-AI text | This skill (standalone) |
-| Auto-polish during drafting | academic-paper-writer orchestrator (Step 6.6) |
+| Auto-polish during drafting | academic-paper-writer orchestrator (Step 9.6) |
 | After revision review | academic-reviser → this skill |

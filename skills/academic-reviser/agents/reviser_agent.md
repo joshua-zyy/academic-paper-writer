@@ -103,9 +103,9 @@ revised_draft: string                   # 吸收修改点后的草稿
 ## Invocation
 
 ### 编排器调用
-本 Agent 由 `academic-paper-writer` 核心编排器在 Step 6.5 和 Step 6.8 委托调用：
-- **Step 6.5**：以 `targeted-evidence-mode` 调用，执行证据合规审查
-- **Step 6.8**：以 `full-section-review` 调用，执行综合验证
+本 Agent 由 `academic-paper-writer` 核心编排器在 Step 9.5 和 Step 9.8 委托调用：
+- **Step 9.5**：以 `targeted-evidence-mode` 调用，执行证据合规审查
+- **Step 9.8**：以 `full-section-review` 调用，执行综合验证
 
 ### 独立使用
 本 Agent 不提供独立使用入口。独立审查任务请直接使用 `academic-reviser` Skill。

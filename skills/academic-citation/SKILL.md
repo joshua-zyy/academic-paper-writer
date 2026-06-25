@@ -16,9 +16,13 @@ description: "Search, verify, and map citations for CS/AI/ML papers. Produces VE
    - `red-lines.md` defines absolute prohibitions. Do not negotiate these.
    - `output-contract.md` defines deliverables per mode.
    - `anti-patterns.md` defines known failure modes and their correct alternatives.
-4. Detect the workflow using the manifest's `workflow` axis. Literature reading output must separate source quotes from agent inference; only `source: 原文` or `source: 图片` content may be used as citation evidence.
-5. Echo the selected mode to the user before executing.
-6. Reach for `references/` only when the manifest's `references.on_demand` condition is satisfied.
+4. If the user wants to use a local literature library, first distinguish:
+   - `local_ref_md_dir`: an existing Markdown library containing `_index_ref.json`.
+   - `local_ref_pdf_dir`: a PDF directory, or any local library directory that lacks `_index_ref.json`.
+5. For `local_ref_pdf_dir`, stop before citation search. Tell the user to register a MinerU API token, set `MINERU_API_TOKEN`, run `scripts/convert-pdfs-to-md.py`, and return only after they confirm PDF→MD completion. Do not proceed to local reading until the generated MD directory has `_index_ref.json`.
+6. Detect the workflow using the manifest's `workflow` axis. Literature reading output must separate source quotes from agent inference; only `source: 原文` or `source: 图片` content may be used as citation evidence.
+7. Echo the selected mode to the user before executing.
+8. Reach for `references/` only when the manifest's `references.on_demand` condition is satisfied.
 
 ## Modes
 
@@ -46,7 +50,8 @@ Dispatched by `academic-paper-writer` orchestrator at Step 3. Subagents search a
 |---|---|---|---|
 | Section + keywords | full-citation-pass | 1 (explicit) | Full 6-step workflow |
 | Citation list / seed papers | citation-verification | 1 (explicit) | Metadata only, no extra search |
-| `local_ref_md_dir` provided | local-citation-pass | 2 (path trigger) | Local MD + batch parallel reader agent dispatch |
+| `local_ref_md_dir` provided and `_index_ref.json` exists | local-citation-pass | 2 (path trigger) | Local MD + batch parallel reader agent dispatch |
+| Local PDF library path provided, or local path lacks `_index_ref.json` | pdf2md-preflight | 1 (blocking preflight) | Instruct MinerU setup and script command; wait for user confirmation |
 | Section only | targeted-citation-search | 3 (single feature) | Auto-keyword, 4-class query |
 | Explicit Exemplar Set request | exemplar-set-only | 1 (explicit) | Exemplar Set only |
 

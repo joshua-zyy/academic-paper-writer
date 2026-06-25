@@ -5,7 +5,7 @@
 ## 执行约束（硬性规则）
 
 - **主 Agent 只撰写论文文本，绝对不得修改项目源代码、配置文件或数据文件**。探查时只读，图表代码生成时创建新文件而非覆盖现有文件。
-- 子 Agent 的约束见各自 `agents/xxx_agent.md` 中的 Red Lines。
+- 子 Agent 的约束见本 skill 的 `agents/probe-agent.md` 或对应子 skill 的 `agents/` 文件中的 Red Lines。
 - 论文正文（Introduction / Related Work / Method / Experiments / Discussion / Conclusion / Abstract）由主 Agent **直接撰写**，不 dispatch 独立写作子代理，以确保叙事风格一致。
 
 ---
@@ -14,9 +14,9 @@
 
 | 阶段 | Steps | 文件 | 核心任务 |
 |------|-------|------|---------|
-| 准备 | 0–4（含 1.4, 1.5, 1b） | `workflow-step-0-4.md` | 判定模式、确认 venue、**项目上下文提取**、**Venue Requirements Research**、本地文献库、PDF→MD 转换准备、**并行**证据审计、文献检索（含引用数量硬门禁 Gate B）、实验复核 |
-| 起草与初步审查 | 5–6（含 6.0–6.5） | `workflow-step-5-6.5.md` | Section Plan、Draft v1、占位符审计与图表、证据合规审查 |
-| 审查与整合 | 6.6–9 | `workflow-step-6.6-9.md` | Prose Gate、Expansion、Verification、Section Loop、引用清单、数据图批量生成 |
+| 准备 | 0–7 | `workflow-step-0-7.md` | 判定模式、确认 venue、本地风格库与参考文献库、**PDF→MD 转换确认**、**项目上下文提取**、**Venue Requirements Research**、**并行**证据审计、文献检索（含当前节引用就绪检查 Gate B）、实验复核 |
+| 起草与初步审查 | 8–9.5 | `workflow-step-8-9.5.md` | Section Plan、Draft v1、占位符审计与图表、证据合规审查 |
+| 审查与整合 | 9.6–12 | `workflow-step-9.6-12.md` | Prose Gate、Expansion、Verification、Section Loop、引用清单、数据图批量生成 |
 
 ---
 
@@ -34,27 +34,27 @@
 |------|------|---------|---------|-----|---------|
 | 0 | 判定 mode、scope、当前 section | — | 自动 | — | — |
 | 1 | 确认 venue / 语言 / min_citations（可选）+ 本地风格库 + 本地参考文献库（Blocking Gate） | — | 自动 | — | — |
-| 1b | 自动: PDF→MD 转换（Agent 自动执行 convert-pdfs-to-md.py，两个库可并行） | — | 自动（条件执行） | — | — |
-| 1.4 | **项目上下文提取**（强制）— 读取项目文件，输出 project_keywords + project_description | — | 自动 | — | — |
-| 1.5 | **Venue Requirements Research**（强制）— webfetch 访问官方页面，按 project_keywords 筛选相似论文分析风格，生成 venue-brief.md | — | 自动 | DP-1 | — |
-| 2 | 证据审计 — **Phase 1 轻量全量探查**：盘点"有什么"（module cards、现有材料、代码结构） | probe-agent（dispatch） | 自动，涉及多 probe 时**必须并行** | — | **轻量全量**：快速盘点所有模块的代码结构、数据产物、配置文件 |
-| 3 | 文献检索与核验（3a 本地优先 + 3b 联网 + 3c 聚合 + 3d 过程记录 + **3e 引用数量硬门禁 Gate B**） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 | — | — |
-| 4 | 实验事实复核 | `academic-experiments`（dispatch 子 Agent） | 自动 | — | — |
-| 5 | 生成 Section Contract + Section / Method Blueprint | — | 自动 | DP-2 | — |
-| 6 | **Section Complete Loop** ⚠️ **每节必执行全流程，6.4–6.9 不可跳过。Draft v1 ≠ 初稿完成。** | 混合：见图表/审查/验证 dispatch | 自动 | DP-3, DP-4 | — |
-|   | ├ 6.0 核对 Section Contract | — | 自动 | — | — |
-|   | ├ 6.1 前置探查 — **Phase 2 深层逐节探查**：搞懂"怎么做/为什么"（公式推导、机制细节、实验深度）**MUST use sub-agents for multi-probe sections** | probe-agent / citation-agent / literature-reader-agent（并行） | 自动 | — | **深层逐节**：针对当前 section 做深入代码级/文献级探查，直接支撑起草 |
-|   | ├ 6.2 Draft v1（含占位符 + 待补充清单） | — | 自动 | DP-3 | — |
-|   | ├ 6.3 写入 paper_draft.md | — | 自动 | — | — |
-|   | ├ 6.4 占位符审计 + 数据图代码/手工图表需求记录（⚠️ **强制执行，不可跳过**） | `academic-figure`（仅数据图 dispatch） | 自动 | — |
-|   | ├ 6.5 证据合规审查（⚠️ **强制，Review Phase 1**） | `academic-reviser`（dispatch） | 自动 | — |
-|   | ├ 6.6 Prose Quality Gate（⚠️ **强制，Review Phase 2**） | `academic-polishing`（**内化调用**） | 自动 | — |
-|   | ├ 6.7 Expansion Pass（⚠️ **强制，内容密度检查**） | — | 自动 | — |
-|   | ├ 6.8 Self-Review & Verification（⚠️ **强制**） | `academic-reviser`（dispatch） | 自动 | DP-4 |
-|   | └ 6.9 更新 Cumulative Draft → 推进下一节 | — | 自动 | — |
-| 7 | 整合 & 依赖感知 section loop | — | 自动 | — |
-| 8 | **引用清单生成**（强制，全文完成后执行） | — | 自动 | — |
-| 9 | **数据图批量生成**（强制，全文完成后执行） | `academic-figure`（dispatch，chart-from-data） | 自动 | — |
+| 2 | 本地 PDF→MD 转换确认（提示用户注册 MinerU API 并运行 convert-pdfs-to-md.py；收到 MD 目录后验证索引） | — | 条件执行，缺 MD 时阻塞等待用户 | — | — |
+| 3 | **项目上下文提取**（强制）— 读取项目文件，输出 project_keywords + project_description | — | 自动 | — | — |
+| 4 | **Venue Requirements Research**（强制）— webfetch 访问官方页面，按 project_keywords 筛选相似论文分析风格，生成 venue-brief.md | `academic-venue-research` | 自动 | DP-1 | — |
+| 5 | 证据审计 — **Phase 1 轻量全量探查**：盘点"有什么"（module cards、现有材料、代码结构） | probe-agent（dispatch） | 自动，涉及多 probe 时**必须并行** | — | **轻量全量**：快速盘点所有模块的代码结构、数据产物、配置文件 |
+| 6 | 文献检索与核验（6a 本地优先 + 6b 联网 + 6c 聚合 + 6d 过程记录 + **6e 当前节引用就绪检查 Gate B**） | `academic-citation` + `literature-reader-agent`（并行 dispatch） | 自动 | — | — |
+| 7 | 实验事实复核 | `academic-experiments`（dispatch 子 Agent） | 自动 | — | — |
+| 8 | 生成 Section Contract + Section / Method Blueprint | — | 自动 | DP-2 | — |
+| 9 | **Section Complete Loop** ⚠️ **每节必执行全流程，9.4–9.9 不可跳过。Draft v1 ≠ 初稿完成。** | 混合：见图表/审查/验证 dispatch | 自动 | DP-3, DP-4 | — |
+|   | ├ 9.0 核对 Section Contract | — | 自动 | — | — |
+|   | ├ 9.1 前置探查 — **Phase 2 深层逐节探查**：搞懂"怎么做/为什么"（公式推导、机制细节、实验深度）**MUST use sub-agents for multi-probe sections** | probe-agent / citation-agent / literature-reader-agent（并行） | 自动 | — | **深层逐节**：针对当前 section 做深入代码级/文献级探查，直接支撑起草 |
+|   | ├ 9.2 Draft v1（含占位符 + 待补充清单） | — | 自动 | DP-3 | — |
+|   | ├ 9.3 写入 paper_draft.md | — | 自动 | — | — |
+|   | ├ 9.4 占位符审计 + 数据图代码/手工图表需求记录（⚠️ **强制执行，不可跳过**） | `academic-figure`（仅数据图 dispatch） | 自动 | — |
+|   | ├ 9.5 证据合规审查（⚠️ **强制，Review Phase 1**） | `academic-reviser`（dispatch） | 自动 | — |
+|   | ├ 9.6 Prose Quality Gate（⚠️ **强制，Review Phase 2**） | `academic-polishing`（**内化调用**） | 自动 | — |
+|   | ├ 9.7 Expansion Pass（⚠️ **强制，内容密度检查**） | — | 自动 | — |
+|   | ├ 9.8 Self-Review & Verification（⚠️ **强制**） | `academic-reviser`（dispatch） | 自动 | DP-4 |
+|   | └ 9.9 更新 Cumulative Draft → 推进下一节 | — | 自动 | — |
+| 10 | 整合 & 依赖感知 section loop | — | 自动 | — |
+| 11 | **引用清单生成**（强制，全文完成后执行） | — | 自动 | — |
+| 12 | **数据图批量生成**（强制，全文完成后执行） | `academic-figure`（dispatch，chart-from-data） | 自动 | — |
 
 ---
 
@@ -63,14 +63,14 @@
 Cross-skill data contracts, shared concept references, and reference-loading guidance are maintained in `skills/academic-paper-writer/SKILL.md` as the high-level orchestrator index.
 
 When executing a concrete step in this file:
-- read the referenced schema under `skills/shared/schemas/` if the step consumes or produces structured cross-skill data
+- read the referenced schema under the sibling `shared/schemas/` directory (`../shared/schemas/` from this skill) if the step consumes or produces structured cross-skill data
 - read the referenced file under `references/` when that step explicitly calls for it
 
 ---
 
 ## 迭代上限与降级规则
 
-修订循环（Step 6.7→6.8→7）最多执行 3 轮。每轮完成后记录 `revision_round` 计数。
+修订循环（Step 9.7→9.8→10）最多执行 3 轮。每轮完成后记录 `revision_round` 计数。
 
 ### 达到上限后的处理
 

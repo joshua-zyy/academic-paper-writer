@@ -1,6 +1,6 @@
-# Orchestration Workflow — Part 1: Preparation (Step 0–4)
+# Orchestration Workflow — Part 1: Preparation (Step 0–7)
 
-本文件包含编排器 Step 0–4 的详细执行流程。按需加载，避免一次性加载全部步骤。
+本文件包含编排器 Step 0–7 的详细执行流程。按需加载，避免一次性加载全部步骤。
 
 完整步骤索引见 `orchestration-workflow.md`。
 
@@ -9,7 +9,7 @@
 ## 执行约束（硬性规则）
 
 - **主 Agent 只撰写论文文本，绝对不得修改项目源代码、配置文件或数据文件**。探查时只读，图表代码生成时创建新文件而非覆盖现有文件。
-- 子 Agent 的约束见各自 `agents/xxx_agent.md` 中的 Red Lines。
+- 子 Agent 的约束见本 skill 的 `agents/probe-agent.md` 或对应子 skill 的 `agents/` 文件中的 Red Lines。
 - 论文正文（Introduction / Related Work / Method / Experiments / Discussion / Conclusion / Abstract）由主 Agent **直接撰写**，不 dispatch 独立写作子代理，以确保叙事风格一致。
 
 ---
@@ -40,35 +40,31 @@ Blocking confirmations — must stop and ask if missing:
    - **一次性确认**：确认后全程不再重复询问，用户可随时切换
 4. **Current section**: Determined by Step 0 if user did not specify.
 5. **预期引用数量（min_citations）**：**可选询问**用户预期的参考文献数量。
-   - 询问方式："您预期这篇论文的参考文献数量大约是多少篇？（可留空，由 Step 1.5 venue 调研后自动推断）"
+   - 询问方式："您预期这篇论文的参考文献数量大约是多少篇？（可留空，由 Step 4 venue 调研后自动推断）"
    - 用户指定时记录为 `min_citations`，后续以用户指定为准
-   - 用户未指定或说"留空"时记录为 `min_citations = null`，待 Step 1.5 完成后根据 venue 要求自动推断
-   - **一次性确认**：确认后全程不再重复询问，Step 8 生成引用清单时自动核验。
+   - 用户未指定或说"留空"时记录为 `min_citations = null`，待 Step 4 完成后根据 venue 要求自动推断
+   - **一次性确认**：确认后全程不再重复询问，Step 11 生成引用清单时自动核验。
 
-If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venue Requirements Research，使用 webfetch 访问官方页面获取投稿要求并生成 `venue-brief.md`。
+If venue is known and not `user_declined`, **必须在 Step 2（若适用）和 Step 3 完成后**进入 Step 4 执行 Venue Requirements Research，使用 webfetch 访问官方页面获取投稿要求并生成 `venue-brief.md`。若用户提供了本地目标期刊风格 PDF 库，不得在该库转换为 MD 并验证 `_index_style.json` 之前进入 Step 4。
 
 ### 本地文献库（强制询问，与 venue 同属 Blocking Gate）
 
-**venue/language/min_citations 确认后立即询问，在进入 Step 2 前必须给出明确答案**：
+**venue/language/min_citations 确认后立即询问，在进入 Step 4 前必须给出明确答案**：
 
-- 是否在当前项目中维护了本地文献库（存放待引用 PDF 论文的目录）？
-  - 有 → 记录路径为 `local_ref_pdf_dir`
-  - 没有 → `local_ref_pdf_dir = null`，跳过本地文献流程
-- 如果有，告知将在其同级创建 `refs_md/` 目录存放转换后的 MD 文档
-- **必须先检查 Python 版本，再检查 `pymupdf4llm`**：
-  ```bash
-  python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')"
-  python -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)"
-  python -c "import pymupdf4llm; print('ok')"
-  ```
-- Python `< 3.10` → 停止 PDF→MD 转换，提示用户切换到 Python 3.10+ 环境并安装 `pymupdf4llm`
-- Python `>= 3.10` 但 `pymupdf4llm` 未安装 → 输出 `python -m pip install pymupdf4llm` 安装提示，等待用户安装后重新验证
-- 接下来进入 **Step 1b** 的 PDF→MD 转换准备
-- 若用户明确没有本地文献库或跳过转换：`local_ref_md_dir = null`，跳过 Step 1b
+- 是否有本地目标期刊风格参考文献库（存放目标期刊近年论文 PDF 或已转换 MD 的目录）？
+  - 已是 MD 且包含 `_index_style.json` → 记录 `local_style_md_dir`
+  - 是 PDF 目录 → 记录 `local_style_pdf_dir`，进入 Step 2 提示 MinerU 转换
+  - 没有 → `local_style_md_dir = null`
+- 是否在当前项目中维护了本地参考文献库（存放待引用 PDF 论文或已转换 MD 的目录）？
+  - 已是 MD 且包含 `_index_ref.json` → 记录 `local_ref_md_dir`
+  - 是 PDF 目录 → 记录 `local_ref_pdf_dir`，进入 Step 2 提示 MinerU 转换
+  - 没有 → `local_ref_md_dir = null`
+- 对 PDF 目录只提示用户使用 MinerU API 转换，不自动继续流程；收到用户回传的 MD 目录并验证索引后，才允许进入 Step 3 和 Step 4。
+- 若用户明确没有本地文献库或跳过转换：对应 `local_*_md_dir = null`，跳过 Step 2。
 
 **Failure to confirm venue**: Stop and wait. Do not proceed to Step 2. Do not generate Outline or Section Queue until venue is resolved.
 
-### Step 1 完整执行清单（10 项，Blocking Gate）
+### Step 1 完整执行清单（6 项，Blocking Gate）
 
 执行Step 1时，**必须按以下顺序逐项完成**。**任一未完成，立即 STOP 并解决，不得进入 Step 2。每完成一项打勾 `[x]`，全部打勾后方可继续。**
 
@@ -84,9 +80,9 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
       - 未指定 → 默认英文
 
 - [ ] 3. **确认min_citations**（可选）
-      - 询问："预期参考文献数量？（可留空，由 Step 1.5 venue 调研后自动推断）"
+      - 询问："预期参考文献数量？（可留空，由 Step 4 venue 调研后自动推断）"
       - 用户指定 → 记录 `min_citations = 用户指定值`
-      - 用户未指定/留空 → 记录 `min_citations = null`，待 Step 1.5 后推断
+      - 用户未指定/留空 → 记录 `min_citations = null`，待 Step 4 后推断
 
 - [ ] 4. **确认推进模式**
       - 询问："选择逐节撰写（每节完成后暂停确认）还是自动全部生成初稿？（默认自动）"
@@ -95,70 +91,75 @@ If venue is known and not `user_declined`, **必须进入 Step 1.5** 执行 Venu
       - **一次性确认**：确认后全程不再重复询问，用户可随时切换
 
 - [ ] 5. **询问本地风格参考文献库**
-       - 询问："是否有本地目标期刊风格参考文献库（存放目标期刊近年论文PDF的目录）？"
-       - 有 → 记录路径为 `local_style_pdf_dir`，MD 输出目录记为 `local_style_md_dir`（`<local_style_pdf_dir>/../style_md/`）
-       - 没有 → 记录 `local_style_pdf_dir = null`
+       - 询问："是否有本地目标期刊风格参考文献库（目标期刊近年论文 PDF 目录或已转换 MD 目录）？"
+       - 已转换 MD 且包含 `_index_style.json` → 记录 `local_style_md_dir`
+       - PDF 目录 → 记录 `local_style_pdf_dir`，待 Step 2 提示 MinerU 转换
+       - 没有 → 记录 `local_style_md_dir = null`
 
 - [ ] 6. **询问本地参考文献库**
-       - 询问："是否有本地参考文献库（存放待引用论文PDF的目录）？"
-       - 有 → 记录路径为 `local_ref_pdf_dir`，MD 输出目录记为 `local_ref_md_dir`（`<local_ref_pdf_dir>/../refs_md/`）
-       - 没有 → 记录 `local_ref_pdf_dir = null`
+       - 询问："是否有本地参考文献库（待引用论文 PDF 目录或已转换 MD 目录）？"
+       - 已转换 MD 且包含 `_index_ref.json` → 记录 `local_ref_md_dir`
+       - PDF 目录 → 记录 `local_ref_pdf_dir`，待 Step 2 提示 MinerU 转换
+       - 没有 → 记录 `local_ref_md_dir = null`
 
-- [ ] 7. **本地文献库自动转换**（仅当第5项或第6项为"有"时）
-       - 计算两个 MD 输出目录（见 Step 1b）
-       - 检查 Python 版本：必须 `>= 3.10`
-       - 检查 `pymupdf4llm`：必须安装在同一个 Python 环境中
-       - 任一检查失败 → 停止转换并提示用户配置环境；不得继续执行转换脚本
-       - 两项检查通过 → **自动执行转换**（Agent 自行调用 `bash` 工具，两个库可并行执行）
-       - 转换完成后自动进入第8项（Step 1.4），无需用户介入
+以上全部完成后，进入 Step 2（若有 PDF 库）或 Step 3。
 
-- [ ] 8. **项目上下文提取**（强制 — 必须在 venue 调研前执行）
-       - 主 Agent 直接读取项目关键文件（不 dispatch 子 agent）：
-         - `README.md`（如存在）→ 提取项目描述、研究目标
-         - `config.py` / `config.yaml` / `config.json`（如存在）→ 提取任务名、数据集名、模型名
-         - 代码入口文件（`main.py` / `train.py` / `run.py`）→ 提取函数签名、参数名
-       - 输出 `project_keywords`（5-8 个关键词：任务领域、方法家族、数据集/模态、核心模块名）
-       - 输出 `project_description`（一句话项目摘要："本项目研究 {任务}，采用 {方法} 对 {数据/模态} 进行 {目标}"）
-       - 目的：供 Step 1.5 venue 调研时筛选与项目研究内容最接近的目标期刊论文
+## Step 2: Local PDF→MD Preparation Gate（用户执行，Agent 校验）
 
-- [ ] 9. **进入 Step 1.5**（强制）— venue 确认后，必须执行 Venue Requirements Research（详见下方 Step 1.5），不可跳过
+**条件**: 当 Step 1 第5项或第6项确认用户提供的是本地 PDF 文献库时触发。若用户提供的已经是包含索引文件的 MD 目录，则跳过本步骤。
 
-- [ ] 10. **以上全部完成**（含 Step 1.5） → 进入Step 2
+### 2.1 确定需要转换的库
 
-### Step 1 自动转换执行规则（第7项使用）
+记录需要转换的 PDF 输入目录：
+- `local_style_pdf_dir`：目标期刊风格参考论文 PDF 目录（可选）
+- `local_ref_pdf_dir`：待引用参考文献 PDF 目录（可选）
 
-当用户提供了本地风格参考文献库或本地参考文献库路径后，**Agent 自动执行转换，无需用户介入**。两个库可并行执行：
+MD 输出目录可以由用户决定；如果用户没有偏好，建议：
+- `local_style_md_dir = <local_style_pdf_dir>/../style_md/`
+- `local_ref_md_dir = <local_ref_pdf_dir>/../refs_md/`
 
-执行转换前必须完成 Python 与 `pymupdf4llm` 双门禁：
+### 2.2 提示 MinerU API 转换
 
-```bash
-python -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)"
-python -c "import pymupdf4llm; print('ok')"
+Agent 必须提示用户：
+
+1. 注册 MinerU 并创建 API Token。
+2. 在本地终端设置 `MINERU_API_TOKEN` 环境变量。
+3. 使用本 skill 的转换入口运行转换。
+
+PowerShell 示例：
+
+```powershell
+$env:MINERU_API_TOKEN = "<your_mineru_api_token>"
+
+python .agents/skills/academic-paper-writer/skills/academic-citation/scripts/convert-pdfs-to-md.py <local_style_pdf_dir> <local_style_md_dir> --type style
+python .agents/skills/academic-paper-writer/skills/academic-citation/scripts/convert-pdfs-to-md.py <local_ref_pdf_dir> <local_ref_md_dir> --type ref
 ```
 
-任一门禁失败时，停止转换并提示用户配置 Python 3.10+ 与 `pymupdf4llm`，不得继续执行以下转换命令。
+只提供实际需要的命令。不得要求用户把 token 写入脚本。不得在用户未确认前继续执行 Step 3、Step 4 或 Step 5。
 
-```
-{当 local_style_pdf_dir 不空时:}
-bash: python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_style_pdf_dir> <local_style_md_dir> --type style
+### 2.3 等待用户回传 MD 目录并验证
 
-{当 local_ref_pdf_dir 不空时:}
-bash: python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_ref_pdf_dir> <local_ref_md_dir> --type ref
-```
+发出转换指导后，Agent 必须暂停 workflow，等待用户回复转换完成并提供 MD 输出目录。
 
-**转换后验证**：检查各目录是否生成对应索引文件（`_index_style.json` / `_index_ref.json`）。若转换失败，输出错误信息并告知用户；若成功，自动进入第8项（Step 1.4 项目上下文提取）。
+收到用户回复后：
+1. 若有 `local_style_pdf_dir`，检查 `local_style_md_dir/_index_style.json` 是否存在。
+2. 若有 `local_ref_pdf_dir`，检查 `local_ref_md_dir/_index_ref.json` 是否存在。
+3. 检查各 MD 输出目录至少包含一个 `.md` 文件。
+4. 记录通过验证的 `local_style_md_dir` / `local_ref_md_dir`。
+5. 验证通过后进入 Step 3（项目上下文提取）→ Step 4（若 venue 已知）→ Step 5。
+6. 验证失败时，报告缺失项并继续停在 Step 2。
 
-> **安全性**：转换脚本只读 PDF → 写 MD 到独立输出目录，不修改任何项目源文件，符合 Red Line 边界。
+转换报告（若生成）统一保留在输出目录的 `mineru_api_report/` 下；该报告不是引用阅读的必要输入，但可用于审计 API 任务和失败恢复。
 
 ---
 
-## Step 1.4: 项目上下文提取（强制，Venue 调研前置）
+## Step 3: Project Context Extraction（强制，Venue 调研前置）
 
-**条件**: venue 确认后，在 Step 1.5 之前强制执行。**不可跳过**。
+**条件**: venue 确认后，在 Step 4 之前强制执行。**不可跳过**。
 
 **目的**: 让 venue 调研子 agent 知道项目研究什么，从而精准筛选目标期刊中与项目研究内容最接近的论文进行深度风格分析。
 
-### 1.4.1 执行方式
+### 3.1 执行方式
 
 **主 Agent 直接执行**（不 dispatch 子 agent），读取以下项目文件提取上下文：
 
@@ -177,9 +178,9 @@ bash: python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_ref_p
 - 若仍无法获取 → `project_keywords = []`，`project_description = "项目信息未获取，请在后续步骤中补充"`
 - 输出提示："未能从项目文件中提取上下文，将继续进行 venue 调研（但无法筛选相似论文）"
 
-### 1.4.2 输出格式
+### 3.2 输出格式
 
-提取后**必须**结构化记录以下两项，供 Step 1.5 dispatch 模板使用：
+提取后**必须**结构化记录以下两项，供 Step 4 dispatch 模板使用：
 
 ```yaml
 project_keywords:
@@ -204,14 +205,14 @@ project_keywords:
 project_description: "本项目研究基于图神经网络的 EEG 情绪识别，采用双分支时空注意力机制对多通道脑电信号进行建模，在 SEED 数据集上验证。"
 ```
 
-### 1.4.3 与 Step 2 的区别
+### 3.3 与 Step 5 的区别
 
-- **Step 1.4**：论文级摘要 — 只提取 "这个项目做什么" 的简短描述，供 venue 调研使用。耗时秒级。
-- **Step 2 Phase 1**：代码级盘点 — 扫描全部模块的代码结构、数据产物、配置文件，构建 Evidence Map。耗时需 sub-agent。
+- **Step 3**：论文级摘要 — 只提取 "这个项目做什么" 的简短描述，供 venue 调研使用。耗时秒级。
+- **Step 5 Phase 1**：代码级盘点 — 扫描全部模块的代码结构、数据产物、配置文件，构建 Evidence Map。耗时需 sub-agent。
 
 ---
 
-## Step 1.5: Venue Requirements Research（强制）
+## Step 4: Venue Requirements Research（强制）
 
 **条件**: venue 已确认且非 `user_declined` 时**必须执行**。不可跳过，不可推迟到起草阶段。
 
@@ -220,7 +221,7 @@ project_description: "本项目研究基于图神经网络的 EEG 情绪识别�
 - `section-drafting` / `section-revision`：若 venue-brief.md 已存在（同一项目、同一 venue），可复用，无需重复执行；若不存在，必须执行
 - `related-work-or-citation-pass` / `experiment-evidence-pass`：若 venue 影响执行策略（如引用格式），且 venue-brief.md 不存在，必须执行
 
-### 1.5.1 执行方式
+### 4.1 执行方式
 
 **委托方式**：dispatch `academic-venue-research` 子skill
 
@@ -236,7 +237,7 @@ Task:
     venue: {venue}
     local_style_md_dir: {local_style_md_dir | null}
     research_type: full
-    suggested_output_path: ./docs/paper-drafts/venue-brief.md
+    suggested_output_path: ./academic-paper-writer/paper-drafts/venue-brief.md
 
     项目上下文:
     project_keywords: {project_keywords}           # 5-8 个关键词
@@ -260,19 +261,19 @@ Task:
 
 **输入**：
 - `venue`：目标 venue 名称
-- `local_style_md_dir`：本地风格参考文献库 MD 输出路径（可选，来自 Step 1 第5项转换后）
-- `project_keywords`：项目核心关键词列表（来自 Step 1.4）
-- `project_description`：一句话项目摘要（来自 Step 1.4）
+- `local_style_md_dir`：本地风格参考文献库 MD 输出路径（可选，来自用户已提供的 MD 目录或 Step 2 验证后的转换结果）
+- `project_keywords`：项目核心关键词列表（来自 Step 3）
+- `project_description`：一句话项目摘要（来自 Step 3）
 - `research_type`：调研类型（full / requirements / style）
-- `suggested_output_path`：建议输出路径（默认 `./docs/paper-drafts/venue-brief.md`，由主 Agent 写入）
+- `suggested_output_path`：建议输出路径（默认 `./academic-paper-writer/paper-drafts/venue-brief.md`，由主 Agent 写入）
 
 **输出**：
 - Venue Brief Markdown 内容（由主 Agent 写入 `venue-brief.md`）
 - 调研摘要（在对话中输出）
 
-### 1.5.2 生成 Venue Brief 文件
+### 4.2 生成 Venue Brief 文件
 
-主 Agent **必须**将调研结果写入 `./docs/paper-drafts/venue-brief.md`，格式如下：
+主 Agent **必须**将调研结果写入 `./academic-paper-writer/paper-drafts/venue-brief.md`，格式如下：
 
 ```markdown
 # Venue Brief
@@ -342,22 +343,22 @@ Task:
 | Appendix Policy | VERIFIED / Unknown | {URL 或 agent_knowledge (unverified)} |
 ```
 
-### 1.5.3 对后续步骤的影响
+### 4.3 对后续步骤的影响
 
 Venue Brief 生成后，在后续步骤中**必须参考**：
 
 | 后续步骤 | 如何使用 Venue Brief |
 |----------|---------------------|
-| Step 3 (文献检索) | 根据 Citation Format 确定引用核验策略 |
-| Step 4 (实验复核) | 根据 Page Limit 确定实验结果展示的详略程度 |
-| Step 5 (Blueprint) | 根据 Required Structure 调整 section queue |
-| Step 6 (Draft) | 根据 Page Limit 控制各节篇幅 |
-| Step 6 (Draft) | 根据 Citation Format 使用正确的引用格式 |
-| Step 6 (Draft) | 根据 Anonymous Review 决定是否去除可识别信息 |
-| Step 8 (引用清单) | 根据 Appendix Policy 决定附录内容 |
-| Step 9 (图片生成) | 根据 Template 确定图片尺寸和分辨率要求 |
+| Step 6 (文献检索) | 根据 Citation Format 确定引用核验策略 |
+| Step 7 (实验复核) | 根据 Page Limit 确定实验结果展示的详略程度 |
+| Step 8 (Blueprint) | 根据 Required Structure 调整 section queue |
+| Step 9 (Draft) | 根据 Page Limit 控制各节篇幅 |
+| Step 9 (Draft) | 根据 Citation Format 使用正确的引用格式 |
+| Step 9 (Draft) | 根据 Anonymous Review 决定是否去除可识别信息 |
+| Step 11 (引用清单) | 根据 Appendix Policy 决定附录内容 |
+| Step 12 (图片生成) | 根据 Template 确定图片尺寸和分辨率要求 |
 
-### 1.5.3b 自动推断 min_citations
+### 4.3b 自动推断 min_citations
 
 **条件**：仅当 Step 1 中用户未指定 min_citations（`min_citations = null`）时执行。
 
@@ -383,60 +384,17 @@ Venue Brief 生成后，在后续步骤中**必须参考**：
 
 **用户已指定时**：跳过本节，直接使用用户指定的 `min_citations`。
 
-### 1.5.4 失败处理
+### 4.4 失败处理
 
 - webfetch 无法访问官方页面 → 依次尝试：(1) 其他官方 URL (2) agent 已知知识（标注 `agent_knowledge (unverified)`）(3) 标注 Unknown 并警告用户
-- 用户提供 venue 但明确说"你决定" → agent 自主选择 venue 后仍需执行 1.5
-- venue = user_declined → 跳过 1.5，使用通用结构，警告用户"未指定 venue，通用结构可能不满足投稿要求"
+- 用户提供 venue 但明确说"你决定" → agent 自主选择 venue 后仍需执行 Step 4
+- venue = user_declined → 跳过 Step 4，使用通用结构，警告用户"未指定 venue，通用结构可能不满足投稿要求"
 - 二级证据（已录用论文）仅用于风格偏好，不能定义 venue 规范
 - **信息来源透明**：所有 Venue Brief 中的信息必须标注来源（`webfetch` / `agent_knowledge (unverified)` / `Unknown`），不得隐藏信息来源
 
 ---
 
-## Step 1b: Local Literature PDF→MD Conversion（自适应自动执行）
-
-**条件**: 当 Step 1 第5项或第6项确认有本地文献库时触发。Agent 自动执行转换，用户无需手动操作。
-
-### 1b.1 确定 MD 输出目录
-
-按约定规则计算两个 MD 输出目录（Step 1 第7项已计算）：
-```python
-local_style_md_dir = <local_style_pdf_dir>/../style_md/
-local_ref_md_dir = <local_ref_pdf_dir>/../refs_md/
-```
-
-### 1b.2 检查 Python 与 `pymupdf4llm` 后自动执行转换
-
-1. **检查 Python 版本**：Agent 运行 `python -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)"`。
-    - 退出码 0 → Python 版本满足 `pymupdf4llm` 要求，继续检查依赖。
-    - 非 0 → 输出环境提示并停止转换：`pymupdf4llm` 需要 Python 3.10+，请切换环境后重试。
-2. **检查 `pymupdf4llm`**：Agent 运行 `python -c "import pymupdf4llm; print('ok')"`。
-    - 输出 `ok` → 已安装，继续执行。
-    - 报 ImportError → 输出安装提示：`python -m pip install pymupdf4llm`，等待用户安装后重新验证。
-3. **自动执行转换**：只有 Python 版本和 `pymupdf4llm` 检查均通过时，Agent 才能调用 `convert-pdfs-to-md.py`。两个库的转换可**并行执行**（两次 `bash` 调用在同一个消息中发出）：
-
-```bash
-# 风格文献库转换
-python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_style_pdf_dir> <local_style_md_dir> --type style
-
-# 参考文献库转换
-python skills/academic-citation/scripts/convert-pdfs-to-md.py <local_ref_pdf_dir> <local_ref_md_dir> --type ref
-```
-
-> **安全性**：转换脚本输出到独立目录（`style_md/` / `refs_md/`），不修改任何项目源文件。
-
-### 1b.3 转换后验证
-
-两个转换完成后：
-1. 检查 `local_style_md_dir` 是否存在 `_index_style.json`
-2. 检查 `local_ref_md_dir` 是否存在 `_index_ref.json`
-3. 输出转换统计（各库 PDF 总数 → 转换成功数 / 跳过数 / 失败数）
-4. 若任一转换失败 → 输出错误信息，提示用户手动检查该库；成功的库正常使用
-5. 自动进入 Step 1.4（项目上下文提取）→ 然后进入 Step 1.5（若 venue 已知）或 Step 2
-
-**Python 或 `pymupdf4llm` 检查失败时的处理**：Agent 只提示用户配置 Python 3.10+ 与 `python -m pip install pymupdf4llm`，不得自行安装 Python 包，也不得继续执行转换脚本。
-
-## Step 2: Evidence Audit
+## Step 5: Evidence Audit
 
 Create a todo list for evidence items. Dispatch probe agents per section type.
 
@@ -586,9 +544,9 @@ List four categories:
 
 ### 探查策略：轻量全量探查 + 按需深度探查（混合策略）
 
-首次执行 full-paper-planning 时，Step 2 采用**混合探查策略**：
+首次执行 full-paper-planning 时，Step 5 采用**混合探查策略**：
 
-**Phase 1 — 轻量全量探查（Step 2 执行，必须并行 dispatch）：**
+**Phase 1 — 轻量全量探查（Step 5 执行，必须并行 dispatch）：**
 同时 dispatch 以下 3 个轻量探查任务（每个只需读取目录级信息和配置文件）。**必须同时发出，不得串行：**
 
 ```yaml
@@ -642,26 +600,27 @@ Task C:
 
 3 个探查全部返回后，汇总为 **Project Overview**，作为 Evidence Map 的索引层。
 
-**深层探查不在此处执行**。各 section 起草前的深度探查规则已移至 `references/workflow-step-5-6.5.md` Step 6 的"前置检查：是否需要深层探查"表中。起草对应 section 前须按该表 dispatch。
+**深层探查不在此处执行**。各 section 起草前的深度探查规则已移至 `references/workflow-step-8-9.5.md` Step 9 的"前置检查：是否需要深层探查"表中。起草对应 section 前须按该表 dispatch。
 
 For Introduction / Related Work, also audit exemplar paper candidates.
 For Method, also audit model data flow, module boundaries, tensor shapes, recoverable formulas.
 
-## Step 3: Literature Search and Verification（四步流程）
+## Step 6: Literature Search and Verification（五步流程）
 
-本步骤分为四个子步骤：
-- **Step 3a**：本地文献库优先搜索（条件执行）
-- **Step 3b**：联网文献检索 + 全文获取与阅读
-- **Step 3c**：Subagent 阅读结果聚合 + Citation-to-Claim 映射
-- **Step 3d**：生成引用文献清单文件（过程记录）
+本步骤分为五个子步骤：
+- **Step 6a**：本地文献库优先搜索（条件执行）
+- **Step 6b**：联网文献检索 + 全文获取与阅读
+- **Step 6c**：Subagent 阅读结果聚合 + Citation-to-Claim 映射
+- **Step 6d**：生成引用文献清单文件（过程记录）
+- **Step 6e**：当前节引用就绪检查（Gate B）
 
 ---
 
-### Step 3a: 本地文献库优先搜索
+### Step 6a: 本地文献库优先搜索
 
 **条件**: 仅在 `local_ref_md_dir != null` 且目录中存在 MD 文件时执行。
 
-#### 3a.1 关键词搜索（强制，不可跳过）
+#### 6a.1 关键词搜索（强制，不可跳过）
 
 **必须先按关键词搜索 `_index_ref.json`，仅 dispatch 搜索命中的候选文献。禁止直接读取全部 MD 文件。**
 
@@ -681,9 +640,9 @@ For Method, also audit model data flow, module boundaries, tensor shapes, recove
 6. 主 agent 综合报告决定是否引用
 
 **判定路径**：
-- 若关键词搜索找到 0 篇候选 → 跳过 Step 3a，直接进入 Step 3b
-- 若找到候选但所有 `recommendation` 均为 `skip` → 进入 Step 3b 补充
-- 若找到候选且至少部分被采纳 → 采纳的进入 Verified References，不足处继续 Step 3b
+- 若关键词搜索找到 0 篇候选 → 跳过 Step 6a，直接进入 Step 6b
+- 若找到候选但所有 `recommendation` 均为 `skip` → 进入 Step 6b 补充
+- 若找到候选且至少部分被采纳 → 采纳的进入 Verified References，不足处继续 Step 6b
 
 **并行阅读 dispatch 模板（按批次分发，N 篇候选同时执行）：**
 
@@ -735,9 +694,9 @@ Task C:
 
 ---
 
-### Step 3b: 联网文献检索 + 全文获取与阅读
+### Step 6b: 联网文献检索 + 全文获取与阅读
 
-**在本地搜索完成后（或跳过 Step 3a 时），执行联网检索。**
+**在本地搜索完成后（或跳过 Step 6a 时），执行联网检索。**
 
 **强制 checklist（必须全部完成，缺一不可）**：
 - [ ] 至少覆盖 4 类查询（问题导向 / 方法导向 / 基线导向 / 时间导向）
@@ -747,7 +706,7 @@ Task C:
 - [ ] Introduction / Related Work 时额外构建 Exemplar Set
 - [ ] 目标：全篇各节累计达到至少 `min_citations` 篇引用（当前节尽可能多收集）
 
-**未完成 checklist 前，不得进入 Step 4。Dispatch `academic-citation` 完成检索：**
+**未完成 checklist 前，不得进入 Step 7。Dispatch `academic-citation` 完成检索：**
 
 **Dispatch template：**
 ```yaml
@@ -779,9 +738,9 @@ Constraint: only VERIFIED references enter the draft body.
 
 ---
 
-### Step 3c: 聚合与 Citation-to-Claim 映射
+### Step 6c: 聚合与 Citation-to-Claim 映射
 
-合并 Step 3a 的 `local_reading_reports` 和 Step 3b 的返回结果：
+合并 Step 6a 的 `local_reading_reports` 和 Step 6b 的返回结果：
 
 1. 对所有候选文献按 `relevance_to_current_work` + `recommendation` 综合排序
 2. 主 agent 逐条评估：
@@ -796,15 +755,15 @@ Constraint: only VERIFIED references enter the draft body.
 - `source: 原文` 和 `source: 图片` 的 `citable_claims` 可作为确定性引用依据
 - `source: 推断` 的内容最多用于背景描述，且须在正文中降级表述（如"我们认为...可能..."）
 
-For Introduction / Related Work: if retries still produce zero VERIFIED references and the user cannot provide usable seed papers, block before Step 6. Do **not** proceed with a `[REF_NEEDED]`-only draft for these sections.
+For Introduction / Related Work: if retries still produce zero VERIFIED references and the user cannot provide usable seed papers, block before Step 9. Do **not** proceed with a `[REF_NEEDED]`-only draft for these sections.
 
-### Step 3d: 生成引用文献清单文件（过程记录）
+### Step 6d: 生成引用文献清单文件（过程记录）
 
 **用途**：生成一个独立于论文正文的引用清单文件，方便用户随时查看已引用文献、逐篇下载 PDF。
 
-**执行时机**：Step 3c 完成后立即执行。后续每完成一个 section 的起草，追加该节新增的引用。
+**执行时机**：Step 6c 完成后立即执行。后续每完成一个 section 的起草，追加该节新增的引用。
 
-1. 将当前所有 Verified References 写入 `./docs/paper-drafts/referenced-literature-inventory.md`
+1. 将当前所有 Verified References 写入 `./academic-paper-writer/paper-drafts/referenced-literature-inventory.md`
 2. 每篇记录：标题、作者、venue、年份、DOI/arXiv、来源链接、引用章节
 3. 后续每完成一个 section，检查该节新增的引用并追加到此文件
 
@@ -820,31 +779,38 @@ For Introduction / Related Work: if retries still produce zero VERIFIED referenc
 | 2 | Author et al., "Title2" | CVPR | 2023 | 10.1109/CVPR.2023.00123 | https://openaccess.thecvf.com/... | Method |
 ```
 
-**与 Step 8 的区别**：
-- Step 3d = 过程记录，逐节追加，方便用户随时下载
-- Step 8 = 终版核验清单，论文完成后一次性生成，用于确认引用合理性
+**与 Step 11 的区别**：
+- Step 6d = 过程记录，逐节追加，方便用户随时下载
+- Step 11 = 终版核验清单，论文完成后一次性生成，用于确认引用合理性
 
-### Step 3e: 引用数量硬门禁（Gate B）
+### Step 6e: 当前节引用就绪检查（Gate B）
 
-**条件**：Step 3c 完成后，Step 3d 写入 inventory 文件后，**必须执行此门禁检查，不可跳过**。
+**条件**：Step 6c 完成后，Step 6d 写入 inventory 文件后，**必须执行当前 section 的引用就绪检查，不可跳过**。本步骤不检查全文 `min_citations`；全文去重引用总数只在 Step 11 统一核验。
 
-1. 统计当前 Verified References 总数（去重后）
-2. 对比 `min_citations`（Step 1 或 Step 1.5 已确定的值）：
-   - Verified References ≥ `min_citations` → Gate B Pass，进入 Step 4
-   - Verified References < `min_citations` → Gate B **Blocked**
-3. **Blocked 时的处理**：
-   - 在对话中输出警告："当前 Verified References 共 {N} 篇，未达到 min_citations ({min_citations}) 要求。需要补充至少 {gap} 篇文献。"
-   - **回退到 Step 3b**，以新的关键词组合继续联网检索
-   - 补充文献后重新执行 Step 3c→3d→3e
-   - 最多回退 2 轮（共 3 轮检索），3 轮后仍不足 → 标记为 `citation_gap = {gap}`，进入 Step 4 但提示用户"引用数量不足，建议后续自行补充"
-4. 每轮回退后，在 cited-reference inventory 文件中记录回退原因和新增引用数
+1. 按当前 section 统计 Verified References 和 Citation-to-Claim Map 覆盖情况。
+2. 检查该 section 的关键 claims 是否满足以下任一条件：
+   - 有 VERIFIED 引用支撑，并在 Citation-to-Claim Map 中映射到具体 claim；
+   - 有项目证据支撑，且无需外部文献；
+   - 明确保留 `[REF_NEEDED: ...]`，并说明后续补充方向。
+3. Section-dependent 判定：
+   - Introduction / Related Work：必须有足够 VERIFIED references 和 Citation-to-Claim Map；若为 0 或无法形成 work clusters / exemplar support，Gate B blocked。
+   - Method：关键方法来源、组件背景、数据集或标准模块至少应有 VERIFIED references；允许少量 `[REF_NEEDED]`，但必须进入 debt list。
+   - Experimental Setup / Results / Ablation：数据集、baseline、指标来源和比较对象必须有 VERIFIED references 或显式占位；结果数值本身以 Step 7 Evidence Inventory 为准。
+   - Discussion / Conclusion：不得引入无引用的新外部 claim；若需要新文献支撑，回退到 Step 6b。
+4. **Blocked 时的处理**：
+   - 在对话中输出当前 section 缺少哪些引用支撑，而不是报告全文引用总数。
+   - **回退到 Step 6b**，以新的关键词组合继续联网检索。
+   - 补充文献后重新执行 Step 6c→6d→6e。
+   - 最多回退 2 轮（共 3 轮检索）；仍不足时：
+     - Introduction / Related Work：保持 blocked，不得进入 Step 8。
+     - 其他 section：可带显式 `[REF_NEEDED]` debt 进入 Step 8/9，但 Draft 和 Verification 必须保留该 debt。
+5. 每轮回退后，在 cited-reference inventory 文件中记录回退原因和新增引用数。
 
-> ⚠️ **此门禁是 Hard Gate B**。在 full-paper-planning 模式下，Gate B 未通过前不得进入 Step 5（Section Plan）。section-drafting 模式下可放宽至该节所需的引用充足即可。
+> ⚠️ **此门禁是 Hard Gate B**。Gate B 只判断当前 section 是否具备可起草的引用基础；全文 `min_citations` 只在 Step 11 检查。
 
-## Step 4: Experiment Evidence Review
+## Step 7: Experiment Evidence Review
 
-- Create a todo list for experiment evidence items.
-- Delegate to `academic-experiments` via the dispatch template below (only when empirical paper and current section needs experiment facts).
+Create a todo list for experiment evidence items. Delegate to `academic-experiments` via the dispatch template below (only when empirical paper and current section needs experiment facts).
 
 **Dispatch template：**
 ```yaml
