@@ -771,7 +771,7 @@
         </div>
         <div class="metrics">
           <div class="metric"><b>8</b><span>specialized skills</span></div>
-          <div class="metric"><b>4</b><span>hard gates</span></div>
+          <div class="metric"><b>5</b><span>hard gates</span></div>
           <div class="metric"><b>35+</b><span>default citations</span></div>
         </div>
       </aside>
@@ -823,7 +823,7 @@
         <div class="section-head">
           <div>
             <p class="section-kicker">Skill System</p>
-            <h2>Core 编排器 + 6 个专项 Subskills</h2>
+            <h2>Core 编排器 + 6 个编排子技能 + 1 个独立 LaTeX Skill</h2>
           </div>
           <p class="section-desc">主 Agent 保持论文叙事风格一致，子 skill 只提供文献、实验、审修、润色和图表等工具型输出</p>
         </div>
@@ -958,7 +958,7 @@
             <div class="step">
               <div>
                 <h3>① 加载编排器</h3>
-                <p>加载核心 <code>SKILL.md</code>，自动注册 6 个 built-in sub-agent 及其能力边界</p>
+                <p>加载核心 <code>SKILL.md</code>，按需调度 6 个编排子技能；LaTeX 布局作为独立 skill 直接调用</p>
               </div>
             </div>
             <br>
@@ -1028,7 +1028,7 @@ task("终审验证", academic-reviser)
             <ul class="list no">
               <li>非 CS / AI / ML 领域论文</li>
               <li>只想要一个一次性生成全文的通用 prompt</li>
-              <li>纯排版或 LaTeX 调整任务</li>
+              <li>只想让核心编排器处理纯排版任务；LaTeX 布局应直接调用 academic-latex-layout</li>
               <li>要求无视证据边界，把不确定内容写成已验证结论</li>
             </ul>
           </article>

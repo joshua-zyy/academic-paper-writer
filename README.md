@@ -133,7 +133,7 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 | ✨ **academic-polishing** | 文体打磨 | Prose Quality Gate、Claim Strength Audit、去 AI 化 | `润色`、`claim strength` |
 | 📊 **academic-figure** | 数据图生成 | 实验数据图（Python 代码）、图表审查与修改；架构图只记录手工绘制需求 | `绘图`、`训练曲线`、`消融实验` |
 | 🏛️ **academic-venue-research** | 期刊调研 | 调研目标 venue 投稿要求与写作风格，产出标准化 Venue Brief | `期刊调研`、`venue research`、`投稿要求` |
-| 📐 **academic-latex-layout** | 独立 Skill | 学术论文 LaTeX 布局、图表浮动体放置、模板适配与布局修复（独立调用） | `LaTeX 布局`、`float placement`、`layout repair` |
+| 📐 **academic-latex-layout** | latex排版 | 学术论文 LaTeX 布局、图表浮动体放置、模板适配与布局修复（独立调用） | `LaTeX 布局`、`float placement`、`layout repair` |
 
 ---
 
@@ -197,9 +197,6 @@ Academic Paper Writer 是面向 `CS / AI / ML` 论文写作场景的 **模块化
 ```bash
 # 克隆到用户级目录（推荐）
 git clone https://github.com/joshua-zyy/academic-paper-writer.git ~/.agents/skills/academic-paper-writer
-
-# 或克隆到项目级目录
-git clone https://github.com/joshua-zyy/academic-paper-writer.git .codex/skills/academic-paper-writer
 ```
 
 #### 选项 B：稳定版（stable 分支）
@@ -207,9 +204,6 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git .codex/skills/
 ```bash
 # 克隆 stable 分支到用户级目录
 git clone -b stable https://github.com/joshua-zyy/academic-paper-writer.git ~/.agents/skills/academic-paper-writer
-
-# 或克隆到项目级目录
-git clone -b stable https://github.com/joshua-zyy/academic-paper-writer.git .codex/skills/academic-paper-writer
 ```
 
 #### 选项 C：指定版本（tag）
@@ -286,8 +280,8 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 | 模型                       | 说明                                                                                       |
 |--------------------------|------------------------------------------------------------------------------------------|
 | 🚀 **gpt-5.5**           | anyRouter中提供免费的api，需要使用vpn+教育邮箱/linux do账号注册，地址: https://anyrouter.top/register?aff=hZXa |
-| 🚀 **claude-4.8**        | anyRouter中提供免费的api，需要使用vpn+教育邮箱/linux do账号注册，地址: https://anyrouter.top/register?aff=hZXa                           |
-| 🚀 **DeepSeek V4 Flash** | 没其他原因，主要是token价格低，且是推理模型支持1m上下文，可以用于测试skill效果                                            |
+| 🚀 **claude-4.8**        | agentRouter中提供免费的api，需要使用github账号注册，地址: https://agentrouter.org/register?aff=Wpuc                           |
+| 🚀 **DeepSeek V4 Flash** | token价格低，且是推理模型支持1m上下文，可以用于测试skill效果，缺点是无多模态能力                                            |
 
 ### 推荐 Agent 平台
 
@@ -381,20 +375,20 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 │    ↓                                                                    │
 │   🔬 Step 5  并行证据审计（⚡涉及多 probe 时必须并行 dispatch）            │
 │    ↓                                                                    │
+│   📚 Step 6  文献检索与核验（本地优先 + 联网 + 全文阅读 + Gate B）        │
+│    ↓                                                                    │
+│   🔬 Step 7  实验事实复核                                                │
+│    ↓                                                                    │
+│   🧩 Step 8  Section Plan / Section Contract / Blueprint                 │
+│    ↓                                                                    │
 │   ┌──────────────────────────────────────────────────────────────────┐   │
-│   │              调研阶段                                              │   │
-│   │  📚 Step 3  文献检索与核验（四步流程）                              │   │
-│   │     ├─ 3a  本地文献库优先搜索（MD/PDF 直读）                        │   │
-│   │     ├─ 3b  联网检索 + 全文获取 + subagent 阅读                     │   │
-│   │     └─ 3c  聚合 + Citation-to-Claim Map + 3d 引用清单文件          │   │
-│   │  🔬 Step 4  实验事实复核                                           │   │
+│   │              Step 9  Section Complete Loop                         │   │
+│   │  🧭 Step 9.0  Section Contract Gate                                │   │
+│   │  🔎 Step 9.1  前置深度探查（多 probe 时必须并行 dispatch）           │   │
+│   │  ✏️ Step 9.2  Draft v1（占位符系统 + 待补充清单）                    │   │
+│   │  📝 Step 9.3  写入 paper_draft.md                                  │   │
+│   │  📌 Step 9.4  占位符审计 + 数据图代码 / 手工图表需求                  │   │
 │   └──────────────────────────────────────────────────────────────────┘   │
-│    ↓                                                                    │
-│   🧩 Step 5  Section Blueprint / Method Blueprint                        │
-│    ↓                                                                    │
-│   ✏️ Step 6  Draft v1（前置深度探查检查 + 占位符系统 + 待补充清单）       │
-│    ↓                                                                    │
-│   📌 Step 6.4  占位符审计 + 数据图代码 / 手工图表需求                      │
 │    ↓                                                                    │
 │   ┌──────────────────────────────────────────────────────────────────┐   │
 │   │              质量门（双阶段审查）                                    │   │
@@ -405,7 +399,9 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 │    ↓                                                                    │
 │   ✅ Step 9.8  Self-Review & Verification                                │
 │    │                                                                    │
-│   ├── passed  →  🔄 Step 10  依赖感知 Section Loop（推进下一节）         │
+│   ├── passed  →  Step 9.9  更新 Cumulative Draft → 推进下一节           │
+│   │              ↓                                                       │
+│   │          🔄 Step 10  依赖感知 Section Loop                           │
 │   └── failed  →  ⬆️ 回到 Step 9.5 证据合规审查 重来                      │
 │                                                                          │
 │   📌 Abstract 后置 — 所有核心章节全部 passed 后才允许生成                  │
@@ -485,7 +481,7 @@ git clone https://github.com/joshua-zyy/academic-paper-writer.git
 
 - 🚫 非 CS/AI/ML 领域论文
 - ⚡ 只想要一次性成稿的通用 prompt
-- 🎨 纯排版 / LaTeX 调整任务
+- 📐 只需要 LaTeX 排版 / 浮动体修复时，不应走核心论文编排器；请直接调用 `academic-latex-layout`
 - ⚠️ 要求无视证据边界强行写成已验证结论
 
 </td>
@@ -515,14 +511,12 @@ academic-paper-writer/
 ├── .claude-plugin/                     # Claude Code 插件配置
 │   ├── plugin.json                     # 插件清单
 │   └── marketplace.json                # 市场定义
-├── .codex/                             # Codex CLI 插件配置
-│   └── skills/                         # Codex skills 目录
 ├── scripts/                            # 项目级工具脚本
 │   └── check_schemas.py                # 跨技能 schema 一致性检查
 └── skills/
     ├── shared/
     │   ├── schemas/                    # 跨技能数据契约（5 个 schema）
-    │   └── references/                 # 共享概念与边界规则
+    │   └── core/                       # 共享证据、非编造与输出边界规则
     ├── academic-paper-writer/          # 📌 核心编排器
     │   ├── SKILL.md
     │   ├── agents/                     # probe agent 定义
@@ -544,6 +538,9 @@ academic-paper-writer/
     │   ├── agents/                     # figure_agent
     │   ├── scripts/                    # chart_template.py + qa_figure.py
     │   └── references/                 # 设计理论、图表类型、QA、教程
+    ├── academic-venue-research/        # 🏛️ 期刊调研
+    │   ├── agents/                     # venue-research-agent
+    │   └── references/                 # 投稿要求、风格分析、venue brief 模板
     └── academic-latex-layout/          # 📐 LaTeX 布局
         ├── SKILL.md
         ├── manifest.yaml
