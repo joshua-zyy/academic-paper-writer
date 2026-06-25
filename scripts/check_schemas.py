@@ -228,16 +228,12 @@ def check_skill_frontmatter(skills_root: Path) -> list:
 
 def check_package_noise(skills_root: Path) -> list:
     repo_root = _repo_root_from_skills(skills_root)
-    roots = [skills_root, repo_root / ".codex" / "skills"]
     noisy = []
-    for root in roots:
-        if not root.exists():
-            continue
-        noisy.extend(p.resolve() for p in root.rglob("*.pyc"))
-        noisy.extend(p.resolve() for p in root.rglob("__pycache__") if p.is_dir())
+    noisy.extend(p.resolve() for p in skills_root.rglob("*.pyc"))
+    noisy.extend(p.resolve() for p in skills_root.rglob("__pycache__") if p.is_dir())
     if noisy:
         return [("FAIL", "Package noise found: " + ", ".join(str(p.relative_to(repo_root)) for p in noisy))]
-    return [("PASS", "No .pyc or __pycache__ files under skills/ or .codex/skills/")]
+    return [("PASS", "No .pyc or __pycache__ files under skills/")]
 
 
 def check_python_only_figure_policy(skills_root: Path) -> list:
@@ -259,42 +255,6 @@ def check_python_only_figure_policy(skills_root: Path) -> list:
     if hits:
         return [("FAIL", "academic-figure contains non-Python backend language: " + ", ".join(hits))]
     return [("PASS", "academic-figure contains no non-Python backend language")]
-
-
-def check_codex_mirror_drift(skills_root: Path) -> list:
-    repo_root = _repo_root_from_skills(skills_root)
-    codex_root = repo_root / ".codex" / "skills"
-    if not codex_root.exists():
-        return [("WARN", ".codex/skills directory not found")]
-    drift = []
-    missing = []
-    extra = []
-    for source in sorted(skills_root.rglob("*")):
-        if not source.is_file():
-            continue
-        rel = source.relative_to(skills_root)
-        mirror = codex_root / rel
-        if not mirror.exists():
-            missing.append(str(rel))
-        elif source.read_text(encoding="utf-8").replace("\r\n", "\n") != mirror.read_text(encoding="utf-8").replace("\r\n", "\n"):
-            drift.append(str(rel))
-    for mirror in sorted(codex_root.rglob("*")):
-        if not mirror.is_file():
-            continue
-        rel = mirror.relative_to(codex_root)
-        source = skills_root / rel
-        if not source.exists():
-            extra.append(str(rel))
-    issues = []
-    if missing:
-        issues.append(("FAIL", ".codex/skills missing files: " + ", ".join(missing)))
-    if extra:
-        issues.append(("FAIL", ".codex/skills has extra files not in skills/: " + ", ".join(extra)))
-    if drift:
-        issues.append(("FAIL", ".codex/skills content drift: " + ", ".join(drift)))
-    if not issues:
-        issues.append(("PASS", ".codex/skills mirrors matching files under skills/"))
-    return issues
 
 
 def check_min_citations_usage(skills_root: Path) -> list:
@@ -593,12 +553,6 @@ def main():
 
     print("\n18. Python-only figure policy:")
     issues = check_python_only_figure_policy(root)
-    all_issues.extend(issues)
-    for level, msg in issues:
-        print(f"  [{level}] {msg}")
-
-    print("\n19. .codex mirror drift:")
-    issues = check_codex_mirror_drift(root)
     all_issues.extend(issues)
     for level, msg in issues:
         print(f"  [{level}] {msg}")
