@@ -4,3 +4,5 @@
 tests/
 docs/
 .agents/
+.opencode/
+.pytest_cache/
