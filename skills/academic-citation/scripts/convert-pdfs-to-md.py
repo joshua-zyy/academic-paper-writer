@@ -2,9 +2,8 @@
 """PDF literature library to Markdown converter.
 
 This skill entrypoint defaults to the MinerU precise parsing API. It delegates
-to the project-level implementation at scripts/convert_pdfs_to_md_mineru_api.py
-so the academic-citation skill keeps the historical command name while using
-one maintained converter.
+to the bundled implementation in this skill package so the historical command
+name remains stable for users of the open-source skill.
 
 Usage:
   python .agents/skills/academic-paper-writer/skills/academic-citation/scripts/convert-pdfs-to-md.py researchPaper/refs researchPaper/refs_md --type ref
@@ -21,6 +20,28 @@ import sys
 from pathlib import Path
 
 
+def normalize_exit_code(code: object) -> int:
+    if code is None:
+        return 0
+    if isinstance(code, int):
+        return code
+    print(code)
+    return 1
+
+
+def run_script(script_path: Path, argv: list[str]) -> int:
+    old_argv = sys.argv
+    sys.argv = [str(script_path), *argv]
+    try:
+        try:
+            runpy.run_path(str(script_path), run_name="__main__")
+        except SystemExit as exc:
+            return normalize_exit_code(exc.code)
+        return 0
+    finally:
+        sys.argv = old_argv
+
+
 def find_project_root(start: Path) -> Path:
     for candidate in [start, *start.parents]:
         if (candidate / "scripts" / "convert_pdfs_to_md_mineru_api.py").is_file():
@@ -30,8 +51,13 @@ def find_project_root(start: Path) -> Path:
     )
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
     script_path = Path(__file__).resolve()
+    bundled_script = script_path.with_name("convert_pdfs_to_md_mineru_api.py")
+    if bundled_script.is_file():
+        return run_script(bundled_script, argv)
+
     try:
         project_root = find_project_root(script_path.parent)
     except FileNotFoundError as exc:
@@ -39,9 +65,7 @@ def main() -> int:
         return 2
 
     mineru_script = project_root / "scripts" / "convert_pdfs_to_md_mineru_api.py"
-    sys.argv = [str(mineru_script), *sys.argv[1:]]
-    runpy.run_path(str(mineru_script), run_name="__main__")
-    return 0
+    return run_script(mineru_script, argv)
 
 
 if __name__ == "__main__":
