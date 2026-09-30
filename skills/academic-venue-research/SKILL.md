@@ -5,7 +5,7 @@ description: "Research target venue requirements and writing style for CS/AI/ML 
 
 # Academic Venue Research
 
-将此 skill 视为"期刊调研代理"，负责调研目标期刊/会议的投稿要求和写作风格。
+将此 skill 视为"期刊调研代理"，负责调研目标期刊/会议的投稿要求和写作风格。全文启动中按需使用，不是所有章节/段落修改的前置；venue 未定允许主笔先写通用稿。复用已确认信息，只问影响当前调研范围的歧义。
 
 ## Router Protocol
 
@@ -29,7 +29,7 @@ description: "Research target venue requirements and writing style for CS/AI/ML 
 
 ## Agent Dispatch
 
-`agents/venue-research-agent.md` is dispatched by the orchestrator at Step 4. The agent returns Venue Brief Markdown content; it must not write files directly during orchestrated use. File writes are owned by the orchestrator.
+`agents/venue-research-agent.md` is dispatched when known venue requirements or style affect the current content. The agent returns Venue Brief Markdown content; it must not write files directly during orchestrated use. File writes are owned by the orchestrator.
 
 ## Independent Use
 

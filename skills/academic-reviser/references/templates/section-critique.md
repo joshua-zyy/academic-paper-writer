@@ -1,44 +1,19 @@
-# Section Critique 模板
-
-Section Critique 的输出应与 `academic-reviser` 的输出格式保持一致。详见 `academic-reviser/SKILL.md` Step 6 的完整示例。
-
-## 结构
+# 验收呈现模板
 
 ```markdown
-## Section Critique
+## 验收范围
+- 当前版本/位置：
+- 可检查来源：
+- 未检查项目及原因：
 
-- Issues fixed:
-  - [列出本轮解决的问题]
+## 问题
+| ID | 位置 | 类别 | 问题与依据 | 修复完成条件 | 处理 |
+|---|---|---|---|---|---|
+| I001 | Results 第2段 | consistency | 正文与表1数值不一致 | 与确认的源结果表一致 | fix |
 
-- Claims weakened or clarified:
-  - [列出被降级或澄清的主张]
-
-- Evidence still missing:
-  - [列出仍缺失的证据]
-
-- Risks to carry into next section:
-  - [列出需要带到下一节的风险]
-
-- Missing figure/table/formula placements:
-  - [列出缺失的图/表/公式位置]
-
-- Missing or inconsistent inline citations:
-  - [列出引用问题]
-
-## Verification Status
-
-- Verdict: passed / failed / blocked
-- section_contract_debt: open / closed
-- prose_debt: open / closed
-- thin_draft: yes / no
-- Checks performed:
-  - [ ] 事实与证据检查
-  - [ ] 论证强度与审稿风险检查
-  - [ ] Section Contract 检查
-  - [ ] 结构与风格检查
-  - [ ] 代码与方法一致性检查
-  - [ ] 引用闭合检查
-- Remaining issues:
-  - [未闭合问题清单]
-- Can move to next section: yes / no
+## 状态
+- verdict: passed / needs_revision / needs_author_input
+- next_action: revise / advance / ask_author
 ```
+
+结构化交换用共享 verification-report 契约。模板不要求输出 Revised Draft、审稿分或每种空栏目。

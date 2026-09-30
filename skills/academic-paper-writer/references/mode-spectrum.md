@@ -10,23 +10,23 @@
 |-------|------|---------|---------|------|
 | academic-paper-writer | `full-paper-planning` | 平衡 | 中 | 有固定 section queue，但内容起草是创造性的 |
 | academic-paper-writer | `section-drafting` | 平衡 | 中 | section 结构固定，但写作可适应论证 |
-| academic-paper-writer | `section-revision` | 忠实度 | 重 | 修订有固定模板（Critique + Revised Draft） |
+| academic-paper-writer | `section-revision` | 忠实度 | 重 | 主笔依据具体问题修订；验收只回传问题与完成条件 |
 | academic-paper-writer | `related-work-or-citation-pass` | 忠实度 | 重 | Citation-to-Claim 映射格式固定 |
 | academic-paper-writer | `experiment-evidence-pass` | 忠实度 | 重 | Evidence Inventory 输出格式固定 |
 | academic-citation | `full-citation-pass` | 忠实度 | 重 | 检索→核验→映射流程固定 |
 | academic-citation | `targeted-citation-search` | 平衡 | 中 | 范围更灵活 |
 | academic-citation | `exemplar-set-only` | 平衡 | 中 | 仅构建 Exemplar Set 供学习 |
 | academic-citation | `citation-verification` | 忠实度 | 重 | 核验流程完全固定 |
-| academic-experiments | `experiment-evidence-pass` | 忠实度 | 重 | 盘点→运行→记录流程固定 |
+| academic-experiments | `experiment-evidence-pass` | 忠实度 | 重 | 默认只读盘点；执行须限定授权 |
 | academic-experiments | `evidence-inventory-only` | 平衡 | 中 | 仅盘点，无运行约束 |
 | academic-experiments | `minimal-reproducible-run` | 忠实度 | 重 | 最小可复核流程固定 |
 | academic-figure | `chart-from-data` | 平衡 | 中 | 代码生成有模板但适应数据 |
 | academic-figure | `figure-revision` | 忠实度 | 重 | 按 QA Contract 逐项检查 |
 | academic-figure | `figure-audit` | 忠实度 | 重 | 审查清单固定 |
 | academic-polishing | `prose-quality-gate` | 忠实度 | 重 | 质量检查清单固定 |
-| academic-polishing | `claim-strength-audit` | 忠实度 | 重 | 强度映射规则固定 |
+| academic-polishing | `claim-strength-audit` | 忠实度 | 重 | 按主张类型与证据范围核对，不机械降调 |
 | academic-polishing | `method-prose-rewrite` | 平衡 | 中 | Method 叙事可灵活调整 |
-| academic-reviser | `full-section-review` | 忠实度 | 重 | 三轮检查流程固定 |
+| academic-reviser | `full-section-review` | 忠实度 | 重 | 按 scope 验收，修复后定向复核 |
 | academic-reviser | `cross-section-review` | 平衡 | 中 | 跨节检查需要判断力 |
 | academic-reviser | `verification-only` | 忠实度 | 重 | 判定规则固定 |
 | academic-reviser | `targeted-review` | 平衡 | 中 | 范围灵活 |

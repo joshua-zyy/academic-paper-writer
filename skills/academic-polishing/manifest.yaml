@@ -1,7 +1,5 @@
 name: academic-polishing
-description: >
-  Declarative routing manifest for academic prose polishing modes.
-
+description: Scope-aware prose, narrative and claim editing.
 always_load:
   - static/core/stance.md
   - static/core/red-lines.md
@@ -9,30 +7,27 @@ always_load:
   - static/core/anti-patterns.md
   - ../shared/core/evidence-policy.md
   - ../shared/core/non-invention-rules.md
-
+  - ../shared/core/output-boundaries.md
 axes:
   mode:
     detect: |
-      Choose the smallest mode that satisfies the request. General polish maps
-      to prose-quality-gate. AI-style removal maps to de-ai-pass. Claim strength
-      or overclaiming maps to claim-strength-audit. Method narrative repair maps
-      to method-prose-rewrite.
+      Use the smallest requested scope; local rewriting is allowed.
+      No venue or whole-paper evidence intake is required.
     values:
       prose-quality-gate: references/de-ai-patterns.md
       method-prose-rewrite: references/method-narrative.md
       de-ai-pass: references/de-ai-patterns.md
       claim-strength-audit: references/claim-strength.md
     multi: false
-
 references:
   on_demand:
-    - condition: AI-style pattern removal or generic prose quality gate
+    - condition: generic prose quality or empty language
       path: references/de-ai-patterns.md
-    - condition: overclaiming, claim-strength downgrade, or trigger-word audit
+    - condition: claim type and scope
       path: references/claim-strength.md
-    - condition: Method section narrative repair
+    - condition: method narrative
       path: references/method-narrative.md
-    - condition: section-level move diagnosis
+    - condition: section-level organization
       path: references/section-moves.md
-    - condition: phrase-level support is explicitly requested
+    - condition: explicit phrase-level support
       path: references/phrasebank-playbook.md

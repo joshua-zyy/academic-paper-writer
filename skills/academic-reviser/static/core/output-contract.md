@@ -1,37 +1,9 @@
-# 修订器输出契约（Reviser Output Contract）
+# 验收输出
 
-## Verification Status
+遵循 `../shared/schemas/verification-report.md`：scope、target、draft_version、verdict、checks_run、issues、checked_sources、unchecked_items、next_action。
 
-输出遵循 `skills/shared/schemas/verification-report.md`。
+每个 issue 具有稳定 ID、类别、fix/author_input/suggestion、位置、具体问题、依据、修复完成条件及影响章节。
 
-**Debt types**（8 个，字段名必须保留）：
-- `prose_debt`, `section_contract_debt`, `citation_debt`, `evidence_debt`, `figure_debt`, `protocol_debt`, `result_debt`, `rationale_debt`
+输出不包含修订正文或自评分。独立单段检查可以用简短表格呈现同样的信息，不强制全文报告；若作者要求改写，将写作任务转交主 agent 的 polishing/writer，而不是本验收 subagent 写。
 
-## 交付物
-
-### full-section-review / targeted-review
-
-- Section Critique
-- Revised Draft（必须真正吸收修复点）
-- Verification Status（`passed`/`failed`/`blocked`）
-
-### cross-section-review
-
-- 跨章节一致性报告
-- 标记出的冲突项
-
-### verification-only
-
-- 仅输出 Verification Status，不重新审稿
-
-### targeted-evidence-mode
-
-- `evidence_debt: open|closed`
-- `evidence_issues` list
-- 不修改 prose
-
-### mock-reviewer-package
-
-- 3 份 reviewer-style reports + cross-review synthesis
-- 可选输出，不能替代 Verification Status
-- 不得编造 reviewer identities 或未提供的 evidence
+验收状态只有 passed / needs_revision / needs_author_input。验收覆盖范围明确，不意味着投稿就绪。细则以共享契约为唯一判定来源，不重复另定义 debt 门控。

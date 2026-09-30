@@ -1,27 +1,9 @@
-# Polishing Output Contract
+# 润色输出
 
-## Deliverable Format
+默认：改写后的请求文本；必要时说明事实未变、关键逻辑调整与需作者补充项。只要求正文时只返回正文；重大主张变更先确认。
 
-```markdown
-## Prose Quality Gate Result
-- prose_debt: open|closed
-- section_contract_debt: open|closed
-- failed_items:
-- method_prose_debt: open|closed (if applicable)
+编排内化：主笔保存改写，记录影响的主张/证据/引用及待复核项，不输出旧 debt 字段或独立 Revised Draft 交给其他作者。
 
-## Rewritten Text
-[revised prose or safe local repair]
+claim audit：原句、具体范围/证据问题、建议修改与理由。不是触发词统计或强弱评分；没有问题的直接陈述不用弱化。
 
-## Claim Strength Changes
-- Original: ...
-- Revised: ...
-- Reason: ...
-```
-
-## Completion Criteria
-
-- **prose-quality-gate / de-ai-pass**: Max 2 rewrite rounds. After 2 rounds, deliver with prose_debt status.
-- **method-prose-rewrite**: 问题 → 设计 → 机制 → 收益/边界 narrative established.
-- **claim-strength-audit**: All zero-tolerance trigger words checked. All mismatched claims downgraded.
-
-If structural or evidence_debt prevents safe polishing, return the diagnosis and the smallest safe text repair instead of rewriting the whole section.
+文本可重排、压缩、补已有事实之间的连接，不新增实验或引文。相同问题两轮无实质进展报告分歧，不制造无限润色任务。

@@ -1,51 +1,14 @@
-# Orchestrator Stance
+# 主编排原则
 
-`academic-paper-writer` is the evidence-first orchestrator for CS/AI/ML paper drafting.
+1. 从作者现有材料和想法出发，不把研究完备作为启动条件。一次启动持续推进，产出当前材料能够支持的内容稿或框架与补充建议。
+2. 主 agent 是唯一作者、修订者和合并者。探查返回证据，验收返回问题，数据图任务按明确路径产出，不派发章节写作者。
+3. 信息已给出就复用，只集中问必要决定。默认 auto，可选 step-by-step。正文主张与主线在起草前集中确认；重大变化、高成本补证和授权变化问作者。
+4. 启动建议 MinerU PDF→MD 建库，告知 API 上传边界；可读材料直接用，不因单文件不可读暂停无关工作。
+5. 初次并行探查方法、实验与文献，去重合并后跨节复用；按具体缺口追加探查，不每节固定重搜。
+6. 已知 venue 遵循官方内容要求，未知 venue 先写通用稿。样例论文习惯和引用数量只是建议。
+7. 写作表达直接、具体，数字与事实有来源。作者意图不等于实验观察，文献身份不等于支持关系。局限在 Discussion 适度集中，不每段防御。
+8. 章节级检查加全文验收，不模拟审稿人，不评判录用、创新性或实验设计优劣。协议检查描述闭合与材料一致。
+9. 材料缺失进入具体补充建议，已有正文仍推进；可通过修订解决的问题必须修复。同一问题两轮无实质进展交作者，不无限循环或假通过。
+10. 保护源代码、配置、原始数据与既有实验产物。执行与文件所有权遵循共享边界。正式稿仅一份文末 References，不附各节引用说明。
 
-## Non-Negotiable Rules
-
-1. **证据优先**：先找证据，再写定论。区分三类证据（see `../shared/core/evidence-policy.md`）：`newly_run`、`preexisting_artifact`、`user_claim`。只把前两类当作可直接引用的证据。
-2. **分节推进**：按 section unit 逐段推进，默认自动推进（auto 模式），完成当前 section 的 Verification 后自动开始下一节。用户可要求 step-by-step 模式逐节确认。
-3. **上下文确认**：任务进入论文起草或正式章节写作时，必须先询问目标期刊/会议、本轮写作语言、本地风格文献库和本地参考文献库，不得直接开写。若用户提供的是 PDF 文献库路径，必须先提示用户用 MinerU 转换为 MD，并等待用户回传转换后的 MD 目录后再继续。
-4. **venue 优先**：目标 venue 已知时，章节结构优先遵循官方作者指南或模板，不套用通用结构。venue 要求必须通过 Step 4 实际调研并生成 Venue Brief；如果用户提供了本地目标期刊风格 PDF 库，Step 4 必须等该库转换为 `local_style_md_dir` 后再执行。仅记录 venue 名称但不调研其要求等同于未确认 venue。
-5. **占位符保留**：缺失模型架构图、实验流程图、表格、方法细节或数据集细节时，必须在正文对应位置留下显式占位标记，不得静默略过。
-6. **方法深度**：Method 不得只写概述。对核心或非显然设计选择，必须交代：解决什么瓶颈、为什么采用这种设计、预期收益、代价/局限性/适用边界。
-7. **Introduction/Related Work**：不得按通用模板直接开写。必须先调研同领域 exemplar papers，抽取常见叙述单元、比较框架与引用密度。
-8. **审查备注分离**：审查备注、Critique/Audit Notes 不得混入论文正文。论文正文写入 `paper_draft.md`，审查备注在 agent 上下文中维护或按需在对话中输出。
-9. **Abstract/Conclusion 后置**：必须等到主要证据稳定后再写，不得在结果未稳时抢先写成完整定稿。
-10. **引用闭合**：需要文献支撑的段落必须有 inline citation 或 `[REF_NEEDED: ...]`。参考文献列表只能包含正文中被引用或已声明的条目。
-11. **Section Complete Loop**：每节必须完成 Step 9 的完整闭环（Phase 1 起草 → Phase 2 审查润色 → Phase 3 整合）。**Draft v1 ≠ 初稿完成**，只有完成 Step 9.8（综合验证）的section才算初稿完成。
-12. **失败不伪装**：Verification 未通过且非外部阻塞时，必须继续下一轮修订，不得直接结束或假装通过。
-13. **完整流程执行**：执行 full-paper-planning 时，必须按 Step 0→1→2(若用户提供本地 PDF 文献库，则提示 MinerU 转换并等待 MD 目录确认)→3→4(Venue Requirements Research)→5→6(6a→6b→6c→6d)→7→8→9(9.0→9.9)→10→11→12 的顺序逐一执行，不得跳步。用户催促时也不得跳过 Step 2（PDF→MD 转换确认）、Step 4（Venue Requirements Research）、证据审计（Step 5）、文献检索（Step 6）、实验复核（Step 7）、Hard Gates（A/B/C）中的任何一个。
-14. **引用产物必输出**：Step 6 完成后，必须在上下文中维护 Verified References 列表和 Citation-to-Claim Map。缺少任一 → 不得进入 Step 9。
-15. **引用数量下限**：整篇完整论文的总引用数（含本地文献库和外部文献，去重后）不得少于 `min_citations`。Step 1 可询问用户预期引用数量（可选），用户未指定时由 Step 4 venue 调研后根据 venue-brief.md 中的引用密度自动推断（详见 `workflow-step-0-7.md` Step 4.3b 节）。论文完成后 Step 11 生成引用清单时自动核验。
-16. **两阶段写作**：Step 8 Blueprint 可使用 bullet points 和提纲式结构，但 Step 9 Draft v1 必须是完整 prose 段落。bullet points 仅用于规划阶段，不得出现在最终论文正文中。
-17. **最大迭代次数**：修订循环（Step 9.7→9.8→10）最多执行 3 轮。3 轮后仍有未闭合 debt 时，标记为 `unresolvable`，输出修订报告并终止循环，不得继续重试。
-18. **Section Contract 先于 prose**：每节在 Step 8 必须根据 `references/section-writing-contracts.md` 建立 Section Contract（reader state、required moves、evidence hooks、failure checks）。Step 9 Draft v1 不得跳过该 contract 直接写正文；润色只能在 contract debt 基本闭合后执行。
-19. **数字引用格式（默认）**：正文中所有 inline citation 默认使用数字格式 `[1]`, `[2]`, `[1,3,5]`, `[2-4]`。当 `venue-brief.md` 中 `Citation Format` 明确指定为 author-year 格式时，遵循 venue 要求，使用作者-年份格式。参考文献列表的编号/格式与正文引用一一对应。**全稿仅维护一份文末 References 列表**，各节不得单独列出该节引用列表；正文中仅使用 inline citation marker。
-20. **标准化任务计划强制使用**：任务开始后，必须使用当前运行环境可用的任务计划工具创建并维护标准化任务列表（Codex 使用 `update_plan`；Claude Code 可使用 `TodoWrite`；模板见 `references/standard-todo-template.md`），不得自行规划、不得跳过子步骤。每完成一个 Step 或子步骤，更新对应状态。
-
-## Sub-Skill Boundary
-
-Sub-skills perform specialized retrieval, audit, polishing, review, and figure generation. The orchestrator integrates their outputs into the paper draft and owns final writes under `./academic-paper-writer/paper-drafts/`. Follow `../shared/core/output-boundaries.md` for file-write ownership.
-
-**主 Agent 只写文本**：主 Agent 只撰写论文文本，不得修改项目源代码、配置文件或数据文件。图表代码生成创建新文件而非覆盖。
-
-## Shared Rules
-
-Follow `../shared/core/evidence-policy.md` for evidence types, `../shared/core/non-invention-rules.md` for anti-fabrication rules, and `../shared/core/output-boundaries.md` for file-write ownership.
-
-## Scope
-
-本 Skill 不适用于：
-- 非 CS/AI/ML 领域的论文
-- 已有完整 LaTeX 稿仅需排版调整
-- 用户明确要求单次生成整篇论文且拒绝分节推进（仍不能跳过证据检查）
-
-## Failure Handling
-
-- **文献搜不到**：如实报告，不补假引文
-- **代码跑不通**：报告阻塞点和环境需求，不伪造结果
-- **运行成本过高**：退回 preexisting_artifact 盘点或最小复核
-- **证据不足**：降级为带占位符的草稿，说明不能下哪些结论
-- **用户要求一次成稿**：仍先给 Outline/Section Queue，再分节推进
+按需阅读章节指南，它们是帮助形成论证的参考，不是段落、基线、实验或篇幅配额。输出等级与验收状态分开。

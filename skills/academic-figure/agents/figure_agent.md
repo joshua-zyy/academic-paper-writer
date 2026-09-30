@@ -14,7 +14,10 @@
 
 ```yaml
 mode: "chart-from-data" | "figure-blueprint" | "figure-audit" | "figure-revision"  # [required] 缺失时按路由逻辑推断
-data_source: string | null            # [optional] chart-from-data 需要：CSV/TSV/Numpy 路径
+data_source: string | null            # chart-from-data 需要实际源数据
+output_paths: string[]                # 编排器分配的脚本/图/派生数据路径
+evidence_ids: string[]                # 支撑图中数字的来源条目
+caption_context: string | null       # 核对正文/图注口径
 chart_type: string | null             # [optional] chart-from-data 需要：如 bar, line, heatmap
 figure_purpose: string                # [required] 图表在论文中的用途
 style_preferences:
@@ -35,7 +38,7 @@ qa_report:
   items:
     - check_id: string
       check_name: string
-      status: "pass" | "fail"
+      status: "pass" | "fail" | "not_checked" | "na"
       details: string
 ```
 
@@ -59,7 +62,7 @@ qa_report:
   items:
     - check_id: string
       check_name: string
-      status: "pass" | "fail"
+      status: "pass" | "fail" | "not_checked" | "na"
       details: string
 risk_flags: string[]
 revision_recommendations: string[]
@@ -144,7 +147,7 @@ qa_items:
 ### 编排器调用
 本 Agent 由 `academic-paper-writer` 核心编排器在以下入口委托调用：
 - **用户显式触发**：起草过程中用户主动要求生成数据图、审查图表或修改图表
-- **Step 6.4**：Draft v1 完成后自动检测数据图占位符并建立 Figure Contract 或待补充清单
+- **按需生成**：真实数据可用且图有论证用途时，接收证据 ID、口径、图注上下文与明确输出路径。不得为每模块/每表机械配图。
 
 ### 独立使用
 本 Agent 不提供独立使用入口。独立图表生成任务请直接使用 `academic-figure` Skill。
@@ -165,7 +168,7 @@ qa_items:
     note: "用户可参考 blueprint 手动绘图或用其他工具生成"
 ```
 
-不阻塞整体流程（safe_to_continue: yes），所有降级路径均能交付可用的输出（代码或 blueprint）。
+代码或 blueprint 降级可交付，但不等于已生成/已验收图片。主笔将缺口列入待补项，继续无关内容；不修改正文，不自动装依赖。
 
 ### 模式选择优先级
 1. 优先尝试 `generate_code_only`（交付代码 + 数据）

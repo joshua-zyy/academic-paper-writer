@@ -1,22 +1,7 @@
-# Citation Output Contract
+# 引用输出
 
-## full-citation-pass / targeted-citation-search / local-citation-pass
+身份条目使用共享 verified-references 契约；支持关系使用 citation-to-claim-map 契约；详细阅读按需附 literature-reading-report。
 
-- **Verified References**: 按 `skills/shared/schemas/verified-references.md` 格式输出，含 VERIFIED/UNVERIFIED 标记
-- **Exemplar Set**: Introduction 3-5 篇 + Related Work 4-8 篇，提炼叙事功能
-- **Citation-to-Claim Map**: 强制步骤，按 `skills/shared/schemas/citation-to-claim-map.md` 格式
+搜索任务返回采用候选与未确认候选、所支持主张、具体定位和剩余缺口；身份核验只返回字段与来源比对；内容核验明确支持/部分支持/矛盾/未检查。Exemplar 请求只返回组织观察与实际来源，不强制附全文引用清单。
 
-## citation-verification / citation-verification-with-reading
-
-- 核验报告：列出每篇候选文献的验证状态和失败原因
-- `literature-reading-report` 格式见 `skills/shared/schemas/literature-reading-report.md`
-
-## exemplar-set-only
-
-- Exemplar Set（不强制输出完整引用列表）
-
-## final-reference-section support
-
-- 每条 Verified Reference 必须保留可写入最终 `## References` 的完整条目字段。
-- 每条正文 inline citation marker 必须映射到一条 Verified Reference 或明确的 `[REF_NEEDED: ...]`。
-- 输出不得鼓励按章节拆分参考文献列表；最终由 `academic-paper-writer` 汇总为一份全稿 References。
+编排调用不返回正文，不写论文文件。独立调用可以返回所需条目/映射，用户明确需要时在指定路径输出；不强制整篇 intake。最终 References 由主笔统一编号，候选不能伪装已采用。

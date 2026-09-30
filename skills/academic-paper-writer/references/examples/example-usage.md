@@ -1,76 +1,17 @@
-# Example Usage — 端到端使用场景
+# 使用示例（不宣称真实运行结果）
 
-## 场景 1: full-paper-planning — 从研究概要启动完整论文
+## 全文启动
 
-**用户输入**：
-> 我有一个基于双分支 Transformer 的 EEG 情绪识别项目，代码在 `./eeg-emotion/`，想用这个仓库写一篇完整论文投到 IEEE T-AFFC。
+作者提供代码、主结果和研究想法，venue 尚未定。主笔集中确认语言/推进方式，建议 MinerU 本地建库。方法、实验与文献任务并行只读取证，主笔汇总主线请作者确认，再逐节写作、局部验收、修订和全文验收。没有消融材料时列建议，不暂停整篇。
 
-**执行流程摘要**：
-```
-Step 0: mode=full-paper-planning, scope=empirical CS/AI paper
-Step 1: 确认 venue=IEEE T-AFFC, 英文, min_citations=用户未指定(null)
-Step 2: 如有本地 PDF 文献库，提示用户用 MinerU 转换并等待 MD 目录；无 PDF 库则跳过
-Step 3: 提取项目上下文 → project_keywords / project_description
-Step 4: Venue Requirements Research → venue-brief.md (双栏, 12页, 匿名评审, IEEE模板, 平均引用30篇)
-Step 4.3b: 自动推断 min_citations=35 (30+5余量)
-Step 5: 并行 dispatch probe agents 探查代码/数据/配置
-Step 6: 并行 dispatch citation agent + literature reader → Verified References (12篇本地+8篇外部)
-Step 7: dispatch experiment agent → Evidence Inventory (3个newly_run结果, 2个preexisting_artifact)
-Step 8: Section Blueprint → 8节结构 + 每节要点
-Step 9.2: Draft v1 (Introduction) → 5段完整prose + 待补充清单
-Step 9.4: 记录整体方法图 manual_figure_needed；如有实验数据图则生成绘图代码
-Step 9.5: evidence compliance review → evidence_debt: closed
-Step 9.6: prose quality gate → prose_debt: closed
-Step 9.7: expansion pass → thin_draft: no
-Step 9.8: verification → Verdict: passed, Score: 8/10
-Step 9.9: 更新Cumulative Draft
-Step 10: 依赖检查并推进到 Related Work...
-```
+## 材料不足
 
-**对话输出**（auto 模式）：
-> ✅ Introduction 完成 | Verdict: passed | Score: 8/10 | 下一节: Related Work
+只有模型想法和部分 Method 笔记。主笔明确可写 Method 内容，建立 Introduction/Results/Discussion 框架，指出需要文献、实际协议和结果表及其用途，交付 structured_outline 或 partial_draft，不编数字。
 
----
+## 独立改段
 
-## 场景 2: section-drafting — 聚焦单节起草
+作者提供 Method 段落要求更自然。直接用 polishing 保持事实、重排衔接，不追问 venue/整篇库；需要新事实时标明缺口。验收 subagent 只报告问题，正文由当前主笔改。
 
-**用户输入**：
-> 帮我写 Method 节，代码在 `./model/`，重点讲清楚双分支架构和注意力机制。
+## 恢复与反馈
 
-**执行流程摘要**：
-```
-Step 0: mode=section-drafting, section=Method
-Step 5: probe agent 探查代码 → 识别核心模块 (TemporalBranch, SpatialBranch, FusionModule)
-Step 6: 文献检索 → 相关 attention 机制文献 (6篇VERIFIED)
-Step 8: Blueprint → 整体框架 → 模块拆解 → 训练目标
-Step 9.2: Draft v1 → 完整prose + [FIGURE_NEEDED: overall architecture] + 待补充清单
-Step 9.4: 记录分支架构图 manual_figure_needed，不自动绘制；生成数据图代码（如有）
-Step 9.5-9.8: 审查闭环 → Verdict: passed
-Step 9.9: 更新Cumulative Draft → 推进
-```
-
-**输出片段**（Draft v1 Method 开头）：
-> The proposed dual-branch Transformer architecture processes EEG signals through
-> parallel temporal and spatial pathways... [后续展开模块细节]
-
----
-
-## 场景 3: section-revision — 修订已有草稿
-
-**用户输入**：
-> 这是我的 Related Work 草稿，帮我审查修订：[粘贴草稿文本]
-
-**执行流程摘要**：
-```
-Step 0: mode=section-revision, section=Related Work
-Step 9.5: evidence compliance review → 发现3处裸claim无citation
-Step 9.6: prose quality gate → prose_debt: open (罗列式段落)
-Step 9.7: expansion pass → 补充work cluster综合比较
-Step 9.8: verification → Verdict: passed, Score: 7/10
-Step 9.9: 更新Revised Draft到Cumulative Draft
-```
-
-**输出**（Section Critique 摘要）：
-> - Issues fixed: 补充3处inline citation, 将罗列式段落重组为2个work clusters
-> - Claims weakened: "outperforms all existing methods" → "achieves competitive results"
-> - Evidence still missing: [REF_NEEDED: recent GNN-based EEG methods]
+作者要求继续同一稿。读取 task_state、blueprint、来源记录及实际正文；确认当前版本，继续 next_action。作者更新结果表，回查相关数字、Discussion、Conclusion、Abstract，不重做无变化的库转换和 intake。

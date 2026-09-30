@@ -23,6 +23,10 @@ LaTeX layout and float-placement router for academic papers. Optimize figure/tab
 | `layout-repair` | Existing `.tex` project has float pileups, text/figure drift, blank areas, or two-column layout problems |
 | `layout-audit` | User wants diagnosis only, without edits |
 
+## 调用范围
+
+只在作者明确请求排版时独立调用，不作为 academic-paper-writer 内容稿的默认阶段或完成条件。复用已有 venue/图表信息，局部布局修复不重做论文 intake。
+
 ## Boundaries
 
 Do not generate data figures; use `academic-figure`. Do not broadly polish prose; use `academic-polishing`. Do not decide which figures the paper should contain.

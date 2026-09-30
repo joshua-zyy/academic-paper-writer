@@ -1,34 +1,27 @@
-# 证据策略（Evidence Policy）
+# 证据策略（权威规则）
 
-本文件定义 academic skill suite 的跨 skill 证据语义。
+来源类型与核验状态是两个维度，不得互相代替。
 
-## 证据类型
-
-| Type | 含义 | 是否可支撑论文 claim |
+| type | 含义 | 使用边界 |
 |---|---|---|
-| `newly_run` | 当前工作会话中实际运行命令产生的证据 | yes |
-| `preexisting_artifact` | 已存在的本地产物，例如 logs、CSV files、checkpoints、tables 或此前已验证输出 | yes，但必须记录来源和限制 |
-| `user_claim` | 用户提供但 agent 未独立检查的陈述 | no |
+| `newly_run` | 本次经授权执行得到的结果 | 记录命令、配置、产物；运行成功不证明科学有效性 |
+| `preexisting_artifact` | 已有代码、日志、表格、论文等材料 | 记录路径及具体位置，不推断它必然是最终实验版本 |
+| `author_provided` | 作者提供的结果、方法说明、设计意图 | 可以据此忠实起草；记录来源及未独立核验状态，不宣称复现成功 |
+| `user_claim` | 想法、猜想或尚未明确性质的陈述 | 可组织研究问题、动机或框架，不能冒充观察结果 |
 
-## 规则
+核验状态：`verified`（已对照具体来源）、`unverified`（尚未核对）、`conflicting`（来源冲突）、`unavailable`（所需来源不可读）。`verified` 只表示完成指定核对，不表示实验有效、结论获科学认证或达到投稿条件。
 
-1. 只有记录了 source path、command 或 provenance 的 `newly_run` 与 `preexisting_artifact` 才能作为可用证据。
-2. `user_claim` 只能作为调查上下文，不是已验证证据。
-3. 对缺少支撑的 claim，应弱化、冻结或标记为 unsupported，不得让它听起来更确定。
-4. 缺少证据时保留 placeholder；只有真实证据替代后才能删除 placeholder。
+## 使用规则
 
-## 占位符系统（Placeholder System）
+1. 关键方法、数字、协议和解释性引文须有来源定位。作者提供的内容记录为作者材料；不要求重跑所有实验才能写作。
+2. 作者想法与已报告结果分开。代码可确认运算，不可独自证明作者动机、实际运行版本或性能。
+3. 对事实冲突核对实际配置与产物；无法判断时请作者确认。继续无关内容，不自行修改实验或宣判结果无效。
+4. 材料缺失时写好现有正文及剩余框架，记录建议补什么、用于哪节、支撑什么。不能补出虚构数字或引文，不能以框架代替完整稿却宣称完整。
+5. 不机械降低所有句子的语气。准确描述证据范围；必要局限集中在 Discussion，不在每段追加防御性声明。
+6. 文献身份核验与原文支持关系分别记录，详见引用契约。
 
-缺少证据时使用显式 placeholder，不得编造内容或删除缺口：
+## 缺口标记
 
-| Placeholder | 用途 |
-|---|---|
-| `[REF_NEEDED: claim/topic]` | 缺少文献支撑 |
-| `[FIGURE_NEEDED: purpose \| placement \| why]` | 缺少图表 |
-| `[TABLE_NEEDED: purpose \| columns \| why]` | 缺少表格 |
-| `[RESULT_NEEDED: experiment/metric/source]` | 缺少实验结果 |
-| `[RESULT_UNVERIFIED: claim \| why]` | 结果尚未验证 |
-| `[METHOD_DETAIL_NEEDED: description]` | 缺少方法细节 |
-| `[RATIONALE_NEEDED: module \| missing]` | 缺少设计动机 |
-| `[DATASET_DETAIL_NEEDED: description]` | 缺少数据集细节 |
-| `[ABSTRACT_NEEDED: reason]` | Abstract 延后撰写 |
+按需使用 `[REF_NEEDED: 主张]`、`[RESULT_NEEDED: 实验/指标]`、`[METHOD_DETAIL_NEEDED: 细节]`、`[DATASET_DETAIL_NEEDED: 细节]`、`[RATIONALE_NEEDED: 设计意图]`、`[FIGURE_NEEDED: 用途]`、`[TABLE_NEEDED: 列与来源]`、`[RESULT_UNVERIFIED: 冲突或待确认]`、`[ABSTRACT_NEEDED: 缺失核心内容]`。
+
+标记与文末待补清单同步，审查备注不得伪装为正文。不强制写满没有材料的章节；不因标记存在而阻塞所有章节。

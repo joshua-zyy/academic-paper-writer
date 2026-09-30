@@ -1,79 +1,33 @@
 ---
 name: academic-paper-writer
-description: "Use when writing or revising CS/AI/ML papers from research notes, code repositories, local literature libraries, target venue requirements, or section-level drafting requests. Triggers include 写论文, 初稿, paper draft, write introduction, write method, full paper outline, section-by-section drafting, 证据闭环, 论文起草, 从零写论文, 逐节写作."
+description: "基于作者现有材料和想法，一次启动持续产出 CS/AI/ML 论文内容初稿；材料不足时形成实质正文、章节框架与补充建议。也支持独立章节起草与局部改写。主 agent 唯一写作，subagent 并行探查与验收。用于写论文、初稿、paper draft、逐节写作、论文框架、章节起草或修改。"
 ---
 
-# Academic Paper Writer (Core Orchestrator)
+# Academic Paper Writer
 
-证据闭环型、分节推进的论文编排代理。协调六个子技能：Step 0→1→2→3→4→5→6→7→8→9→10→11→12。
+目标是可用内容稿，不是投稿包或录用保证。主 agent 负责所有正文与修订；subagent 只取证、验收或生成分配的数据图。
 
-## Router Protocol
+## 路由
 
-1. Read `manifest.yaml`. It declares `always_load` files, `axes`, and `references.on_demand`.
-2. Read every file listed under `always_load`. These are the skill's binding rules — not reference material.
-3. Apply the loaded material as constraints:
-   - `stance.md` defines core rules, sub-skill boundary, and scope.
-   - `red-lines.md` defines absolute prohibitions. Do not negotiate these.
-   - `output-contract.md` defines file outputs, deliverables, and completion criteria.
-   - `anti-patterns.md` defines known failure modes and their correct alternatives.
-   - `workflow.md` defines the Step 0-12 sequence summary.
-   - `../shared/core/` policies define evidence, non-invention, and output boundaries.
-4. Detect `mode`, `paper_type`, `section`, and `language` using manifest axes.
-5. Echo the detected mode to the user before executing.
-6. Reach for `references/` only when the manifest's `references.on_demand` condition is satisfied.
+1. 读取 `manifest.yaml` 及 `always_load`，遵循共享证据、禁止编造和输出边界。
+2. 判定 full-paper-planning、section-drafting、section-revision 或专项转交；已确认信息与已加载规则在后续复用。
+3. 简短告知范围。局部任务不启动整篇 intake，不强制 venue、全文证据包或完整文献库。
+4. 全文任务读 `references/orchestration-workflow.md`；准备、写作、验收分别按需读对应步骤文件。只加载当前工作需要的章节指南。
 
-## Modes
+## 全文路径
 
-| Mode | Purpose |
-|---|---|
-| `full-paper-planning` | From-scratch full paper (balanced spectrum) |
-| `section-drafting` | Single section, narrowed evidence scope (balanced) |
-| `section-revision` | Local evidence audit + rewrite (fidelity spectrum) |
-| `related-work-or-citation-pass` | Delegate to academic-citation (fidelity spectrum) |
-| `experiment-evidence-pass` | Delegate to academic-experiments (fidelity spectrum) |
+集中确认必要信息 → 首轮并行探查 → 主 agent 汇总主张与主线、作者确认 → 分节写作与验收 → 全文整合与验收 → 内容稿交付。
 
-## Sub-Skill Dispatch
+- 自动推进默认开启，保留逐节确认选择，可随时切换；不是每节都问“继续吗”。
+- 启动建议用 MinerU 将本地 PDF 转 Markdown 建库，区分参考库与风格库；不将转换和索引缺失设为全局阻塞。
+- venue 未定允许通用初稿。已知 venue 时按需调研，官方内容要求优先于风格观察。
+- 探查证据跨节复用，只因具体缺口或来源变更追加任务。独立任务能并行则并行，能力不足可串行并如实说明。
+- 材料够则写实质正文；不够则搭好框架、明确建议补什么，不硬凑、不断言未观察结果。
+- academic-polishing 内化执行；academic-reviser 仅验收，不返回改写稿。
+- min_citations 仅建议；正文引用身份与支持关系必须准确记录。
 
-| Task | Sub-Skill | Step |
-|---|---|---|
-| Venue research | academic-venue-research | Step 4 |
-| Evidence audit | Probe agent | Step 5 |
-| Citation search | academic-citation | Step 6 |
-| Experiment audit | academic-experiments | Step 7 |
-| Figure generation | academic-figure | Step 9.4 |
-| Prose polishing | academic-polishing | Step 9.6 (internal) |
-| Draft review | academic-reviser | Step 9.5 / 9.8 |
+## 交付与恢复
 
-## Push Modes
+输出规则见 `static/core/output-contract.md`；正文默认 `paper_draft.md`，来源记录 `evidence_inventory.yaml`，必要任务状态 `task_state.yaml`。恢复先读实际产物、已确认主线及待办，只重做受影响工作。
 
-| Mode | Behavior |
-|---|---|
-| `auto` (default) | Auto-advance after Verification; brief progress summary only |
-| `step-by-step` | Pause after each section for user confirmation |
-
-Switch anytime via user request.
-
-## Hard Gates (A-E)
-
-| Gate | Trigger | Condition | Failure |
-|---|---|---|---|
-| E: Venue | Step 1→5 | 若用户提供本地 PDF 文献库，Step 2 已验证 MD 目录；venue-brief.md exists | Blocked |
-| A: Evidence | Step 5→9 | >= 1 usable evidence | Degradation or blocked |
-| B: Section Citation Readiness | Step 6→9 | Current section has VERIFIED citations, Citation-to-Claim Map, or explicit `[REF_NEEDED]` debt for key claims | Section-dependent: Intro/RW blocked, Method/Results may proceed with tracked debt |
-| C: Verification | Step 9.8→10 | All hard debts closed + thin_draft=no | passed/failed/blocked |
-| D: Full-Paper Citation Count | Step 11→output | Total >= min_citations | Warn, allow retry |
-
-## 9.1 Pre-Draft Probe Rules
-
-| Section | Probes to Dispatch | Strategy |
-|---|---|---|
-| Introduction | `existing_material` + local lit deep search + external lit search | **Must parallel** (3 Tasks) |
-| Related Work | `existing_material` + local lit deep search + external lit search | **Must parallel** (3 Tasks) |
-| Method | `code_structure` (Module Cards + tensor shapes + forward) + `preprocessing` | **Must parallel** |
-| Experimental Setup | `experiment_setup` (hyperparams, dataset split, demographics) | Single probe |
-| Results / Ablation | `experiment_results` (main results, baselines, ablation) | Single probe |
-| Discussion | `interpretability` (interpretability results, network analysis) | Single probe |
-
-## Default Section Queue
-
-Abstract is post-posed, not in initial queue. Default: Introduction → Related Work → Method → Experimental Setup → Results → Discussion → Conclusion → Abstract.
+交付区分 usable_draft、partial_draft、structured_outline，不把交付完成称为全部验收通过。架构图由作者提供；LaTeX 排版仅在明确请求时使用独立技能，不进入默认完成条件。

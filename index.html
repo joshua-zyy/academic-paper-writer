@@ -739,10 +739,10 @@
   <header class="hero" id="top">
     <div class="shell hero-grid">
       <div>
-        <div class="eyebrow">Evidence-first · Section loop · Hard gates</div>
+        <div class="eyebrow">Evidence-first · Auto drafting · One author</div>
         <h1><span class="gradient-text">Academic Paper Writer</span></h1>
         <p class="subtitle">
-          面向 <strong>CS / AI / ML</strong> 论文写作场景的模块化 Agent Skill 集合它不是一次性生成全文的 prompt，而是一套按证据审计、文献核验、实验复核、逐节起草和验证推进的工程化写作系统
+          面向 <strong>CS / AI / ML</strong> 的八个 Agent Skills。一次启动，依据现有材料与想法自动推进，交付论文内容初稿；后续章节与段落可独立修改。缺材料处给具体框架和补充建议，不编造。
         </p>
         <div class="hero-actions">
           <a class="btn primary" href="#start">🚀 开始使用</a>
@@ -765,14 +765,14 @@
           </div>
           <pre><span class="key">mission</span>: <span class="val">free researchers from repetitive writing</span>
 <span class="key">domain</span>: <span class="val">CS / AI / ML papers</span>
-<span class="key">loop</span>: evidence → citation → experiment → draft → review
-<span class="key">policy</span>: <span class="ok">block or downgrade when evidence is missing</span>
-<span class="key">promise</span>: verifiable, modular, claim-aware writing</pre>
+<span class="key">loop</span>: probe → confirm storyline → draft → accept → deliver
+<span class="key">policy</span>: <span class="ok">write supported content; make gaps concrete</span>
+<span class="key">delivery</span>: content draft, not a submission package</pre>
         </div>
         <div class="metrics">
           <div class="metric"><b>8</b><span>specialized skills</span></div>
-          <div class="metric"><b>5</b><span>hard gates</span></div>
-          <div class="metric"><b>35+</b><span>default citations</span></div>
+          <div class="metric"><b>1</b><span>body-text author</span></div>
+          <div class="metric"><b>Auto</b><span>default progression</span></div>
         </div>
       </aside>
     </div>
@@ -813,7 +813,7 @@
         </div>
 
         <div class="statement">
-          <strong>核心思想: </strong>把论文写作拆成多个可独立验证的环节，通过证据审计 → 文献检索 → 实验复核 → 起草 → 质量门 → 验证的闭环逐节推进证据不足时，系统会阻塞、降级或保留占位符，而不是强行写成已验证结论
+          <strong>核心思想：</strong>首轮并行取证，跨章节复用；主 Agent 唯一起草和修订，subagent 只取证或验收。材料决定交付深度，缺口不阻塞无关内容，不把框架稿伪装成完整投稿稿。
         </div>
       </div>
     </section>
@@ -825,14 +825,14 @@
             <p class="section-kicker">Skill System</p>
             <h2>Core 编排器 + 6 个编排子技能 + 1 个独立 LaTeX Skill</h2>
           </div>
-          <p class="section-desc">主 Agent 保持论文叙事风格一致，子 skill 只提供文献、实验、审修、润色和图表等工具型输出</p>
+          <p class="section-desc">主 Agent 统一叙事与正文写入，探查返回事实与定位，验收返回问题与修复条件；润色规则由主笔内化，各技能也可独立调用。</p>
         </div>
 
         <div class="skills-grid">
           <article class="card skill-card">
             <div>
               <div class="skill-title"><span>🧠</span><h3>academic-paper-writer</h3></div>
-              <p>核心编排器，负责完整论文起草、section loop、Hard Gates 和子 skill 调度</p>
+              <p>整体内容稿编排，默认自动推进，支持逐节确认、局部修改与同任务恢复</p>
             </div>
             <div class="tag-row"><span class="tag">写论文</span><span class="tag">paper draft</span><span class="tag">orchestrator</span></div>
           </article>
@@ -848,7 +848,7 @@
           <article class="card skill-card">
             <div>
               <div class="skill-title"><span>🔬</span><h3>academic-experiments</h3></div>
-              <p>盘点实验日志、checkpoint 和结果表，并用最小可复核方式确认实验事实</p>
+              <p>默认只读盘点协议、日志和结果表；重算须限定授权，新实验另行审批</p>
             </div>
             <div class="tag-row"><span class="tag">复核实验</span><span class="tag">verify results</span><span class="tag">risk audit</span></div>
           </article>
@@ -856,7 +856,7 @@
           <article class="card skill-card">
             <div>
               <div class="skill-title"><span>✅</span><h3>academic-reviser</h3></div>
-              <p>以审稿人视角执行证据审查、三轮自审和 Verification 判定</p>
+              <p>一个产物验收角色：表达、逻辑、数据、协议交代、引用与图文一致性；不模拟审稿人、不改正文</p>
             </div>
             <div class="tag-row"><span class="tag">审修</span><span class="tag">self review</span><span class="tag">verification</span></div>
           </article>
@@ -864,7 +864,7 @@
           <article class="card skill-card">
             <div>
               <div class="skill-title"><span>✨</span><h3>academic-polishing</h3></div>
-              <p>执行 Prose Quality Gate、Claim Strength Audit 和论文语气打磨</p>
+              <p>按论证与主张范围打磨章节或段落，直接表达有依据的事实，不机械降调</p>
             </div>
             <div class="tag-row"><span class="tag">润色</span><span class="tag">claim strength</span><span class="tag">prose gate</span></div>
           </article>
@@ -901,28 +901,28 @@
         <div class="section-head">
           <div>
             <p class="section-kicker">Workflow</p>
-            <h2>逐节闭环，失败就回退</h2>
+            <h2>自动起草，按问题验收与修复</h2>
           </div>
-          <p class="section-desc">每一节都必须经过占位符审计、证据合规审查、文体质量门、内容密度检查与最终验证</p>
+          <p class="section-desc">写作前确认主张与主线，章节验收后整合全文验收；只补具体缺口，不每节重做全面调查。</p>
         </div>
 
         <div class="workflow-wrap">
-          <div class="flow" aria-label="逐节闭环流程">
-            <div class="flow-step"><b>✏️ Draft v1</b><span>允许占位符</span></div>
-            <div class="flow-step"><b>📌 Placeholder Audit</b><span>记录和追踪 debt</span></div>
-            <div class="flow-step"><b>⚖️ Evidence Check</b><span>claim 与证据匹配</span></div>
-            <div class="flow-step"><b>✨ Prose Gate</b><span>可读性与学术语气</span></div>
-            <div class="flow-step"><b>📏 Expansion</b><span>内容密度检查</span></div>
-            <div class="flow-step"><b>✅ Self Review</b><span>三轮自审</span></div>
-            <div class="flow-step"><b>🔒 Verification</b><span>通过才推进</span></div>
+          <div class="flow" aria-label="内容稿编排流程">
+            <div class="flow-step"><b>📂 盘点</b><span>集中确认必要缺项</span></div>
+            <div class="flow-step"><b>🔍 并行取证</b><span>事实、定位与缺口</span></div>
+            <div class="flow-step"><b>🧭 主线确认</b><span>作者确认核心主张</span></div>
+            <div class="flow-step"><b>✏️ 主笔起草</b><span>有据正文与具体框架</span></div>
+            <div class="flow-step"><b>✅ 章节验收</b><span>定向修复与复核</span></div>
+            <div class="flow-step"><b>📖 全文验收</b><span>跨节一致性</span></div>
+            <div class="flow-step"><b>📦 交付</b><span>真实等级与补充建议</span></div>
           </div>
 
           <div class="gate-row">
-            <div class="gate"><b>Gate E · Venue 调研</b><p>venue 确认后必须完成调研，生成 venue-brief.md，否则阻塞</p></div>
-            <div class="gate"><b>Gate A · 证据完备</b><p>至少存在一条可引用证据，否则降级或阻塞</p></div>
-            <div class="gate"><b>Gate B · 引用就绪</b><p>Introduction / Related Work 零 VERIFIED 引用时必须阻塞</p></div>
-            <div class="gate"><b>Gate C · Verification</b><p>所有 debt 闭合且内容达标后，才能进入下一节</p></div>
-            <div class="gate"><b>Gate D · 引用数量</b><p>全文默认要求去重引用不少于 35 篇</p></div>
+            <div class="gate"><b>Venue · 可未定</b><p>先写通用内容稿，按需查询要求，不擅自选择 venue</p></div>
+            <div class="gate"><b>材料 · 决定深度</b><p>实质稿、局部框架或整体框架，如实区分，不强凑完整稿</p></div>
+            <div class="gate"><b>MinerU · 推荐建库</b><p>PDF 转 Markdown 可复用；缺索引不全局阻塞，敏感上传须确认</p></div>
+            <div class="gate"><b>验收 · 有停止条件</b><p>问题有依据和修复条件；两轮无进展交作者决定，无关内容继续</p></div>
+            <div class="gate"><b>引用 · 准确优先</b><p>身份与支持关系分开核对，min_citations 仅建议，不凑数量</p></div>
           </div>
         </div>
       </div>
@@ -933,16 +933,16 @@
         <div>
           <p class="section-kicker">Dispatch Model</p>
           <h2>编排器派发 sub-agent，各司其职</h2>
-          <p class="section-desc" style="max-width: 620px; margin-top: 18px;">核心编排器不直接处理所有任务——写作前通过并行 probe-agent 探查项目，调研阶段顺序派发期刊调研、引用核验和实验复核，章节循环中按需派发数据图生成、手工图表需求记录和终审验证；润色则由编排器内化调用规则自行完成，确保文体风格一致</p>
+          <p class="section-desc" style="max-width: 620px; margin-top: 18px;">首轮按方法、协议/结果、文献并行取证，已有证据跨节复用。主笔写作并吸收一个验收角色的问题；修复后定向复核，重大缺口与高成本补证交作者决定。无 subagent 工具时明确降级执行。</p>
         </div>
         <div class="dispatch" aria-label="编排派发模型">
           <pre><span class="dp-orch">主编排器</span><span class="dp-tb"> ──┬── </span><span class="dp-ag">期刊调研</span><span class="dp-tb"> ──── </span><span class="ta">投稿要求与写作风格调研</span>
-<span class="dp-tb">          ├── </span><span class="dp-ag">引用核验</span><span class="dp-tb"> ──── </span><span class="ta">文献检索与 VERIFIED 判定</span>
+<span class="dp-tb">          ├── </span><span class="dp-ag">引用核验</span><span class="dp-tb"> ──── </span><span class="ta">身份核验与原文支持分别记录</span>
 <span class="dp-tb">          ├── </span><span class="dp-ag">实验复核</span><span class="dp-tb"> ──── </span><span class="ta">实验日志与结果表核验</span>
 <span class="dp-tb">          ├── </span><span class="dp-na">润色</span><span class="dp-tb"> ──────── </span><span class="ta">Prose Gate · Claim 强度审计</span><span class="dp-tb">  </span><span class="dp-note">(内化执行)</span>
 <span class="dp-tb">          ├── </span><span class="dp-ag">数据图生成</span><span class="dp-tb"> ──── </span><span class="ta">数据可视化与手工图表需求</span>
-<span class="dp-tb">          └── </span><span class="dp-ag">终审验证</span><span class="dp-tb"> ──── </span><span class="ta">审稿人视角 · 三轮自审</span>
-<span class="dp-tb">          </span><span class="dp-note">并行探查 → 顺序调研 → 章节循环 · 统一 Gate 管控</span></pre>
+<span class="dp-tb">          └── </span><span class="dp-ag">终审验证</span><span class="dp-tb"> ──── </span><span class="ta">章节与全文验收 · 问题及完成条件</span>
+<span class="dp-tb">          </span><span class="dp-note">并行取证 → 主笔起草 → 定向验收 · 单一写入所有权</span></pre>
         </div>
       </div>
     </section>
@@ -965,42 +965,33 @@
             <div class="step">
               <div>
                 <h3>② 按阶段派发</h3>
-                <p>并行探查（probe-agent）→ 并行文献阅读（reader-agent）→ 顺序调研（venue research、citation、experiments）→ 章节循环（figure、reviser）</p>
+                <p>按现有材料并行探查，推荐 MinerU 建库；主线确认后自动起草，必要缺口才增量补查。</p>
               </div>
             </div>
             <br>
             <div class="step">
               <div>
                 <h3>③ 汇总验证</h3>
-                <p>编排器收集各 agent 输出，执行 Hard Gates 验证，通过后推进到下一节</p>
+                <p>主笔修复具体问题并核对全文，交付内容稿与待补项。默认不排版、不编译 PDF、不生成投稿包。</p>
               </div>
             </div>
           </div>
         </div>
         <div class="codebox" aria-label="快速开始代码">
-          <pre># 将以下命令复制到你的 agent 中执行
-
+          <pre># 获取项目，在宿主中加载对应 SKILL.md
 git clone https://github.com/joshua-zyy/academic-paper-writer.git
-load skills/academic-paper-writer/SKILL.md
 
-# 编排器按阶段派发 sub-agent
-# 并行探查（写作前，同时 dispatch 3 个 probe-agent）
-task("code_structure",  probe-agent)
-task("data_artifacts",  probe-agent)
-task("config",          probe-agent)
+# 给 agent 的请求示例：
+材料在 ./research：方法笔记、CSV 结果、本地文献。
+语言英文，venue 暂未定；先确认主张与主线，
+之后自动推进并交付可用内容初稿。
+缺材料处给具体框架与补充建议；不运行新实验。
 
-# 并行文献阅读（同时 dispatch N 个 reader-agent）
-task("lit_read", literature-reader-agent)
+# 后续局部修改无需整篇重启：
+使用 academic-polishing 改写这一段 Method，
+保留给定事实，不添加动机或结果。
 
-# 调研阶段（顺序执行）
-task("期刊调研", academic-venue-research)
-task("引用核验", academic-citation)
-task("实验复核", academic-experiments)
-
-# 章节循环（每节重复，顺序执行）
-task("数据图生成", academic-figure)
-task("终审验证", academic-reviser)
-# 润色由编排器内化执行</pre>
+# 想逐节确认时，可中途切换为 step-by-step。</pre>
         </div>
       </div>
     </section>
@@ -1018,7 +1009,7 @@ task("终审验证", academic-reviser)
             <h3>✅ 适合</h3>
             <ul class="list">
               <li>已有代码仓库、实验日志、结果表、草稿或研究笔记</li>
-              <li>需要逐节推进完整论文，而不是一次性成稿</li>
+              <li>希望一次启动自动交付内容稿，也可选择逐节确认</li>
               <li>希望明确区分“能写的”和“暂时不能下结论的”</li>
               <li>需要对文献、实验和 claim 强度做显式控制</li>
             </ul>
@@ -1027,7 +1018,7 @@ task("终审验证", academic-reviser)
             <h3>❌ 不适合</h3>
             <ul class="list no">
               <li>非 CS / AI / ML 领域论文</li>
-              <li>只想要一个一次性生成全文的通用 prompt</li>
+              <li>期望无材料也能生成真实完整实验论文</li>
               <li>只想让核心编排器处理纯排版任务；LaTeX 布局应直接调用 academic-latex-layout</li>
               <li>要求无视证据边界，把不确定内容写成已验证结论</li>
             </ul>
@@ -1067,7 +1058,7 @@ task("终审验证", academic-reviser)
         </div>
         <div class="grid-4">
           <article class="card"><div class="icon">🚫</div><h3>不编造</h3><p>禁止编造文献、作者、年份、DOI、实验结果、图表、命令或日志</p></article>
-          <article class="card"><div class="icon">⚠️</div><h3>不混淆</h3><p>不把 UNVERIFIED 文献写成 VERIFIED，也不把 user claim 写成可引用证据</p></article>
+          <article class="card"><div class="icon">⚠️</div><h3>不混淆</h3><p>作者事实、意图与猜想分开；文献身份核验不等于原文支持已确认</p></article>
           <article class="card"><div class="icon">📛</div><h3>不夸大</h3><p>不把内部验证包装成 SOTA、generalization 或 strong evidence</p></article>
           <article class="card"><div class="icon">📌</div><h3>不静默</h3><p>缺失信息必须显式保留 REF_NEEDED、RESULT_NEEDED 等占位符</p></article>
         </div>
@@ -1089,8 +1080,8 @@ task("终审验证", academic-reviser)
           <a class="card" href="https://github.com/Yuan1z0825/nature-skills" target="_blank" rel="noreferrer">
             <strong>🌿 nature-skills</strong>
           </a>
-          <a class="card" href="https://github.com/Imbad0202/academic-research-skills" target="_blank" rel="noreferrer">
-            <strong>🎓 academic-research-skills</strong>
+          <a class="card" href="https://github.com/WUBING2023/PaperSpine" target="_blank" rel="noreferrer">
+            <strong>📖 PaperSpine</strong>
           </a>
         </div>
       </div>

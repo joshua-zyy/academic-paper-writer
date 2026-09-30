@@ -31,7 +31,13 @@ CS/AI/ML academic-figure router. 实验数据图默认交付 Python/matplotlib �
 
 ## Agent Dispatch
 
-`agents/figure_agent.md` is dispatched by the orchestrator at Step 6.4. The agent returns figure artifacts, scripts, SVG paths, and reports; it must not independently edit project source code or experimental data.
+`agents/figure_agent.md` is dispatched when available data and the argument call for a figure, with assigned output paths and evidence IDs. The agent returns figure artifacts, scripts, SVG paths, and reports; it must not independently edit project source code or experimental data.
+
+## 调用范围
+
+局部绘图/修改只确认源数据、用途与必要样式，不要求全文准备或 venue。缺数据时给 blueprint 与具体补充项，不编数字、不阻塞其他写作。架构图由作者提供；本技能可核对图注与方法材料，不能自动绘制。
+
+图、图注、正文的数字、单位、比较对象和误差含义需一致。运行脚本不等于视觉 QA；不可读或无法渲染时报告未检查，不宣称图已验收。只在分配路径创建代码/图/派生绘图数据，不修改实验数据或正文。
 
 ## Completion Criteria
 

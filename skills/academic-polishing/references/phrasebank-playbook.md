@@ -4,11 +4,11 @@
 
 源自 Academic Phrasebank，针对 CS/AI/ML 论文写作惯例进行了补充适配。
 
-## 证据强度动词
+## 表达按主张类型选择
 
-根据 `claim-strength.md` 定义的证据等级选择匹配的动词。
+参照 `claim-strength.md` 核对实际主张的比较对象、条件与范围，不按全项目证据等级机械选词。以下是可选表达，不是许可词或禁词表；不能从动词推定因果、泛化或 SOTA 已证明。
 
-### Strong（仅当 Strong 条件全部满足时使用）
+### 直接报告观察和已报告比较
 
 - `show`
 - `demonstrate`
@@ -20,7 +20,7 @@
 - `achieves state-of-the-art on`
 - `surpasses`
 
-### Moderate（内部验证 / baseline 不全时使用）
+### 解释与关系（根据具体支持判断）
 
 - `suggest`
 - `indicate`
@@ -32,7 +32,7 @@
 - `compares favorably against`
 - `yields competitive results`
 
-### Speculative（仅 user_claim / 无法复核时使用）
+### 明确假设或未确认解释
 
 - `may reflect`
 - `could arise from`
@@ -45,14 +45,14 @@
 
 ### CS 论文特有高频动词用法场景
 
-| 场景 | 强度 | 推荐动词 |
-|------|------|---------|
-| 报告主表结果（full baseline 对比） | Strong | `outperform`, `consistently improves`, `surpasses` |
-| Ablation study 验证模块有效性 | Moderate→Strong | `confirm`, `validate`, `demonstrate the contribution of` |
-| 报告参数敏感性分析 | Moderate | `suggest`, `indicate`, `reveal a trade-off between` |
-| 报告定性/可视化结果 | Speculative→Moderate | `suggest`, `appear to`, `are qualitatively consistent with` |
-| 声称 generalization | Strong（需多数据集验证） | `generalize to`, `transfer effectively to` |
-| 报告负结果/failure case | Speculative | `may stem from`, `could be attributed to` |
+| 主张 | 表达与必要限定 |
+|------|---------------|
+| 主表结果 | 直接报告数值及实际比较对象，不将内部结果一律改为 suggests |
+| 消融 | 说明具体去除/替换及观察变化，不自动推出机制因果 |
+| 参数敏感性 | 直接描述实际趋势，解释与观察分开 |
+| 可视化 | 描述图中观察，不把图样当机制证实 |
+| 泛化 | 明确真实测试分布与目标范围，不以多数据集数量自动判可泛化 |
+| 负结果 | 直接报告结果，原因不明时才用假设表达 |
 
 ## 证据强度搭配
 
@@ -119,7 +119,7 @@
 - 分词总结：`Taken together, ...`
 - 零连接词推进（当逻辑已经足够明显时）
 
-限制以指示代词开头的句子。每段通常一个就够了。
+检查指示代词的指代是否清楚，不设每段次数限额。
 
 ## CS 论文特有过渡与衔接场景
 
@@ -187,7 +187,7 @@ CS/AI/ML 特有比较场景：
 
 ## Limitation 语言
 
-有用模式：
+通常在 Discussion 适度集中说明；正文只有避免误解所需的条件，不每节重复防御。有用模式：
 
 - `These findings should be interpreted with caution because ...`
 - `A limitation of this study is that ...`
@@ -203,7 +203,9 @@ CS/AI/ML 特有 limitation 表达：
 - `We only evaluate on ... ; the performance on other datasets remains unknown.`
 - `The design of ... introduces a trade-off between ... and ...`
 - `Our analysis is limited to ... ; we leave extensions to ... for future work.`
-- `The current implementation requires ... , which may hinder deployment in ... limitation 应与不确定性的实际来源配对，而非模糊的谦虚。`
+- `The current implementation requires ... , which may hinder deployment in ...`
+
+limitation 应与不确定性的实际来源配对，而非模糊的谦虚。
 
 ## Implication 语言
 

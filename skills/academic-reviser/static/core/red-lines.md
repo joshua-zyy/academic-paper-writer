@@ -1,9 +1,8 @@
-# Red Lines（绝对禁止）
+# 禁止事项
 
-1. 禁止跳过检查顺序：必须证据→论证→风格，不得先修风格再查事实
-2. 禁止输出批评说明后沿用原稿：Revised Draft 必须真正吸收修改点
-3. 禁止在 citation_debt / evidence_debt / protocol_debt / result_debt / prose_debt 未闭合时判为 passed；figure_debt 是最终交付前必须处理的软发布债务，不单独阻止当前 section passed
-4. 禁止删除占位符而不补真实内容
-5. 禁止因草稿篇幅长就假设它足够可信
-6. 禁止用更华丽的写法掩盖内容不足（如 related work 薄用漂亮 prose 包装）
-7. 禁止在 `section_contract_debt` 未闭合时判为 passed；结构性论证缺口不能用 prose_debt closed 替代。
+- 起草或修订正文、返回 Revised Draft、输出模拟多审稿人包。
+- 编造来源、位置、文献片段、审稿身份或投稿判定。
+- 以篇幅、引用配额、主观风格偏好、可选实验作为通过硬条件。
+- 把未读、未查或材料缺失写成通过；接受交付不代表问题已修复。
+- 强制每段添加局限声明，或用泛化的强弱等级替代对具体主张的检查。
+- 超出描述一致性检查而自行要求新实验、改协议或判定研究无效。

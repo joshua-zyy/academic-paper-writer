@@ -1,52 +1,11 @@
-# 迭代控制指南
+# 修订与停止
 
-## 节级迭代闭环
+按共享验收契约区分 fix、author_input、suggestion；缺材料不是必须改写到通过的问题。
 
-当前 section 的最小闭环：
+主笔修复 fix，验收者 recheck 相关问题与影响范围。每个 issue 保持稳定 ID，记录修复和是否产生实质进展。
 
-```
-Draft v1 → Placeholder Audit → Evidence Compliance Review → Prose Quality Gate → Expansion Pass → Self-Review → Revised Draft v2 → Verification
-```
+同一问题连续两轮无实质进展：报告具体分歧和尝试，交作者选择继续、接收含缺口版本或暂缓相关部分。不得无限循环或换 ID 重置计数；不新增 escalated/unresolvable verdict。
 
-## 退出条件
+重大补证需显著时间/成本时提前让作者决定，不先花预算再汇报。作者接收不意味着问题通过；如实记录未解决项和交付等级。
 
-只有在以下情况之一成立时，才允许退出当前 section：
-
-- **Verification 判定为 `passed`**：所有 debt（citation/protocol/result/rationale/prose）均已闭合，thin_draft 为 no
-- **Verification 判定为 `blocked` 且 `safe_to_continue = yes`**：阻塞问题来自外部证据缺失，已冻结相关 claims，继续其他 section 不会放大幻觉风险
-- **用户明确要求暂停**
-
-## 不退出条件
-
-以下情况保持当前 section 为活跃项，继续下一轮修订：
-
-- **Verification 判定为 `failed` 且失败原因不是外部阻塞**：问题可通过继续改写解决，必须继续下一轮 Self-Review → Revision → Verification
-- **Verification 判定为 `blocked` 且 `safe_to_continue = no`**：后续 section 会依赖未闭合 claim，必须等待外部证据
-
-## 修订轮次
-
-- 简单草稿：至少 1 轮审查
-- 完整论文草稿：优先做 2 轮以上，其中至少含 1 轮扩写和 1 轮批判性修订
-- 证据链复杂、实验风险高或目标 venue 较严：直到主要问题被显式处理后再停
-
-## 轮次上限
-
-- 单节内部 Draft→Verification 闭环最多执行 **3 轮**
-- 3 轮后仍未通过 Verification → 冻结所有未闭合 claims，标记 `verdict: escalated`，报告用户决策
-- 用户可选择：继续修订 / 接受当前版本（含已知缺口） / 跳过本节
-- Prose Quality Gate 子循环上限为 **2 轮**，详见 Step 9.6 规则
-
-## 跨章节整合（依赖感知）
-
-参见 `references/section-dependency-matrix.md` 中的矩阵定义。
-
-每完成一个 section 后，按矩阵执行依赖检查（编排器 Step 10b）：
-- 当前 section 的 `depended_by` 列表中有哪些已完成 section
-- 这些 section 是否因 `shared_claims` 变更而需要回修
-- 若需回修，将对应 section 标记 `pending` 并询问使用者
-
-此外，每完成 2-3 个 section，做一次轻量 integration pass：
-- 术语是否一致
-- 符号是否统一
-- 贡献点口径是否前后一致
-- 结论口气是否与当前累积证据匹配
+自动模式继续独立章节；逐节模式在当前节处理结果后暂停。共享主张、数字或方法变化才触发相关已写章节回查，不为纯措辞变动重跑全文。

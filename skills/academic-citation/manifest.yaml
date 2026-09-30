@@ -1,24 +1,17 @@
 name: academic-citation
-description: >
-  Declarative workflow manifest for citation search, verification, local
-  literature reading, exemplar construction, and citation-to-claim mapping.
-
+description: Citation identity, source reading and claim-support mapping.
 always_load:
   - static/core/stance.md
   - static/core/red-lines.md
   - static/core/output-contract.md
   - static/core/anti-patterns.md
   - ../shared/core/non-invention-rules.md
-
+  - ../shared/core/output-boundaries.md
 axes:
   workflow:
     detect: |
-      Use explicit user mode first. Section or claim reference search maps to
-      targeted-citation-search unless a full paper or complete section pass is
-      requested. Existing citation lists map to citation-verification. Local MD
-      literature paths map to local-citation-pass. Full-text validation of used
-      citations maps to citation-verification-with-reading. Requests for writing
-      exemplars map to exemplar-set-only.
+      Use explicit scope. Local paths do not force PDF conversion.
+      Metadata checks do not require full-text reading.
     values:
       full-citation-pass: references/workflow-citation-pass.md
       targeted-citation-search: references/search-strategy.md
@@ -27,18 +20,21 @@ axes:
       local-citation-pass: references/workflow-citation-pass.md
       citation-verification-with-reading: references/verification-protocol.md
     multi: false
-
 references:
   on_demand:
-    - condition: search query design
+    - condition: query design
       path: references/search-strategy.md
-    - condition: candidate metadata or claim support verification
+    - condition: metadata or claim-support verification
       path: references/verification-protocol.md
-    - condition: citation-to-claim map construction
+    - condition: citation mapping
       path: references/citation-mapping.md
-    - condition: verified references schema
+    - condition: identity records
       path: ../shared/schemas/verified-references.md
-    - condition: literature reading schema
+    - condition: reading reports
       path: ../shared/schemas/literature-reading-report.md
-    - condition: literature reader agent dispatch
+    - condition: reading delegation
       path: agents/literature-reader-agent.md
+    - condition: claim-support records
+      path: ../shared/schemas/citation-to-claim-map.md
+    - condition: full or local workflow
+      path: references/workflow-citation-pass.md

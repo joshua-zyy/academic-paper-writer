@@ -1,31 +1,7 @@
-# Experiment Output Contract
+# 实验取证输出
 
-## experiment-evidence-pass
+使用共享 evidence-inventory 契约：事实条目、来源定位、条件、冲突、缺项、建议材料与写作用途。数值包括单位、粒度、聚合、比较条件；不知道就标明。
 
-```
-## Experiment Evidence
-（逐条记录：Status, Evidence Type, Command, Workdir, Environment, Inputs, Key Config, Output Artifacts, Metrics Used In Draft, Protocol Risks, Claim Readiness）
+inventory-only 不执行研究代码；evidence-pass 定向核对已有材料；authorized-run 增加实际命令、工作目录、环境、输入/配置、授权依据、输出路径与真实失败记录。
 
-## Protocol Risks
-（数据泄漏 / 验证集调参 / baseline 缺失 / 无独立测试集 / 单次运行 / 指标定义模糊 / 图表溯源不明）
-
-## Results / Setup Draft
-（可用实验事实写成的草稿段落，缺证据处用占位符）
-
-## Remaining Blockers
-（无法运行的实验、缺失的数据/环境/依赖）
-```
-
-## evidence-inventory-only
-
-- 实验产物清单（不执行任何命令）
-
-## minimal-reproducible-run
-
-- 运行记录 + Evidence Inventory 条目
-
-## Claim Readiness
-
-每个结果标注：`paper_ready` / `weaken_claim` / `blocked` / `author_input_needed`
-
-Schema: `skills/shared/schemas/evidence-inventory.md`
+不输出论文正文、Method/Results 草稿或研究质量 verdict。缺少数据只影响相关内容，作者可以继续框架稿。

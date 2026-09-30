@@ -1,7 +1,12 @@
 # IDE
 .vscode/
 .idea/
-tests/
+# Private manuscripts remain local; publish synthetic regression tests only.
+tests/*
+!tests/public/
+!tests/public/**
+__pycache__/
+*.pyc
 docs/
 .agents/
 .opencode/

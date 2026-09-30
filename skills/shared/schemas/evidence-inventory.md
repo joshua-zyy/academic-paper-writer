@@ -1,50 +1,29 @@
-# Evidence Inventory Schema — 跨技能数据契约
+# 证据记录契约（source of truth）
 
-**本文件为权威版本（source of truth）。**
-
-**用途**: 实验技能到论文编排器之间的实验证据数据交换格式。
-**生产者**: `academic-experiments`, `academic-paper-writer` (Step 2)
-**消费者**: `academic-paper-writer` (Step 6), `academic-reviser` (Step 9.5/9.8)
-
-## 结构
+探查者返回、主 agent 维护，验收者可回查。来源与核验含义遵循 `../core/evidence-policy.md`。
 
 ```yaml
 evidence_inventory:
-  section: string              # 所属章节
-  paper_type: string           # empirical / theory / survey / reproducibility / position
-  items:
-    - evidence_id: string      # 如 E001
-      type: enum               # newly_run / preexisting_artifact / user_claim
-      source_path: string      # 来源路径（文件、代码位置、或人）
-      claim_summary: string    # 该证据支撑的核心主张（一句话）
-      verification_status: enum # verified / unverified / blocked
-      verified_at: string|null # 验证时间或版本号
-      used_in_draft: boolean   # 是否已写入当前草稿
-      risks: string[]          # 潜在风险列表
-  known_facts: string[]        # 已知事实
-  missing_blocking: string[]   # 缺失但阻塞当前 section 的事实
-  missing_placeholder: string[] # 缺失但可占位的事实
-  needs_external_validation: string[] # 需要外部核验的主张
-```
-
-## 示例
-
-```yaml
-evidence_inventory:
-  section: method
-  paper_type: empirical
   items:
     - evidence_id: E001
-      type: newly_run
-      source_path: "experiments/run_logs/exp001.log"
-      claim_summary: "Proposed module achieves 92.3% accuracy on CIFAR-10"
-      verification_status: verified
-      verified_at: "2026-05-10"
-      used_in_draft: true
-      risks: []
-  known_facts:
-    - "Model uses ResNet-50 backbone"
-    - "Trained for 200 epochs with cosine annealing"
-  missing_placeholder:
-    - "Ablation study results on module size"
+      type: newly_run | preexisting_artifact | author_provided | user_claim
+      content_kind: method | protocol | result | rationale | hypothesis | literature
+      source_locator: string       # 文件+位置，或作者提供的消息/附件
+      fact: string
+      verification_status: verified | unverified | conflicting | unavailable
+      verified_against: string | null
+      conditions: string           # 数据集、划分、单位、实际运行配置等
+      relevant_sections: [string]
+  conflicts:
+    - description: string
+      source_locators: [string]
+      author_decision_needed: boolean
+  missing:
+    - item: string
+      affected_sections: [string]
+      suggested_material: string
+      writing_use: string
+  execution_records: []             # 仅经授权执行时填命令、授权范围、产物
 ```
+
+不得返回论文段落。结果数字与单位、分母、汇总方式和划分一起记录；不知道的字段标明未确认，不按领域惯例填补。没有代码仓库时也可盘点作者表格、笔记与草稿，不强制请求 repo_path。

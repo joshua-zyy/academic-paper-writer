@@ -1,18 +1,7 @@
-# Venue Research Output Contract
+# Venue Brief 输出
 
-## full-venue-research
+full 返回官方要求和适用风格观察；requirements-only 返回官方要求及未知项；style-only 返回实际读到的章节观察，不伪装官方要求。
 
-- venue-brief.md 包含：citation format, length/page limits, section expectations, anonymization, figures/tables, reproducibility/artifact expectations, source confidence, fetch timestamp
-- 投稿要求调研结果（标注来源）
-- 写作风格分析结果（基于已录用论文观察）
+每项含内容、来源、年份/读取时间和确认状态。分清影响正文的结构/篇幅/声明/引用样式，及暂不执行的模板/提交文件要求。样例引用数量只是建议，未知不默认35。
 
-## requirements-only
-
-- 投稿要求列表（标注来源 + fetch 时间戳）
-- 缺失信息标注为 `[UNVERIFIED: ...]`
-
-## style-only
-
-- 写作风格分析报告
-- 基于本地风格参考文献库的观察
-- 不与官方指南矛盾
+编排调用只返回 Markdown 内容与 suggested_output_path，主笔写入；独立请求文件可写指定路径。信息不足不阻塞其他写作，明确需后续核对。

@@ -1,6 +1,6 @@
 # QA Contract: 交付前 QA 检查清单
 
-`chart-from-data` 和 `figure-audit` 模式中使用。逐项检查，所有关键项 pass 方可交付。
+`chart-from-data` 和 `figure-audit` 模式中使用。实际检查记录 pass/fail/not_checked/na；关键失败先修复，无法修复则如实降级交付，不声称通过。未做统计检验、无误差数据时不编标注，相关项按适用性记录。还需检查图与正文/图注数字、单位、比较对象一致。
 
 ## Chart QA 检查清单
 

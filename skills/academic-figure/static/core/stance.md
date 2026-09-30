@@ -15,7 +15,7 @@ Before plotting or prompting, establish:
 1. `Core conclusion`: the one-sentence claim the figure supports.
 2. `Evidence chain`: data, artifacts, or manual figure evidence behind each panel.
 3. `Panel mapping`: each panel's unique role; remove redundant panels.
-4. `Reviewer risk`: what a skeptical reviewer may challenge.
+4. `Consistency`: numeric values, units, conditions and caption/body mapping.
 5. `Export bundle`: script, source data, vector output, caption, and QA report.
 
 ## 不可协商规则
@@ -34,8 +34,8 @@ Before plotting or prompting, establish:
 
 | 🟢 Green — Direct | 🟡 Yellow — Cautious | 🔴 Red — Forbidden |
 |---|---|---|
-| Auto-select axis ranges from data | Auto-preset significance level (must confirm) | Invent data or network structures |
-| Apply colormap rules (academic palette, fonts) | Guess missing statistics | Output final publication version without review |
+| Auto-select axis ranges from data | Use supplied significance annotations only after checking their meaning | Invent data or network structures |
+| Apply colormap rules (academic palette, fonts) | Record missing statistics as unavailable | Guess missing statistics or claim unperformed QA |
 | Add panel labels (a/b/c/d) | Auto-choose chart type (must confirm ambiguous requests) | Use 3D bar charts instead of 2D |
 | Standard layout and alignment | Merge separate charts into multi-panel | Use colorblind-unfriendly palettes |
 | Detect missing dependencies and prompt install | Mark model diagrams as manual figure needs | Treat placeholder images as final output |

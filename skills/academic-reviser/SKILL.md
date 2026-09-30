@@ -1,55 +1,25 @@
 ---
 name: academic-reviser
-description: "Self-review, audit, or verify CS/AI/ML paper drafts as a critical peer reviewer. Three-round review (evidence→argument→style) with Verification Status and debt tracking. Use when: reviewing a paper draft before submission, checking evidence compliance of claims, simulating peer reviewer feedback, verifying citation closure and evidence debts, performing cross-section consistency checks. Triggers on: self review, 自查, verification, 审稿, evidence compliance, peer review, 论文审查, draft audit, 验证论文, 检查引用, cross-section review, 审修, draft verification."
+description: "验收 CS/AI/ML 论文内容稿、章节或段落，检查论文级表达、假大空、逻辑断链、数据/叙事一致性、协议描述、解释性引文与图文引用。返回有定位依据的问题与修复条件，不改正文、不模拟审稿人、不评判创新性或录用。用于论文检查、全文验收、章节自查、draft audit、引用检查、修订复核。"
 ---
 
-# Academic Reviser
+# Academic Reviser — 产物验收
 
-将此 skill 视为"挑剔审稿人代理"——像 peer reviewer 一样审查草稿，按证据→论证→风格三轮顺序执行。
+1. 读 manifest 与 always_load；按 scope 选择资源，不强制三轮。
+2. 确认实际看到的版本与范围、可读证据及不可查项。局部任务不要求整篇 intake。
+3. 读当前正文/图表与相关来源，不拿上轮 verdict 替代本轮检查。
+4. 检查后输出 `../shared/schemas/verification-report.md`，每条问题有位置、依据、修复条件。
+5. 主 agent 修订；本角色只 recheck 受影响部分，不返回修订稿。
 
-## Router Protocol
-
-1. Read `manifest.yaml`. It declares `always_load` files, `axes`, and `references.on_demand`.
-2. Read every file listed under `always_load`. These are the skill's binding rules — not reference material.
-3. Apply the loaded material as constraints:
-   - `stance.md` defines non-negotiable rules, bounded assessment, termination conditions, and scope.
-   - `red-lines.md` defines absolute prohibitions. Do not negotiate these.
-   - `output-contract.md` defines deliverables, debt types, and Verification Status format.
-   - `anti-patterns.md` defines known failure modes, correct alternatives, and self-deception signals.
-4. Detect the mode using the manifest's `mode` axis. When input materials are incomplete, declare a Bounded Assessment before proceeding.
-5. Echo the selected mode to the user before executing.
-6. Reach for `references/` only when the manifest's `references.on_demand` condition is satisfied.
-
-Debt types tracked: `prose_debt`, `section_contract_debt`, `citation_debt`, `evidence_debt`, `figure_debt`, `protocol_debt`, `result_debt`, `rationale_debt`. Schema: `skills/shared/schemas/verification-report.md`.
-
-## Modes
-
-| Mode | Use when |
+| scope | 用途 |
 |---|---|
-| `full-section-review` | Complete 3-round review + Verification for a single section |
-| `cross-section-review` | Cross-section consistency check |
-| `verification-only` | Verdict only, no re-review |
-| `targeted-review` | Specific issue (e.g. citation closure only) |
-| `targeted-evidence-mode` | Evidence compliance only (orchestrator Step 9.5) |
-| `mock-reviewer-package` | Optional pre-submission 3-reviewer package |
+| section | 章节已有正文/框架的适用检查 |
+| manuscript | 全文整合后跨节与整体检查 |
+| targeted | 作者指定的一段、引用、图注或问题 |
+| recheck | 已报告问题修复后的定向复核 |
 
-## Agent Dispatch
+先查事实与一致性，再看逻辑与表达；不是三个必须反复执行的轮次。协议只查交代清楚、来源一致，不判断研究方法是否最优。min_citations 只是建议。
 
-`agents/reviser_agent.md` dispatched by orchestrator at Step 9.5 or Step 9.8. Subagent returns structured review content; must not modify project files or invent reviewer identities, experiments, citations, or unprovided evidence.
+验收职责包括：非论文级表述、空泛夸赞/泛论、论证断链、数据/叙事冲突、协议描述缺项、解释与文献内容支持关系及矛盾、过度防御与重复、参考文献及图文错误。不以词语黑名单或自评分替代具体依据。
 
-## Independent Use
-
-| Input | Mode | Priority | Behavior |
-|---|---|---|---|
-| Section draft | full-section-review | 2 (path trigger) | Full 3-round review |
-| Multiple sections | cross-section-review | 2 (path trigger) | Consistency only |
-| "只用 verdict" | verification-only | 1 (explicit) | Verdict only |
-| Specific issue | targeted-review | 1 (explicit) | Targeted check |
-| Evidence focus | targeted-evidence-mode | 1 (explicit) | Evidence compliance |
-| "审稿包" / pre-submission | mock-reviewer-package | 1 (explicit) | Optional reviewer package |
-
-| Scenario | Recommended |
-|---|---|
-| Just reviewing a draft | This skill (standalone) |
-| During paper drafting | academic-paper-writer orchestrator |
-| After polishing pass | academic-polishing → this skill |
+局限通常在 Discussion 适度集中；不能强制 Results 每段加局限声明。明确缺陷 fix、作者缺材料 author_input、偏好 suggestion 分开。连续两轮同问题无实质进展交作者，不无限循环。

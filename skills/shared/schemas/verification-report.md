@@ -1,88 +1,42 @@
-# Verification Report Schema — 跨技能数据契约
+# 验收报告契约（source of truth）
 
-**本文件为权威版本（source of truth）。**
-
-**用途**: 审修技能到论文编排器之间的验证状态交换格式。
-**生产者**: `academic-reviser`
-**消费者**: `academic-paper-writer` (Step 9.8, Step 10)
-
-## 结构
+生产者：academic-reviser。消费者：主 agent。验收只检查本次 scope 的产物，不评判创新性、录用或实验方法学优劣。
 
 ```yaml
 verification_report:
-  section: string
-  verdict: enum               # passed / failed / blocked
-  overall_score: integer      # 1-10, 快速质量指示
+  scope: section | manuscript | targeted | recheck
+  target: string                 # 章节 ID、全文或问题 ID
+  draft_version: string          # 当前文件版本或内容标识
+  verdict: passed | needs_revision | needs_author_input
   checks_run:
     - check_id: string
-      check_name: string
-      status: enum            # pass / fail / na
+      status: pass | fail | not_checked | na
       details: string
-  prose_debt: enum            # open / closed
-  section_contract_debt: enum # open / closed
-  citation_debt: enum         # open / closed
-  evidence_debt: enum         # open / closed
-  figure_debt: enum           # open / closed
-  protocol_debt: enum         # open / closed
-  result_debt: enum           # open / closed
-  rationale_debt: enum        # open / closed
-  thin_draft: boolean
-  frozen_claims:              # 仅 blocked 时有
-    - claim: string
-      reason: string
-      safe_to_continue: boolean
-  remaining_issues: string[]
-  iteration_count: integer
-  next_action: string         # continue_revision / advance_section / wait_external
+  issues:
+    - issue_id: string
+      category: prose | logic | consistency | protocol_description | citation | figure
+      disposition: fix | author_input | suggestion
+      location: string           # 文件+章节/段落/图表定位，不能编造行号
+      problem: string
+      basis: string              # 具体原文/来源/质量要求
+      acceptance_condition: string
+      affected_sections: [string]
+  checked_sources: [string]
+  unchecked_items: [string]
+  next_action: revise | advance | ask_author
 ```
 
-## 字段说明
+## 判定
 
-| 字段 | 含义 | 判定标准 |
-|------|------|---------|
-| `overall_score` | 整体质量评分（1-10） | 9-10: 所有 debt 闭合，内容充实; 7-8: 硬 debt 闭合，少量可改进; 5-6: 主要 debt 闭合，中等改进空间; 3-4: 部分 debt 未闭合; 1-2: 多个 debt 未闭合 |
-| `prose_debt` | 文体质量缺口 | `academic-polishing` Step 9.6 输出 |
-| `section_contract_debt` | 章节论证功能缺口 | 缺少对应 section 的 required moves、reader-state 转换或 evidence hooks |
-| `citation_debt` | 引用缺口 | 正文中存在未闭合 `[REF_NEEDED]` 或裸 claim |
-| `evidence_debt` | 证据缺口 | 存在无证据支撑的 claim 或 `[RESULT_UNVERIFIED]` |
-| `figure_debt` | 图表缺口 | 存在未替换的 `[FIGURE_NEEDED]` 或 `[TABLE_NEEDED]` |
-| `protocol_debt` | 实验协议缺陷 | 实验协议细节不可确认或混入领域默认值 |
-| `result_debt` | 实验结果缺口 | 缺实验结果、表格或指标 |
-| `rationale_debt` | 设计动机缺口 | 核心模块缺设计动机/预期收益/边界说明 |
-| `thin_draft` | 内容过薄 | Expansion Pass 判定 |
+- 存在 `fix` → `needs_revision`。主 agent 修复，验收者只复核问题及受影响范围。
+- 无 `fix`，但存在 `author_input` → `needs_author_input`。材料缺失或未解决事实冲突不能伪装通过；不受影响部分继续。
+- 其余 → `passed`，可保留 `suggestion`。未查项目显式列出，通过只适用于已声明 scope。
+- 引用数量低于建议值、纯风格偏好、可选扩展实验不是失败项。
+- 协议检查是否交代清楚并与材料一致，不评价实验是否最优或要求额外研究。
+- 同一问题连续两轮无实质进展，保留 issue 并交作者决定，不输出新 verdict 枚举、不无限循环。
 
-**通过条件**：
-- `verdict = passed` 要求所有硬 debt 闭合（`prose_debt = closed`、`section_contract_debt = closed`、`citation_debt = closed`、`evidence_debt = closed`、`protocol_debt = closed`、`result_debt = closed`、`rationale_debt = closed`）且 `thin_draft = no`。
-- `figure_debt` 为软发布债务：`figure_debt = open` 不单独阻止当前 section `passed`，但必须进入 Step 9 或外部阻塞清单；最终稿交付前必须处理或显式标记为外部阻塞。
-- `thin_draft = yes` 时：若可通过扩写解决，verdict = `failed`；若需外部证据，verdict = `blocked`。
+## 交付状态与验收分离
 
-## 示例
+任务交付使用 `delivery_level: usable_draft | partial_draft | structured_outline`，由主 agent 根据实际内容判断；不是验收 verdict。
 
-```yaml
-verification_report:
-  section: method
-  verdict: failed
-  checks_run:
-    - check_id: C001
-      check_name: "evidence_consistency"
-      status: pass
-      details: "All claims match experiment data"
-    - check_id: C002
-      check_name: "citation_completeness"
-      status: fail
-      details: "Missing citation for backbone claim"
-  prose_debt: closed
-  section_contract_debt: closed
-  citation_debt: open
-  evidence_debt: closed
-  figure_debt: open
-  protocol_debt: closed
-  result_debt: closed
-  rationale_debt: closed
-  thin_draft: false
-  remaining_issues:
-    - "Module B design rationale needs supporting citation"
-    - "Architecture figure placeholder not yet replaced"
-  iteration_count: 1
-  next_action: continue_revision
-```
+`usable_draft` 有实质论证与正文；`partial_draft` 已有正文加局部框架；`structured_outline` 以框架和补充建议为主。任何等级均附未解决项，不表示投稿就绪。接受带缺口交付不改变原问题状态。

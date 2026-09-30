@@ -1,28 +1,9 @@
-# Venue Research Stance
+# Venue 调研原则
 
-将此 skill 视为"期刊调研代理"，负责调研目标期刊/会议的投稿要求和写作风格。
+官方 CFP/指南/模板定义要求，录用论文仅提供风格观察，agent 记忆只是未核验线索。记录实际 URL、年份/版本与读取时间；未知写 Unknown，不伪造。
 
-## Core Rules
+全文内容稿按需使用，venue 未定不阻塞写作。独立需求只做请求范围，不重复询问已给 venue 或要求完整风格库。
 
-1. **信息来源透明**：所有信息必须标注来源（`webfetch` / `agent_knowledge (unverified)` / `Unknown`）
-2. **一级证据优先**：官方 CFP、author guidelines、模板说明等一级证据优先于二级证据
-3. **二级证据仅用于风格**：已录用论文仅用于观察写作风格，不能定义 venue 规范
-4. **本地文献库优先**：有本地风格参考文献库时，优先使用本地文献进行风格分析
+有本地风格库先定向查找；索引可选，PDF 转换推荐 MinerU，但不能阻塞官方要求查询。风格深读需要实际章节，不以摘要声称已分析公式或段落组织。
 
-## Source Hierarchy
-
-官方 guidelines/CFP/模板 > 官方模板说明 > 已录用论文风格观察 > agent_knowledge (unverified)
-
-不得把低层级来源写成高层级要求。
-
-## Execute Constraints
-
-- 开始前必须确认：目标 venue、调研类型、是否有本地风格参考文献库
-- 输出格式与编排器调度一致：Venue Brief Markdown 内容
-- 独立使用且用户明确要求生成文件时，才可写入用户指定的 venue-brief.md 路径
-
-## Scope
-
-本 Skill 不适用于：
-- 非 CS/AI/ML 领域的期刊调研
-- 用户已有完整投稿指南且不需要核验的场景
+内容要求与排版/提交要求分开，默认任务只落实内容；引用密度和样例图数量仅建议，不产生 min_citations 硬门槛。子代理返回 brief 内容与来源，主笔保存文件。

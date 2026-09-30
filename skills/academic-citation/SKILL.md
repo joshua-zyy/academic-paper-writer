@@ -1,64 +1,24 @@
 ---
 name: academic-citation
-description: "Search, verify, and map citations for CS/AI/ML papers. Produces VERIFIED/UNVERIFIED reference lists with Citation-to-Claim maps and Exemplar Sets. Use when: finding references for a paper section, verifying citation accuracy, building exemplar sets for introduction/related work learning, checking if existing citations are real and accurate, supplementing local literature library. Triggers on: 找引用, 文献检索, citation pass, find references, reference check, 补文献, citation verification, Exemplar Set, search papers, verify citation, 核验文献, 查引用, literature search, reference verification, citation verification with reading, 引用确认, 全文阅读验证."
+description: "检索、阅读和核验 CS/AI/ML 文献，分别确认文献身份与原文对主张的支持，提供可定位引用映射。本地文献库优先，支持单条核验、局部补引用、解释性分析引用复查及全文引用整理。用于找引用、文献检索、引用确认、全文阅读验证、citation pass、reference check 或 exemplar 学习。"
 ---
 
 # Academic Citation
 
-将此 skill 视为"文献取证代理"，而不是搜索结果搬运器。
+1. 读 manifest 与 always_load，按当前请求选 workflow，复用已确认目标和已读证据。
+2. 全文或本地建库任务启动时主动建议 MinerU PDF→MD，提供 scripts/convert-pdfs-to-md.py 用法；API 上传敏感材料需确认。局部元数据核验无需全文转换。
+3. 有本地材料先检索；有索引用索引，无索引定向搜索文件名/可读内容，不因缺 `_index_ref.json` 全局暂停。所需原文不可读时明确该主张未核验，可建议转换。
+4. 身份状态使用 verified-references 契约；正文内容支持使用 citation-to-claim-map 契约。身份确认不能替代原文阅读与支持范围。
+5. 子代理只返回证据与建议，主 agent 决定采用并整合正文。读者数量按内容/能力安排，独立工作并行，不固定配额或每节重读全部库。
+6. 局部调用只做指定任务；未知 venue、无全篇证据包不阻塞。元数据核验不追加检索，除非解决具体冲突。
 
-## Router Protocol
-
-1. Read `manifest.yaml`. It declares `always_load` files, `axes`, and `references.on_demand`.
-2. Read every file listed under `always_load`. These are the skill's binding rules — not reference material.
-3. Apply the loaded material as constraints:
-   - `stance.md` defines non-negotiable rules, source/inference boundary, and scope.
-   - `red-lines.md` defines absolute prohibitions. Do not negotiate these.
-   - `output-contract.md` defines deliverables per mode.
-   - `anti-patterns.md` defines known failure modes and their correct alternatives.
-4. If the user wants to use a local literature library, first distinguish:
-   - `local_ref_md_dir`: an existing Markdown library containing `_index_ref.json`.
-   - `local_ref_pdf_dir`: a PDF directory, or any local library directory that lacks `_index_ref.json`.
-5. For `local_ref_pdf_dir`, stop before citation search. Tell the user to register a MinerU API token, set `MINERU_API_TOKEN`, run `scripts/convert-pdfs-to-md.py`, and return only after they confirm PDF→MD completion. Do not proceed to local reading until the generated MD directory has `_index_ref.json`.
-6. Detect the workflow using the manifest's `workflow` axis. Literature reading output must separate source quotes from agent inference; only `source: 原文` or `source: 图片` content may be used as citation evidence.
-7. Echo the selected mode to the user before executing.
-8. Reach for `references/` only when the manifest's `references.on_demand` condition is satisfied.
-
-## Modes
-
-| Mode | Use when |
+| workflow | 用途 |
 |---|---|
-| `full-citation-pass` | Complete coverage for a full paper or core section |
-| `targeted-citation-search` | Specific claim, section, or topic |
-| `exemplar-set-only` | Build Exemplar Set only, not full citation list |
-| `citation-verification` | Verify metadata of existing candidate list |
-| `local-citation-pass` | Local MD library first, then web supplement |
-| `citation-verification-with-reading` | Full-text reading after paper draft completion |
+| full-citation-pass | 全文必要背景、方法、数据、解释支持 |
+| targeted-citation-search | 一个主张或章节补引用 |
+| citation-verification | 已有条目身份字段核对 |
+| citation-verification-with-reading | 核对引用是否支持正文陈述 |
+| local-citation-pass | 本地优先定向阅读后补公开来源 |
+| exemplar-set-only | 学习章节组织，非复制原文 |
 
-## Agent Dispatch
-
-| Agent | Purpose |
-|---|---|
-| `agents/citation_agent.md` | Literature search strategy (4-class query templates, output schema) |
-| `agents/literature-reader-agent.md` | Literature reading & extraction (MD full-text → LiteratureReadingReport) |
-
-Dispatched by `academic-paper-writer` orchestrator at Step 3. Subagents search and verify only; they must not modify project files or write paper prose independently. `literature-reader-agent` is dispatched in parallel by `citation_agent` or the orchestrator at Step 3a/3b.
-
-## Independent Use
-
-| Input | Mode | Priority | Behavior |
-|---|---|---|---|
-| Section + keywords | full-citation-pass | 1 (explicit) | Full 6-step workflow |
-| Citation list / seed papers | citation-verification | 1 (explicit) | Metadata only, no extra search |
-| `local_ref_md_dir` provided and `_index_ref.json` exists | local-citation-pass | 2 (path trigger) | Local MD + batch parallel reader agent dispatch |
-| Local PDF library path provided, or local path lacks `_index_ref.json` | pdf2md-preflight | 1 (blocking preflight) | Instruct MinerU setup and script command; wait for user confirmation |
-| Section only | targeted-citation-search | 3 (single feature) | Auto-keyword, 4-class query |
-| Explicit Exemplar Set request | exemplar-set-only | 1 (explicit) | Exemplar Set only |
-
-**Multi-condition**: lower priority number wins.
-
-| Scenario | Recommended |
-|---|---|
-| Just searching/verifying citations | This skill (standalone) |
-| Integrating into paper drafting | academic-paper-writer orchestrator |
-| Existing draft needs citation review | This skill → academic-reviser |
+按需读 references/verification-protocol.md 与 workflow-citation-pass.md。min_citations 仅建议，不为达标堆引用。citation_audit.py 只查 numeric 结构，退出0也不是身份或内容支持通过；author-year 明确未检查。

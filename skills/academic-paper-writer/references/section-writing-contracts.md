@@ -14,7 +14,9 @@ For the current section, create a brief contract before writing prose:
 
 If a required move lacks evidence, keep an explicit placeholder such as `[REF_NEEDED: ...]`, `[RESULT_NEEDED: ...]`, `[TABLE_NEEDED: ...]`, or `[METHOD_DETAIL_NEEDED: ...]`. Do not hide missing evidence through smoother prose.
 
-**Citation format**: All inline citations must use numeric style `[1]`, `[2]`, `[3]` (e.g., `[1]`, `[2-4]`, `[1,3,5]`). Author-year format (e.g., "Vaswani et al. (2017)") is prohibited.
+**Citation format**: Default to numeric style; follow explicit author or verified venue requirements for author-year. Maintain one shared References list.
+
+Use these moves at the requested scale, not as quotas. Local edits need only relevant checks. Missing material permits a clear framework and specific completion advice, not a global writing block.
 
 ## Abstract
 
@@ -88,7 +90,7 @@ Required moves:
 
 1. Define notation, inputs, outputs, and task formulation.
 2. Give an architecture overview before module details, with a figure placeholder when helpful.
-3. For each core or non-obvious module: state the bottleneck, design choice, mechanism, formula or pseudo-formula, expected benefit, and boundary/cost.
+3. Explain core design, mechanism and author-provided rationale; use formulas where needed. Do not require a boundary/cost sentence or formula for every module.
 4. For standard modules: state role, input/output, and operation without overclaiming novelty.
 5. Describe training objective, optimization, inference procedure, and any aggregation or thresholding.
 
@@ -110,14 +112,14 @@ Required moves:
 2. Define evaluation metrics and why they fit the task.
 3. List baselines and explain implementation source or tuning protocol.
 4. Report training details, hyperparameters, compute, seeds, and selection criteria.
-5. State protocol risks, such as single-run evaluation, internal validation only, missing external data, or incomplete baselines.
+5. Identify missing actual protocol details for author completion; discuss necessary limitations in Discussion rather than appending defensive disclaimers here.
 
 Failure checks:
 
 - Treats community defaults as if they were verified project facts.
 - Reports metrics without split strategy or class balance.
 - Compares against baselines without fairness details.
-- Hides protocol limits until the discussion.
+- Omits the actual protocol or replaces unknown details with community defaults.
 
 ## Main Results
 
@@ -129,14 +131,14 @@ Required moves:
 2. Present the main quantitative comparison with metric definitions and scope.
 3. Interpret patterns across metrics, not just the best number.
 4. Compare against baselines only within the verified protocol.
-5. State what the result supports and what it does not support.
+5. State the finding in its actual scope directly; concentrate necessary limitations in Discussion.
 
 Failure checks:
 
 - Cherry-picks one favorable metric while ignoring others.
 - Converts internal validation into external generalization.
 - Uses "outperform" or "SOTA" without complete, fair comparison.
-- Gives numbers with no source path or evidence type.
+- Gives numbers without traceability in the evidence record; internal paths/types do not belong in paper prose.
 
 ## Ablation And Analysis
 
@@ -193,19 +195,8 @@ Failure checks:
 - Introduces new evidence, citations, or claims.
 - Ends with inflated claims that were not earned by the experiments.
 
-## Contract Gate
+## Scope and sufficiency check
 
-Before a section can enter prose polishing, confirm:
+Check the argumentative function against available material. Repair missing transitions when facts exist; otherwise retain a clearly identified outline/placeholder and describe the material needed. No mandatory paragraph/cluster count, citation minimum, optional ablation, or global evidence-closure gate.
 
-- The required moves for that section are present or explicitly marked as missing.
-- Each strong claim has a citation, artifact, result, figure/table, or placeholder.
-- **当前节引用就绪检查**（强制）：
-  - 本检查只判断当前 section 的关键 claims 是否具备可起草的引用基础；不执行全文 `min_citations` 统计。
-  - 每个关键 claim 必须满足以下至少一项：有 VERIFIED 引用并映射到 Citation-to-Claim Map；有项目证据支撑且无需外部文献；或保留明确 `[REF_NEEDED: ...]` debt。
-  - Step 8 中的引用数量范围仅作为 planning target 和补充检索提示，不是 Contract Gate 的硬阈值。
-  - Introduction / Related Work 若无法形成 VERIFIED references、Citation-to-Claim Map、work clusters 或 exemplar support，保持 blocked 并回退 Step 6b。
-  - Method / Results / Discussion / Conclusion 可在少量 `[REF_NEEDED]` debt 已显式记录时继续，但 `citation_debt` 必须保持 open，后续 Verification 不得伪装为 passed。
-- The section's first and last paragraphs change the reader state in the intended direction.
-- The section does not rely on fluent prose to conceal open evidence_debt, rationale_debt, result_debt, or protocol_debt.
-- All inline citations use numeric `[1]` format consistently; no author-year citations exist in the prose.
-- **引用列表约束**：全稿仅维护一份文末引用列表（References section），各节不得单独列出该节引用列表。正文中仅使用 inline citation marker（如 `[1]`, `[2-4]`），不再在各节末尾重复列出参考文献。
+Key factual prose links to author materials or located evidence. External claims use identity-checked references with a separate content-support mapping. Do not hide gaps with fluent prose or convert author hypotheses into findings. Acceptance follows the shared verification-report contract, not a second debt system.

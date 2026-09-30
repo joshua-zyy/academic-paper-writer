@@ -1,39 +1,9 @@
-# Experiment Stance
+# 实验取证原则
 
-将此 skill 视为"实验取证代理"，目标是建立最短且可信的证据链，而不是尽量多跑实验。
+默认只读，目标是为写作找准现有事实，不尽量多跑实验。作者结果可忠实使用并记录未独立复核状态，不要求 newly_run 优先。
 
-## Non-Negotiable Rules
+来源类型与核验遵循共享证据策略。记录实际配置、数据划分、指标定义、单位、聚合粒度、结果位置。正文不嵌入路径和 newly_run 标签，溯源留在证据记录。
 
-1. 区分三类证据，语义对齐到 `../shared/core/evidence-policy.md`：`newly_run`、`preexisting_artifact`、`user_claim`。只把前两类当作可直接引用的证据。
-2. 正文中的定量结果优先来自 `newly_run`。若无法重跑，可用 `preexisting_artifact` 但必须标注来源与限制。
-3. 不能运行则明确报告阻塞点、已尝试命令和缺失条件，不得伪装成"已验证"。
-4. 先验证环境 → 再跑最小可复核命令（如评估已有 checkpoint） → 只有在确有必要时才重训。不得一上来就 full training。
-5. 写结果时先交代 split 和 aggregation level，再给数字。不得跳过协议直接报指标。
+协议闭合指交代清楚且来源一致，不对研究方法学评分或自动要求外部测试、三基线、多种子。事实矛盾附双方定位，核对最终运行材料，仍不明由作者确认。
 
-## Evidence Type Annotation
-
-- `newly_run`：本轮 session 中实际运行产生的证据。优先使用，标注运行时间戳。
-- `preexisting_artifact`：仓库中已有但非本轮运行的证据。必须标注来源路径、产生时间（或版本）、已知限制。
-- 正文中的每个数值结果必须在括号内或脚注中标注证据类型，例如："准确率 86.58%（newly_run，2026-05-10）"或"AUC 0.9314（preexisting_artifact，见 experiments/run_logs/exp001.log）"。
-
-## Failure Degradation
-
-运行失败时按以下优先级降级，不得伪装结果：
-
-- **环境问题**：报告环境检查结果 → 用户确认安装后重试 → 拒绝安装则降级
-- **代码不可执行**：有可用 artifact → 降级为 preexisting_artifact 模式；无可用 artifact → 降级为 inventory_only
-- **运行成本过高**：建议有限集评估 → 用户确认执行最小化；拒绝则降级为 preexisting_artifact 模式
-- 任意路径下：记录已尝试命令、标出缺失项；不得因运行受阻而将旧草稿数字重新包装为已验证结果
-
-## Execute Constraints
-
-- 开始前必须确认：repo_path（默认检测当前目录）、运行模式（minimal/full/skip_run）、超时限制（默认 30min）
-- **禁止在无用户明确许可下**：修改项目文件、安装依赖包、执行 full training
-- 输出格式与编排器调度一致：Evidence Inventory + Protocol Risks + Remaining Blockers
-
-## Scope
-
-本 Skill 不适用于：
-- 非 CS/AI/ML 领域的实验（如湿实验、临床实验）
-- 纯理论论文（无实验产物需要复核）
-- 用户明确只需要文献综述的场景
+执行必须遵循共享授权；禁止默认评估 checkpoint、重训或安装依赖。失败保留有效已有材料与缺口，不伪造复现，不扩大执行范围。

@@ -1,10 +1,7 @@
 name: academic-paper-writer
 description: >
-  Declarative routing manifest for the academic-paper-writer orchestrator. The
-  orchestrator keeps the existing Step 0-12 workflow and loads only the core
-  stance, workflow summary, output contract, and step references needed for the
-  current request.
-
+  Produce content drafts through controlled probes and artifact acceptance.
+  Reuse evidence and route local tasks without full-paper preparation.
 always_load:
   - static/core/stance.md
   - static/core/red-lines.md
@@ -15,14 +12,11 @@ always_load:
   - ../shared/core/evidence-policy.md
   - ../shared/core/non-invention-rules.md
   - ../shared/core/output-boundaries.md
-
 axes:
   mode:
     detect: |
-      Use explicit user intent first. Full paper or from-scratch requests map
-      to full-paper-planning. Single section drafting maps to section-drafting.
-      Existing draft edits map to section-revision. Citation-only and
-      experiment-only requests pass through to the corresponding sub-skill.
+      Use explicit scope. Local tasks do not enter full-paper intake.
+      Citation and experiment tasks pass through to their sub-skills.
     values:
       full-paper-planning: references/orchestration-workflow.md
       section-drafting: references/workflow-step-8-9.5.md
@@ -32,62 +26,57 @@ axes:
     multi: false
   paper_type:
     detect: |
-      Determine from user input or target venue. Default to research when not
-      specified. Keep existing paper type semantics in references/paper-types.md.
+      Use author intent and materials. Missing experiments alone
+      do not make a position paper.
     values:
-      research: references/paper-types.md
-      methods: references/paper-types.md
-      algorithmic: references/paper-types.md
-      review: references/paper-types.md
+      empirical: references/paper-types.md
+      theory: references/paper-types.md
+      survey: references/paper-types.md
+      reproducibility: references/paper-types.md
+      position: references/paper-types.md
     multi: false
   section:
-    detect: |
-      Detect requested section from user wording or current section queue.
-      Load section contracts when drafting or revising a section.
+    detect: Use canonical IDs; ablation is an optional results subsection.
     values:
-      abstract: references/section-writing-contracts.md
       introduction: references/section-writing-contracts.md
-      related-work: references/section-writing-contracts.md
+      related_work: references/section-writing-contracts.md
       method: references/section-writing-contracts.md
-      experiments: references/section-writing-contracts.md
+      experimental_setup: references/section-writing-contracts.md
+      results: references/section-writing-contracts.md
       discussion: references/section-writing-contracts.md
       conclusion: references/section-writing-contracts.md
+      abstract: references/section-writing-contracts.md
     multi: true
   language:
-    detect: |
-      Use the user's requested writing language. If unspecified, ask during
-      Step 1 as part of the existing context confirmation gate.
+    detect: Reuse the requested language; ask only if it affects the result.
     values:
       en: references/writing-guidelines.md
       zh: references/writing-guidelines.md
       zh-to-en: references/writing-guidelines.md
     multi: false
-
 references:
   on_demand:
-    - condition: complete orchestrator workflow, dispatch templates, and shared inputs
+    - condition: full-paper workflow
       path: references/orchestration-workflow.md
-    - condition: Step 0-7 execution and preparation gates
+    - condition: intake and initial probes
       path: references/workflow-step-0-7.md
-    - condition: Step 8 blueprint and Step 9.0-9.5 execution
+    - condition: storyline and drafting
       path: references/workflow-step-8-9.5.md
-    - condition: Step 9.6-12 execution and final gates
+    - condition: acceptance, integration, delivery or resume
       path: references/workflow-step-9.6-12.md
-    - condition: section-specific required moves and reader-state transitions
+    - condition: section argument planning
       path: references/section-writing-contracts.md
-    - condition: default section queue
+    - condition: section order and structure
       path: references/paper-structure.md
-    - condition: placeholder rules
+    - condition: missing materials
       path: references/placeholder-guide.md
-    - condition: evidence type semantics
-      path: ../shared/core/evidence-policy.md
-    - condition: figure generation rules
+    - condition: figure planning and delegation
       path: references/figure-generation-guide.md
-    - condition: iteration control and max rounds
+    - condition: repeated unresolved issues
       path: references/iteration-control.md
-    - condition: standardized todo template
+    - condition: multi-step task plan
       path: references/standard-todo-template.md
-    - condition: content density (thin draft) check
+    - condition: prose sufficiency or compression
       path: references/content-density.md
-    - condition: end-to-end examples
+    - condition: examples
       path: references/examples/example-usage.md

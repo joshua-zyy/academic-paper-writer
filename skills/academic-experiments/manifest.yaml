@@ -1,35 +1,29 @@
 name: academic-experiments
-description: >
-  Declarative routing manifest for experiment evidence audit, inventory-only
-  inspection, and minimal reproducible runs.
-
+description: Read-only evidence discovery with explicitly authorized execution.
 always_load:
   - static/core/stance.md
   - static/core/red-lines.md
   - static/core/output-contract.md
   - static/core/anti-patterns.md
   - ../shared/core/evidence-policy.md
-
+  - ../shared/core/output-boundaries.md
 axes:
   mode:
     detect: |
-      Use explicit user mode first. Repo audit requests map to
-      experiment-evidence-pass. "Only inspect" or "do not run" maps to
-      evidence-inventory-only. A concrete command or checkpoint evaluation maps
-      to minimal-reproducible-run.
+      Default to evidence-inventory-only for paths or supplied results.
+      Evidence passes remain read-only. Execution requires explicit scope.
     values:
-      experiment-evidence-pass: references/run-strategy.md
       evidence-inventory-only: references/evidence-inventory.md
+      experiment-evidence-pass: references/protocol-risks.md
       minimal-reproducible-run: references/run-strategy.md
     multi: false
-
 references:
   on_demand:
-    - condition: evidence inventory and artifact discovery
+    - condition: artifact inventory
       path: references/evidence-inventory.md
-    - condition: runtime checks or minimal reproducible command planning
+    - condition: authorized execution
       path: references/run-strategy.md
-    - condition: protocol risk assessment
+    - condition: protocol description and source conflicts
       path: references/protocol-risks.md
-    - condition: evidence inventory schema
+    - condition: evidence exchange
       path: ../shared/schemas/evidence-inventory.md
