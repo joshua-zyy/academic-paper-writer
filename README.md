@@ -1,5 +1,7 @@
 # 📝 Academic Paper Writer
 
+**简体中文** | [English](README.en.md)
+
 证据驱动 · 自动推进 · 主笔统一 · 并行取证 · 内容稿交付
 
 [项目首页](https://joshua-zyy.github.io/academic-paper-writer) · [GitHub Issues](https://github.com/joshua-zyy/academic-paper-writer/issues) · [MIT License](LICENSE)
